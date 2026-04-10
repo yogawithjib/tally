@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Yoga with Jib — Class Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans',sans-serif}
+body{background:#fafafa;min-height:100vh}
+.container{max-width:700px;margin:0 auto;padding:0 1.25rem 3rem}
+:root{--pink:#fb2a7b;--pink-light:#fff0f6;--pink-mid:#ffd0e8;--border:#ebebeb;--gray:#888;--gray-lt:#bbb}
+
+/* SHARED HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem;margin-bottom:.25rem}
+.brand-main{font-size:26px;font-weight:600;color:var(--pink);letter-spacing:-0.5px;line-height:1}
+.brand-sub{font-size:10px;font-weight:300;color:var(--gray-lt);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* STUDENT VIEW */
+.student-screen{display:block}
+.student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.s-card{border-radius:20px;padding:1.1rem 1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.s-sym{font-size:34px;line-height:1}
+.s-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.s-ring{display:flex;justify-content:center}
+.s-ring svg{overflow:visible}
+.ring-bg{fill:none;stroke:rgba(0,0,0,0.1);stroke-width:6}
+.ring-fill{fill:none;stroke-width:6;stroke-linecap:round}
+.ring-txt{font-size:15px;font-weight:600;text-anchor:middle;dominant-baseline:central;font-family:'IBM Plex Sans',sans-serif}
+.ring-lbl{font-size:9px;font-weight:300;text-anchor:middle;dominant-baseline:central;opacity:0.55;font-family:'IBM Plex Sans',sans-serif}
+.s-status{font-size:11px;font-weight:400;padding:3px 10px;border-radius:20px;margin-top:2px}
+.status-ok{background:rgba(0,0,0,0.07);color:rgba(0,0,0,0.45)}
+.status-low{background:#FFF3D6;color:#7a4800}
+.status-out{background:#FFE0EC;color:#7a0030}
+.admin-hint{text-align:center;padding:2rem 0 .5rem;font-size:11px;color:#ddd;cursor:pointer;user-select:none}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--gray-lt)}
+.empty-icon{font-size:48px;margin-bottom:10px}
+.empty-txt{font-size:13px;font-weight:300}
+
+/* LOGIN */
+.login-screen{display:none;flex-direction:column;align-items:center;padding:1.5rem 0}
+.login-box{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
+.login-label{font-size:11px;font-weight:500;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:block;text-align:center}
+.pin-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.25rem}
+.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);background:#fff;transition:all 0.15s}
+.pin-dot.filled{background:var(--pink);border-color:var(--pink)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.num-btn{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 4px;font-size:17px;font-weight:400;cursor:pointer;transition:all 0.12s;color:#111;display:flex;flex-direction:column;align-items:center;gap:1px}
+.num-btn:hover{background:var(--pink-light);border-color:var(--pink-mid)}
+.num-btn:active{transform:scale(0.95)}
+.num-btn .sub{font-size:7px;font-weight:300;color:var(--gray-lt);letter-spacing:1px}
+.num-btn.del{font-size:15px;color:var(--gray)}
+.num-btn.zero{grid-column:2}
+.login-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
+.back-btn{margin-top:1rem;background:none;border:none;font-size:12px;color:var(--gray-lt);cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif}
+.back-btn:hover{color:var(--pink)}
+.change-pin-btn{margin-top:.75rem;background:none;border:none;font-size:11px;color:var(--gray-lt);cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif}
+.change-pin-btn:hover{color:var(--pink)}
+.shake{animation:shake 0.35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* ADMIN VIEW */
+.admin-screen{display:none}
+.top-actions{display:flex;gap:8px;align-items:center}
+.icon-pill{background:#fff;color:var(--gray);border:1px solid var(--border);border-radius:50px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.icon-pill:hover{border-color:#bbb;color:#111}
+.add-pill{background:var(--pink);color:#fff;border:none;border-radius:50px;width:34px;height:34px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.15s}
+.add-pill:hover{opacity:0.85}
+.admin-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+.a-card{border-radius:20px;padding:1.1rem 1rem 1rem;position:relative;transition:transform 0.15s}
+.a-card:hover{transform:translateY(-2px)}
+.del-btn{position:absolute;top:9px;right:9px;background:rgba(0,0,0,0.11);border:none;cursor:pointer;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(0,0,0,0.4);transition:background 0.15s}
+.del-btn:hover{background:rgba(0,0,0,0.22)}
+.a-sym{font-size:32px;display:block;margin-bottom:8px;line-height:1}
+.a-name{font-size:13px;font-weight:500;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.a-ring{display:flex;justify-content:center;margin-bottom:10px}
+.a-btns{display:flex;gap:6px;justify-content:center}
+.a-btn{border:none;border-radius:10px;cursor:pointer;font-size:17px;font-weight:300;width:38px;height:34px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.55)}
+.a-btn:hover{background:rgba(0,0,0,0.17)}
+.a-btn:active{transform:scale(0.94)}
+.a-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* MODALS */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:#fff;border-radius:20px;border:1px solid var(--border);padding:1.5rem;width:340px;max-width:92vw}
+.modal-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:1rem}
+.preview-card{border-radius:14px;padding:1rem;display:flex;align-items:center;gap:12px;margin-bottom:1rem}
+.preview-sym{font-size:26px;line-height:1}
+.pname{font-size:14px;font-weight:500}
+.ppkg{font-size:11px;font-weight:300;opacity:0.6;margin-top:2px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:500;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;transition:border-color 0.15s;font-family:'IBM Plex Sans',sans-serif}
+.field input:focus{border-color:var(--pink)}
+.sym-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.sym-opt{width:100%;aspect-ratio:1;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+.sym-opt:hover{border-color:var(--pink-mid);background:var(--pink-light)}
+.sym-opt.sel{border-color:var(--pink);background:var(--pink-light)}
+.color-row{display:flex;gap:7px;flex-wrap:wrap}
+.color-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all 0.12s;flex-shrink:0}
+.color-dot.sel{border-color:#111;transform:scale(1.15)}
+.pkg-row{display:flex;gap:7px}
+.pkg-opt{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--gray);background:#fff;transition:all 0.15s}
+.pkg-opt span{display:block;font-size:10px;font-weight:300;color:var(--gray-lt);margin-top:1px}
+.pkg-opt.sel{border-color:var(--pink);background:var(--pink-light);color:var(--pink)}
+.pkg-opt.sel span{color:var(--pink)}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions button{flex:1;padding:10px;border-radius:10px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all 0.15s;font-weight:500}
+.btn-cancel{border:1px solid var(--border);background:#fff;color:var(--gray)}
+.btn-cancel:hover{border-color:#bbb}
+.btn-save{border:none;background:var(--pink);color:#fff}
+.btn-save:hover{opacity:0.88}
+.manage-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.manage-row:last-child{border-bottom:none}
+.manage-info{display:flex;align-items:center;gap:10px}
+.m-sym{font-size:20px}
+.m-name{font-size:14px;font-weight:500;color:#111}
+.m-sub{font-size:11px;font-weight:300;color:var(--gray-lt);margin-top:1px}
+.m-btns{display:flex;align-items:center;gap:6px}
+.m-btn{border:1px solid var(--border);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;color:#111}
+.m-btn:hover{border-color:#bbb}
+.m-btn.minus:hover{border-color:var(--pink);color:var(--pink)}
+.m-btn.plus:hover{border-color:#2dbd60;color:#2dbd60}
+.m-btn:disabled{opacity:0.28;cursor:not-allowed}
+.m-count{font-size:15px;font-weight:600;color:#111;min-width:22px;text-align:center}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- STUDENT VIEW -->
+<div class="student-screen" id="student-screen">
+  <div class="header">
+    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">class tracker</div></div>
+  </div>
+  <div id="student-cards"></div>
+  <div class="admin-hint" id="admin-hint" onclick="showLogin()">⚙</div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="header" style="width:100%">
+    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">admin</div></div>
+  </div>
+  <div class="login-box">
+    <span class="login-label" id="pin-label">Enter PIN</span>
+    <div class="pin-row" id="pin-row">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="numpad">
+      <button class="num-btn" onclick="numPress('1')">1<span class="sub"></span></button>
+      <button class="num-btn" onclick="numPress('2')">2<span class="sub">ABC</span></button>
+      <button class="num-btn" onclick="numPress('3')">3<span class="sub">DEF</span></button>
+      <button class="num-btn" onclick="numPress('4')">4<span class="sub">GHI</span></button>
+      <button class="num-btn" onclick="numPress('5')">5<span class="sub">JKL</span></button>
+      <button class="num-btn" onclick="numPress('6')">6<span class="sub">MNO</span></button>
+      <button class="num-btn" onclick="numPress('7')">7<span class="sub">PQRS</span></button>
+      <button class="num-btn" onclick="numPress('8')">8<span class="sub">TUV</span></button>
+      <button class="num-btn" onclick="numPress('9')">9<span class="sub">WXYZ</span></button>
+      <button class="num-btn zero" onclick="numPress('0')">0</button>
+      <button class="num-btn del" onclick="numDel()">⌫</button>
+    </div>
+    <div class="login-err" id="login-err"></div>
+  </div>
+  <button class="back-btn" onclick="showStudent()">← Back to student view</button>
+  <button class="change-pin-btn" onclick="startChangePin()">Change PIN</button>
+</div>
+
+<!-- ADMIN VIEW -->
+<div class="admin-screen" id="admin-screen">
+  <div class="header">
+    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">admin</div></div>
+    <div class="top-actions">
+      <button class="icon-pill" onclick="manageOpen()" title="Fix classes">✎</button>
+      <button class="icon-pill" onclick="showStudent()" title="Student view">👁</button>
+      <button class="add-pill" onclick="openAdd()" title="Add student">+</button>
+    </div>
+  </div>
+  <div id="admin-cards"></div>
+</div>
+
+</div><!-- /container -->
+<div class="toast" id="toast"></div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="modal" style="display:none">
+  <div class="modal">
+    <div class="modal-hd">New student</div>
+    <div class="preview-card" id="prev-card" style="background:#FFE0EC">
+      <div class="preview-sym" id="prev-sym">🌸</div>
+      <div><div class="pname" id="prev-name">Name</div><div class="ppkg" id="prev-pkg">20 classes</div></div>
+    </div>
+    <div class="field"><label>Name</label><input id="inp-name" type="text" placeholder="Student name" oninput="updatePreview()"/></div>
+    <div class="field"><label>Symbol</label><div class="sym-grid" id="sym-grid"></div></div>
+    <div class="field"><label>Color</label><div class="color-row" id="color-row"></div></div>
+    <div class="divider"></div>
+    <div class="field"><label>Package</label>
+      <div class="pkg-row" id="pkg-row">
+        <div class="pkg-opt sel" data-v="20" onclick="selPkg(this)">20<span>classes</span></div>
+        <div class="pkg-opt" data-v="30" onclick="selPkg(this)">30<span>classes</span></div>
+        <div class="pkg-opt" data-v="40" onclick="selPkg(this)">40<span>classes</span></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveStudent()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPUP MODAL -->
+<div class="modal-bg" id="topup-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-hd">Top up <span id="topup-name" style="color:var(--pink)"></span></div>
+    <div class="field" style="margin-top:4px"><label>Package</label>
+      <div class="pkg-row" id="topup-pkg-row">
+        <div class="pkg-opt sel" data-v="20" onclick="selTopupPkg(this)">20<span>classes</span></div>
+        <div class="pkg-opt" data-v="30" onclick="selTopupPkg(this)">30<span>classes</span></div>
+        <div class="pkg-opt" data-v="40" onclick="selTopupPkg(this)">40<span>classes</span></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeTopup()">Cancel</button>
+      <button class="btn-save" onclick="doTopup()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE MODAL -->
+<div class="modal-bg" id="manage-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-hd">Fix classes</div>
+    <div id="manage-list"></div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn-save" onclick="closeManage()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PIN MODAL -->
+<div class="modal-bg" id="cp-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-hd" id="cp-title">Enter new PIN</div>
+    <div style="text-align:center;margin-bottom:1rem">
+      <div class="pin-row" id="cp-row" style="justify-content:center">
+        <div class="pin-dot" id="cp-d0"></div><div class="pin-dot" id="cp-d1"></div>
+        <div class="pin-dot" id="cp-d2"></div><div class="pin-dot" id="cp-d3"></div>
+      </div>
+    </div>
+    <div class="numpad">
+      <button class="num-btn" onclick="cpPress('1')">1</button>
+      <button class="num-btn" onclick="cpPress('2')">2</button>
+      <button class="num-btn" onclick="cpPress('3')">3</button>
+      <button class="num-btn" onclick="cpPress('4')">4</button>
+      <button class="num-btn" onclick="cpPress('5')">5</button>
+      <button class="num-btn" onclick="cpPress('6')">6</button>
+      <button class="num-btn" onclick="cpPress('7')">7</button>
+      <button class="num-btn" onclick="cpPress('8')">8</button>
+      <button class="num-btn" onclick="cpPress('9')">9</button>
+      <button class="num-btn zero" onclick="cpPress('0')">0</button>
+      <button class="num-btn del" onclick="cpDel()">⌫</button>
+    </div>
+    <div class="login-err" id="cp-err"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeCp()">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+const SYMBOLS=['🧘‍♀️','🌸','⭐','🌈','🦋','🌙','🔥','🌺','🐬','🦄','🌻','🍀','🦊','🐧','🎯','🌊','🐝','🍉','🎸','🦁','🐙','🌴','🎀','🐸'];
+const COLORS=[
+  {bg:'#FFE0EC',ring:'#fb2a7b',text:'#7a0030'},
+  {bg:'#DDEEFF',ring:'#3a8fd4',text:'#0a3a6a'},
+  {bg:'#E2F7E8',ring:'#2dbd60',text:'#0a5a28'},
+  {bg:'#FFF3D6',ring:'#f5a623',text:'#7a4800'},
+  {bg:'#EDE0FF',ring:'#8b5cf6',text:'#3b0099'},
+  {bg:'#FFE8D6',ring:'#f07040',text:'#7a2800'},
+  {bg:'#D6F5F5',ring:'#20b2aa',text:'#004a48'},
+  {bg:'#F0F0F0',ring:'#888888',text:'#333333'},
+];
+
+let students = [], pin = '1234', pinInput = '';
+let selPkgVal = 20, selTopupVal = 20, topupId = null;
+let selectedSym = SYMBOLS[0], selectedColor = COLORS[0];
+
+function loadAll() {
+  try { students = JSON.parse(localStorage.getItem('yj_students') || '[]'); } catch(e) { students = []; }
+  try { pin = localStorage.getItem('yj_pin') || '1234'; } catch(e) {}
+}
+function save() {
+  localStorage.setItem('yj_students', JSON.stringify(students));
+}
+function savePin(p) {
+  localStorage.setItem('yj_pin', p);
+}
+
+/* ── SCREENS ── */
+function showStudent() {
+  document.getElementById('student-screen').style.display = 'block';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'none';
+  pinInput = ''; updateDots(['d0','d1','d2','d3'], 0);
+  document.getElementById('login-err').textContent = '';
+  renderStudent();
+}
+function showLogin() {
+  document.getElementById('student-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+}
+function showAdmin() {
+  document.getElementById('student-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  renderAdmin();
+}
+
+/* ── STUDENT RENDER ── */
+function sRing(rem, total, color) {
+  const r=30, cx=36, cy=36, circ=2*Math.PI*r;
+  const pct = Math.max(0, Math.min(1, rem/total));
+  const dash = circ*pct, gap = circ*(1-pct), offset = circ*0.25;
+  return `<svg width="72" height="72" viewBox="0 0 72 72" style="overflow:visible">
+    <circle class="ring-bg" cx="${cx}" cy="${cy}" r="${r}"/>
+    <circle class="ring-fill" cx="${cx}" cy="${cy}" r="${r}" stroke="${color.ring}"
+      stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}"
+      stroke-dashoffset="${offset.toFixed(1)}"
+      transform="rotate(-90 ${cx} ${cy})"/>
+    <text class="ring-txt" x="${cx}" y="${cy-5}" fill="${color.text}">${rem}</text>
+    <text class="ring-lbl" x="${cx}" y="${cy+9}" fill="${color.text}">classes</text>
+  </svg>`;
+}
+function renderStudent() {
+  const el = document.getElementById('student-cards');
+  if (!students.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🧘‍♀️</div><div class="empty-txt">No students yet</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="student-grid">${students.map(s => {
+    const rem = s.total - s.used, c = s.color || COLORS[0];
+    const pct = rem / s.total;
+    const statusCls = rem===0 ? 'status-out' : pct<=0.25 ? 'status-low' : 'status-ok';
+    const statusTxt = rem===0 ? 'All used' : pct<=0.25 ? 'Running low' : 'Active';
+    return `<div class="s-card" style="background:${c.bg}">
+      <div class="s-sym">${s.symbol}</div>
+      <div class="s-name" style="color:${c.text}">${s.name}</div>
+      <div class="s-ring">${sRing(rem, s.total, c)}</div>
+      <div class="s-status ${statusCls}">${statusTxt}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ── ADMIN RENDER ── */
+function aRing(rem, total, color) {
+  const r=30, cx=36, cy=36, circ=2*Math.PI*r;
+  const pct = Math.max(0, Math.min(1, rem/total));
+  const dash = circ*pct, gap = circ*(1-pct), offset = circ*0.25;
+  return `<svg width="72" height="72" viewBox="0 0 72 72" style="overflow:visible">
+    <circle class="ring-bg" cx="${cx}" cy="${cy}" r="${r}"/>
+    <circle class="ring-fill" cx="${cx}" cy="${cy}" r="${r}" stroke="${color.ring}"
+      stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}"
+      stroke-dashoffset="${offset.toFixed(1)}"
+      transform="rotate(-90 ${cx} ${cy})"/>
+    <text class="ring-txt" x="${cx}" y="${cy-5}" fill="${color.text}">${rem}</text>
+    <text class="ring-lbl" x="${cx}" y="${cy+9}" fill="${color.text}">left</text>
+  </svg>`;
+}
+function renderAdmin() {
+  const el = document.getElementById('admin-cards');
+  if (!students.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🧘‍♀️</div><div class="empty-txt">Add a student to begin</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="admin-cards">${students.map(s => {
+    const rem = s.total - s.used, c = s.color || COLORS[0];
+    return `<div class="a-card" style="background:${c.bg}">
+      <button class="del-btn" onclick="removeStudent('${s.id}')">×</button>
+      <span class="a-sym">${s.symbol}</span>
+      <div class="a-name" style="color:${c.text}">${s.name}</div>
+      <div class="a-ring">${aRing(rem, s.total, c)}</div>
+      <div class="a-btns">
+        <button class="a-btn" onclick="deduct('${s.id}')" ${rem===0?'disabled':''}>−</button>
+        <button class="a-btn" onclick="openTopup('${s.id}')">＋</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ── PIN LOGIN ── */
+function updateDots(ids, len) {
+  for (let i = 0; i < 4; i++) document.getElementById(ids[i]).classList.toggle('filled', i < len);
+}
+function numPress(n) {
+  if (pinInput.length >= 4) return;
+  pinInput += n; updateDots(['d0','d1','d2','d3'], pinInput.length);
+  if (pinInput.length === 4) setTimeout(checkPin, 120);
+}
+function numDel() {
+  pinInput = pinInput.slice(0,-1);
+  updateDots(['d0','d1','d2','d3'], pinInput.length);
+  document.getElementById('login-err').textContent = '';
+}
+function checkPin() {
+  if (pinInput === pin) { showAdmin(); }
+  else {
+    document.getElementById('login-err').textContent = 'Wrong PIN — try again';
+    document.getElementById('pin-row').classList.add('shake');
+    setTimeout(() => {
+      document.getElementById('pin-row').classList.remove('shake');
+      pinInput = ''; updateDots(['d0','d1','d2','d3'], 0);
+      document.getElementById('login-err').textContent = '';
+    }, 600);
+  }
+}
+
+/* ── CHANGE PIN ── */
+let cpStep = 'new', cpFirst = '', cpInput = '';
+function startChangePin() {
+  cpStep = 'new'; cpInput = ''; cpFirst = '';
+  document.getElementById('cp-title').textContent = 'Enter new PIN';
+  document.getElementById('cp-err').textContent = '';
+  updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
+  document.getElementById('cp-modal').style.display = 'flex';
+}
+function cpPress(n) {
+  if (cpInput.length >= 4) return;
+  cpInput += n; updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], cpInput.length);
+  if (cpInput.length === 4) setTimeout(handleCp, 120);
+}
+function cpDel() { cpInput = cpInput.slice(0,-1); updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], cpInput.length); }
+function handleCp() {
+  if (cpStep === 'new') {
+    cpFirst = cpInput; cpInput = ''; cpStep = 'confirm';
+    document.getElementById('cp-title').textContent = 'Confirm new PIN';
+    document.getElementById('cp-err').textContent = '';
+    updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
+  } else {
+    if (cpInput !== cpFirst) {
+      document.getElementById('cp-err').textContent = "PINs don't match";
+      document.getElementById('cp-row').classList.add('shake');
+      setTimeout(() => {
+        document.getElementById('cp-row').classList.remove('shake');
+        cpInput = ''; cpFirst = ''; cpStep = 'new';
+        document.getElementById('cp-title').textContent = 'Enter new PIN';
+        document.getElementById('cp-err').textContent = '';
+        updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
+      }, 700);
+      return;
+    }
+    pin = cpFirst; savePin(pin); closeCp(); toast('PIN updated ✓');
+  }
+}
+function closeCp() { document.getElementById('cp-modal').style.display = 'none'; }
+
+/* ── ADMIN ACTIONS ── */
+function deduct(id) {
+  const s = students.find(x => x.id === id);
+  if (!s || s.used >= s.total) return;
+  s.used++; save(); renderAdmin(); renderStudent();
+  toast(`${s.symbol} ${s.name} · ${s.total - s.used} left`);
+}
+function removeStudent(id) {
+  const s = students.find(x => x.id === id);
+  if (!confirm(`Remove ${s ? s.name : 'student'}?`)) return;
+  students = students.filter(x => x.id !== id); save(); renderAdmin();
+}
+function manageOpen() {
+  const list = document.getElementById('manage-list');
+  if (!students.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--gray-lt);font-size:13px;padding:1rem">No students yet</div>';
+  } else { renderManageList(); }
+  document.getElementById('manage-modal').style.display = 'flex';
+}
+function renderManageList() {
+  document.getElementById('manage-list').innerHTML = students.map(s => {
+    const rem = s.total - s.used;
+    return `<div class="manage-row">
+      <div class="manage-info"><span class="m-sym">${s.symbol}</span>
+        <div><div class="m-name">${s.name}</div><div class="m-sub">${rem} left · ${s.used}/${s.total}</div></div>
+      </div>
+      <div class="m-btns">
+        <button class="m-btn minus" onclick="adj('${s.id}',-1)" ${s.used===0?'disabled':''}>−</button>
+        <span class="m-count">${s.used}</span>
+        <button class="m-btn plus" onclick="adj('${s.id}',1)" ${s.used>=s.total?'disabled':''}>+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function adj(id, d) {
+  const s = students.find(x => x.id === id); if (!s) return;
+  s.used = Math.max(0, Math.min(s.total, s.used + d));
+  save(); renderAdmin(); renderStudent(); renderManageList();
+  toast(`${s.symbol} ${s.name} · ${s.total - s.used} left`);
+}
+function closeManage() { document.getElementById('manage-modal').style.display = 'none'; }
+
+/* ── ADD / TOPUP ── */
+function buildSymGrid() { document.getElementById('sym-grid').innerHTML = SYMBOLS.map(s => `<button class="sym-opt${s===selectedSym?' sel':''}" onclick="pickSym(this,'${s}')" type="button">${s}</button>`).join(''); }
+function buildColorRow() { document.getElementById('color-row').innerHTML = COLORS.map((c,i) => `<div class="color-dot${c===selectedColor?' sel':''}" style="background:${c.bg};border-color:${c.ring}" onclick="pickColor(this,${i})"></div>`).join(''); }
+function pickSym(el, sym) { document.querySelectorAll('.sym-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selectedSym = sym; document.getElementById('prev-sym').textContent = sym; }
+function pickColor(el, idx) { document.querySelectorAll('.color-dot').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selectedColor = COLORS[idx]; document.getElementById('prev-card').style.background = selectedColor.bg; document.getElementById('prev-name').style.color = selectedColor.text; }
+function updatePreview() { document.getElementById('prev-name').textContent = document.getElementById('inp-name').value.trim() || 'Name'; }
+function selPkg(el) { document.querySelectorAll('#pkg-row .pkg-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selPkgVal = parseInt(el.dataset.v); document.getElementById('prev-pkg').textContent = selPkgVal + ' classes'; }
+function selTopupPkg(el) { document.querySelectorAll('#topup-pkg-row .pkg-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selTopupVal = parseInt(el.dataset.v); }
+function openAdd() {
+  selectedSym = SYMBOLS[0]; selectedColor = COLORS[0]; selPkgVal = 20;
+  document.getElementById('inp-name').value = '';
+  document.getElementById('prev-sym').textContent = selectedSym;
+  document.getElementById('prev-name').textContent = 'Name';
+  document.getElementById('prev-name').style.color = selectedColor.text;
+  document.getElementById('prev-pkg').textContent = '20 classes';
+  document.getElementById('prev-card').style.background = selectedColor.bg;
+  document.querySelectorAll('#pkg-row .pkg-opt').forEach(e => e.classList.toggle('sel', e.dataset.v === '20'));
+  buildSymGrid(); buildColorRow();
+  document.getElementById('modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('inp-name').focus(), 60);
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function saveStudent() {
+  const name = document.getElementById('inp-name').value.trim(); if (!name) return;
+  students.push({ id: Date.now().toString(), name, symbol: selectedSym, color: selectedColor, total: selPkgVal, used: 0 });
+  save(); renderAdmin(); closeModal(); toast(`${selectedSym} ${name} added`);
+}
+function openTopup(id) {
+  topupId = id; const s = students.find(x => x.id === id);
+  document.getElementById('topup-name').textContent = s ? `${s.symbol} ${s.name}` : '';
+  selTopupVal = 20;
+  document.querySelectorAll('#topup-pkg-row .pkg-opt').forEach(e => e.classList.toggle('sel', e.dataset.v === '20'));
+  document.getElementById('topup-modal').style.display = 'flex';
+}
+function closeTopup() { document.getElementById('topup-modal').style.display = 'none'; }
+function doTopup() {
+  const s = students.find(x => x.id === topupId); if (!s) return;
+  s.total += selTopupVal; save(); renderAdmin(); closeTopup();
+  toast(`+${selTopupVal} for ${s.symbol} ${s.name}`);
+}
+
+let tt;
+function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2600); }
+
+document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; }));
+document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveStudent(); });
+
+loadAll();
+showStudent();
+</script>
+</body>
+</html>
