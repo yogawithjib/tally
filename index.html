@@ -356,18 +356,21 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 /* Video cards */
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* Breathing widget */
-.breath-widget{padding:1.75rem 0 2.5rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
-.breath-title{font-size:10px;font-weight:600;color:#ccc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.25rem}
-.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:1.75rem;flex-wrap:wrap}
-.bpreset{border:1.5px solid var(--bd);border-radius:20px;background:#fff;padding:5px 14px;font-size:11px;font-weight:500;color:#aaa;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .2s;user-select:none;-webkit-tap-highlight-color:transparent}
-.bpreset.on{border-color:var(--pink);color:var(--pink);background:var(--pl)}
-.breath-svg-wrap{position:relative;width:200px;height:200px;margin:0 auto 1rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.breath-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.breath-phase{font-size:12px;font-weight:500;color:var(--pink);letter-spacing:.8px;text-transform:uppercase}
-.breath-count{font-size:44px;font-weight:200;color:#111;line-height:1;margin-top:2px}
-.breath-tap{font-size:24px;margin-top:4px;opacity:.4}
-.breath-guide{font-size:11px;font-weight:300;color:#ccc;min-height:16px;letter-spacing:.3px}
-/* Responsive */
+.breath-widget{padding:2rem 0 2.5rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
+.breath-title{font-size:10px;font-weight:600;color:#ccc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.5rem}
+.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
+.bpreset{border:none;border-radius:8px;background:#f5f5f5;padding:6px 14px;font-size:11px;font-weight:500;color:#aaa;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .2s;user-select:none;-webkit-tap-highlight-color:transparent}
+.bpreset.on{background:var(--pl);color:var(--pink);font-weight:600}
+.breath-rings-wrap{position:relative;width:180px;height:180px;margin:0 auto 1.5rem;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
+.breath-ring{position:absolute;border-radius:50%;border:1.5px solid #fb2a7b;transition:transform .9s cubic-bezier(.4,0,.2,1),opacity .9s cubic-bezier(.4,0,.2,1)}
+.br1{width:60px;height:60px;opacity:.9}
+.br2{width:60px;height:60px;opacity:0;transition-delay:.08s}
+.br3{width:60px;height:60px;opacity:0;transition-delay:.16s}
+.breath-rings-center{position:relative;z-index:2;width:60px;height:60px;border-radius:50%;background:var(--pl);border:1.5px solid #fb2a7b;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .9s cubic-bezier(.4,0,.2,1),background .5s;pointer-events:none}
+.breath-phase{font-size:9px;font-weight:600;color:var(--pink);letter-spacing:.8px;text-transform:uppercase;line-height:1}
+.breath-count{font-size:22px;font-weight:300;color:#111;line-height:1.1;margin-top:2px}
+.breath-tap{font-size:18px;opacity:.35}
+.breath-guide{font-size:11px;font-weight:300;color:#ccc;min-height:16px;margin-top:.5rem}
 @media (min-width:600px){
   body{background:#f0f0f0}
   .page{max-width:520px;background:#fafafa;box-shadow:0 2px 32px rgba(0,0,0,.08);min-height:100vh;padding:0 2rem 4rem;margin:0 auto}
@@ -436,24 +439,13 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
         <button class="bpreset" onclick="setBreath(this,'478')">4-7-8</button>
         <button class="bpreset" onclick="setBreath(this,'ujjayi')">Ujjayi 4-8</button>
       </div>
-      <div class="breath-svg-wrap" id="breath-circle" onclick="toggleBreath()">
-        <svg width="200" height="200" viewBox="0 0 200 200" id="breath-svg">
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#f0f0f0" stroke-width="3"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#fb2a7b" stroke-width="3"
-            stroke-linecap="round" stroke-dasharray="503" stroke-dashoffset="503"
-            transform="rotate(-90 100 100)" id="breath-arc" style="transition:stroke-dashoffset 1s linear,stroke .5s"/>
-          <circle cx="100" cy="100" r="60" id="breath-blob" fill="url(#bgrad)" style="transition:r 0s linear"/>
-          <defs>
-            <radialGradient id="bgrad" cx="40%" cy="35%">
-              <stop offset="0%" stop-color="#ffd0e8"/>
-              <stop offset="100%" stop-color="#fb2a7b" stop-opacity=".35"/>
-            </radialGradient>
-          </defs>
-        </svg>
-        <div class="breath-center">
+      <div class="breath-rings-wrap" id="breath-circle" onclick="toggleBreath()">
+        <div class="breath-ring br3" id="br3"></div>
+        <div class="breath-ring br2" id="br2"></div>
+        <div class="breath-ring br1" id="br1"></div>
+        <div class="breath-rings-center" id="breath-core">
           <div class="breath-phase" id="breath-phase"></div>
-          <div class="breath-count" id="breath-count"></div>
-          <div class="breath-tap" id="breath-tap">🫁</div>
+          <div class="breath-count" id="breath-count"><div class="breath-tap" id="breath-tap">🫁</div></div>
         </div>
       </div>
       <div class="breath-guide" id="breath-guide">tap to begin</div>
@@ -928,6 +920,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
     <div id="stu-bank-section">
       <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="bankTitle">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
+        <div id="stu-price-row" style="display:none;background:#fff0f6;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:1px solid #ffd0e8"><div style="font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">💰 Amount to transfer</div><div id="stu-price-val" style="font-size:18px;font-weight:600;color:var(--pink)"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
         <div class="pay-bank-row">
@@ -1587,7 +1580,32 @@ async function findStudent(){
   }
   document.getElementById('find-err').textContent='';
   currentStudentData={student:found, teacher:foundTeacher};
-  renderStudentView(found, foundTeacher);
+  // Pull fresh student data from Firebase before rendering
+  try{
+    const freshStudents=await fsGetStudents(foundTeacher.id);
+    if(freshStudents.length){
+      localStorage.setItem('yj_s_'+foundTeacher.id,JSON.stringify(freshStudents));
+      const freshFound=freshStudents.find(function(x){return x.id===found.id;});
+      if(freshFound){found=freshFound;currentStudentData.student=freshFound;}
+    }
+  }catch(e){}
+  showStudentView();
+}
+
+
+async function showStudentView(){
+  if(!currentStudentData)return;
+  // Always re-fetch fresh data from Firebase
+  try{
+    const tc=currentStudentData.teacher;
+    const freshStudents=await fsGetStudents(tc.id);
+    if(freshStudents.length){
+      localStorage.setItem('yj_s_'+tc.id,JSON.stringify(freshStudents));
+      const fresh=freshStudents.find(function(x){return x.id===currentStudentData.student.id;});
+      if(fresh)currentStudentData.student=fresh;
+    }
+  }catch(e){}
+  renderStudentView(currentStudentData.student,currentStudentData.teacher);
   go('student-view-screen');
 }
 
@@ -2035,7 +2053,11 @@ function saveSaPin(p){
   if(db){db.collection('system').doc('admin').set({pin:p}).catch(function(){});}
 }
 function loadGasUrl(){try{const u=localStorage.getItem('yj_gas_url')||'';const el=document.getElementById('gas-url');if(el)el.value=u;}catch(e){}}
-function saveGasUrl(u){try{localStorage.setItem('yj_gas_url',u);}catch(e){}}
+function saveGasUrl(u){
+  try{localStorage.setItem('yj_gas_url',u);}catch(e){}
+  // Also save to Firebase so students can fetch it
+  if(db)db.collection('system').doc('config').set({gasUrl:u}).catch(function(){});
+}
 
 // Triple tap on home logo
 let _slt=0,_sltimer;
@@ -2373,12 +2395,18 @@ function resetNotify(){
 async function sendNotification(){
   if(!currentStudentData)return;
   const {student:s,teacher:tc}=currentStudentData;
-  const ct=getContact(tc.id);
+  // Always fetch contact from Firebase — student localStorage won't have teacher's contact
+  let ct={phone:'',line:'',email:'',lineToken:''};
+  try{const fc=await fsGetContact(tc.id);if(fc)ct=fc;}catch(e){ct=getContact(tc.id);}
   const amount=document.getElementById('notify-amount').value.trim();
   const note=document.getElementById('notify-note').value.trim();
-  const gasUrl=localStorage.getItem('yj_gas_url')||'';
+  // GAS URL stored in Firebase under system/config
+  let gasUrl=localStorage.getItem('yj_gas_url')||'';
+  if(!gasUrl&&db){
+    try{const doc=await db.collection('system').doc('config').get();if(doc.exists)gasUrl=doc.data().gasUrl||'';}catch(e){}
+  }
 
-  if(!ct.lineToken&&!ct.email){
+  if(!ct.email){
     document.getElementById('notify-err').textContent=
       lang==='th'?'ครูยังไม่ได้ตั้งค่าการแจ้งเตือน กรุณาติดต่อครูโดยตรง'
       :'Teacher has not set up notifications yet. Please contact them directly.';
@@ -2458,6 +2486,7 @@ function saveContact(){
     lineToken:''
   };
   saveContactData(currentTeacherId,c);
+  fsSaveContact(currentTeacherId,c);
   cm('contact-m');
   toast('Contact info saved 📱');
 }
@@ -2817,10 +2846,14 @@ function getYtId(url){
 
 function resolveThumb(thumbField,url){
   if(thumbField){
-    const driveM=thumbField.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
-    if(driveM)return'https://lh3.googleusercontent.com/d/'+driveM[1];
+    // Google Drive: try multiple URL formats
+    const driveM=thumbField.match(/[-\w]{25,}/);
+    const idFromDrive=(thumbField.includes('drive.google.com')||thumbField.includes('docs.google.com'))&&driveM?driveM[0]:'';
+    if(idFromDrive)return'https://drive.google.com/thumbnail?id='+idFromDrive+'&sz=w400';
+    // Direct image URL
     if(thumbField.startsWith('http'))return thumbField;
   }
+  // Fall back to YouTube thumbnail
   const ytId=getYtId(url);
   if(ytId)return'https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg';
   return'';
@@ -2925,7 +2958,6 @@ const BREATH_TH={
   '478':{phases:['หายใจเข้า','กลั้น','หายใจออก'],label:'4-7-8 — ผ่อนคลายและหลับ'},
   ujjayi:{phases:['หายใจเข้า','หายใจออก'],label:'Ujjayi — พลังงานและสมาธิ'}
 };
-const CIRC=2*Math.PI*80;
 let bKey='box',bRunning=false,bTimer=null,bPhase=0;
 
 function setBreath(el,key){
@@ -2943,14 +2975,38 @@ function startBreath(){
 function stopBreath(){
   bRunning=false;clearTimeout(bTimer);resetBreathUI();
 }
+function setRings(inhale,hold,dur){
+  const core=document.getElementById('breath-core');
+  const r1=document.getElementById('br1');
+  const r2=document.getElementById('br2');
+  const r3=document.getElementById('br3');
+  [r1,r2,r3].forEach(function(r,i){
+    if(!r)return;
+    r.style.transitionDuration=dur>0?(dur+i*.08)+'s':'0s';
+  });
+  if(inhale){
+    if(core){core.style.transform='scale(1.18)';core.style.background='#ffd0e8';}
+    if(r1){r1.style.transform='scale(1.8)';r1.style.opacity='.55';}
+    if(r2){r2.style.transform='scale(2.5)';r2.style.opacity='.28';}
+    if(r3){r3.style.transform='scale(3.2)';r3.style.opacity='.12';}
+  } else if(hold){
+    if(core){core.style.transform='scale(1.1)';core.style.background='#fff0f6';}
+    if(r1){r1.style.transform='scale(1.4)';r1.style.opacity='.35';}
+    if(r2){r2.style.transform='scale(1.8)';r2.style.opacity='.15';}
+    if(r3){r3.style.transform='scale(2.2)';r3.style.opacity='.07';}
+  } else {
+    if(core){core.style.transform='scale(1)';core.style.background='var(--pl)';}
+    if(r1){r1.style.transform='scale(1)';r1.style.opacity='.9';}
+    if(r2){r2.style.transform='scale(1)';r2.style.opacity='0';}
+    if(r3){r3.style.transform='scale(1)';r3.style.opacity='0';}
+  }
+}
 function resetBreathUI(){
   document.getElementById('breath-phase').textContent='';
   document.getElementById('breath-count').textContent='';
   document.getElementById('breath-tap').style.display='block';
   document.getElementById('breath-guide').textContent='tap to begin';
-  setArc(0,0);setBlobR(60,0);
-  const arc=document.getElementById('breath-arc');
-  if(arc){arc.style.stroke='#fb2a7b';}
+  setRings(false,false,0);
 }
 function runBreathPhase(){
   if(!bRunning)return;
@@ -2961,14 +3017,8 @@ function runBreathPhase(){
   const isIn=name.includes('Inhale')||name.includes('เข้า');
   const isHold=name.includes('Hold')||name.includes('กลั้น');
   document.getElementById('breath-phase').textContent=name;
-  // Arc: reset then fill over duration
-  setArc(0,0);
-  setTimeout(function(){setArc(CIRC,dur);},30);
-  // Blob size & arc colour by phase
-  const arc=document.getElementById('breath-arc');
-  if(arc)arc.style.stroke=isIn?'#fb2a7b':isHold?'#f5a623':'#8b5cf6';
-  const targetR=isIn?78:isHold?78:44;
-  setBlobR(targetR,isHold?0.3:dur);
+  // Blob visual
+  setRings(isIn,isHold,isHold?0.4:dur);
   // Countdown
   let cnt=dur;
   document.getElementById('breath-count').textContent=cnt;
@@ -2983,16 +3033,6 @@ function runBreathPhase(){
     bTimer=setTimeout(tick,1000);
   }
   bTimer=setTimeout(tick,1000);
-}
-function setArc(offset,dur){
-  const arc=document.getElementById('breath-arc');if(!arc)return;
-  arc.style.transition=dur>0?'stroke-dashoffset '+dur+'s linear':'none';
-  arc.style.strokeDashoffset=CIRC-offset;
-}
-function setBlobR(r,dur){
-  const blob=document.getElementById('breath-blob');if(!blob)return;
-  blob.style.transition=dur>0?'r '+dur+'s ease-in-out':'none';
-  blob.setAttribute('r',r);
 }
 </script>
 </body>
