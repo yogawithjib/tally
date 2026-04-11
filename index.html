@@ -1540,10 +1540,9 @@ function renderStudentView(s, tc){
       <div class="sc-teacher" style="color:${c.tx}">with ${tc?tc.name:''}</div>
       ${rem<0?`<div class='debt-banner'><div class='debt-amount'>−${Math.abs(rem)}</div><div class='debt-lbl'>${lang==='th'?'คลาสที่ค้างชำระ':'classes owed'}</div><div class='debt-note'>${lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance'}</div></div>`:`<div class='sc-ring-wrap'>${bigRing(rem,s.t,c)}<div class='sc-ring-inner'><div class='sc-rem' style='color:${c.tx}'>${rem}</div><div class='sc-lbl' style='color:${c.tx}'>${t('left')}</div></div></div>`}
       <div class="sc-status ${scl}">${stx}</div>
-      ${rem<=0?`<button onclick='openStuTopup()' style='width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน / Pay now':'Pay now'}</button>`:''}
-      <button class="topup-student-btn" onclick="openStuTopup()">
-        💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}
-      </button>
+      ${rem<0
+        ?`<button onclick='openStuTopup()' style='width:100%;padding:13px;border-radius:14px;border:none;background:var(--pink);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน / Pay now':'Pay now'}</button>`
+        :`<button class='topup-student-btn' onclick='openStuTopup()'>💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}</button>`}
       <div class="hist-section">
         <div class="hist-sec-title" style="color:${c.tx}">${t('histTitle')}</div>
         ${histHtml}
