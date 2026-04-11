@@ -3219,11 +3219,13 @@ async function loadHomeVideos(){
   if(!grid)return;
   // Show skeletons while loading
   grid.innerHTML=['','','',''].map(function(){
-    return '<div style="background:#f0f0f0;border-radius:14px;overflow:hidden;border:1px solid #ebebeb">'
-      +'<div style="aspect-ratio:16/9;background:linear-gradient(90deg,#eee 25%,#e4e4e4 50%,#eee 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>'
-      +'<div style="padding:9px 11px"><div style="height:11px;background:#e8e8e8;border-radius:4px;margin-bottom:5px"></div>'
-      +'<div style="height:9px;background:#e8e8e8;border-radius:4px;width:45%"></div></div></div>';
+    return '<div style="border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;background:#fff">'
+      +'<div style="width:100%;padding-top:56.25%;background:linear-gradient(90deg,#eee 25%,#e4e4e4 50%,#eee 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>'
+      +'<div style="padding:8px 10px"><div style="height:8px;width:40%;background:#eee;border-radius:4px;margin-bottom:6px"></div>'
+      +'<div style="height:11px;background:#eee;border-radius:4px;margin-bottom:4px"></div>'
+      +'<div style="height:9px;width:30%;background:#eee;border-radius:4px"></div></div></div>';
   }).join('');
+
   try{
     const res=await fetch(VID_GAS,{mode:'cors'});
     if(!res.ok)throw new Error('fetch failed');
@@ -3238,35 +3240,34 @@ async function loadHomeVideos(){
 
 function renderHomeVideos(grid,rows){
   const shuffled=[...rows].sort(function(){return Math.random()-.5;}).slice(0,4);
-  const accessKey='ใครดูได้บ้าง (สมาชิกระดับไหน / ฟรี)';
-  const durKey='duration (mins)';
+  const AK='ใครดูได้บ้าง (สมาชิกระดับไหน / ฟรี)';
+  const DK='duration (mins)';
+  grid.style.gridTemplateColumns='1fr 1fr';
+  grid.style.gap='10px';
   grid.innerHTML=shuffled.map(function(v){
     const url=v.url||v.URL||'';
     const thumb=resolveThumb(v.Thumbnail||v.thumbnail||'',url);
     const title=v.title||v['Full title']||'Yoga with Jib';
-    const dur=v[durKey]||v.duration||'';
-    const access=v[accessKey]||'';
+    const dur=v[DK]||v.duration||'';
+    const access=v[AK]||'';
     const link=url||'https://yogawithjib.github.io/library/videos.html';
-    const badgeBg=access==='ฟรี'?'#2dbd60':access.indexOf('ผีเสื้อ')>=0?'#fb2a7b':'#444';
-    return '<a href="'+link+'" target="_blank" style="display:block;border-radius:14px;overflow:hidden;background:#fff;border:1px solid #ebebeb;text-decoration:none;color:inherit">'
-      // Thumbnail container
-      +'<div style="position:relative;aspect-ratio:16/9;background:#f5f5f5;overflow:hidden">'
-      // Image
-      +(thumb?'<img src="'+thumb+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentNode.style.background=\'var(--pl)\';this.remove()">':'')
-      // Play button
-      +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">'
-      +'<div style="width:36px;height:36px;background:rgba(251,42,123,.88);border-radius:50%;display:flex;align-items:center;justify-content:center">'
-      +'<div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:12px solid #fff;margin-left:3px"></div>'
+    const badgeColor=access==='ฟรี'?'#2dbd60':access.indexOf('ผีเสื้อ')>=0?'#fb2a7b':'#555';
+    // Thumb section — fixed height, relative so play btn can overlay
+    const thumbHtml='<div style="position:relative;width:100%;padding-top:56.25%;background:#f0f0f0;overflow:hidden;border-radius:10px 10px 0 0">'
+      +(thumb?'<img src="'+thumb+'" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'">':'')
+      +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">'
+      +'<div style="width:34px;height:34px;background:rgba(251,42,123,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      +'<div style="width:0;height:0;border-style:solid;border-width:6px 0 6px 11px;border-color:transparent transparent transparent #fff;margin-left:2px"></div>'
       +'</div></div>'
-      // Badge (positioned top-right)
-      +(access?'<div style="position:absolute;top:7px;right:7px;background:'+badgeBg+';color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.3px">'+access+'</div>':'')
-      +'</div>'
-      // Info
-      +'<div style="padding:9px 11px 10px">'
-      +'<div style="font-size:12px;font-weight:500;color:#111;line-height:1.4;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+title+'</div>'
-      +(dur?'<div style="font-size:10px;font-weight:300;color:#aaa">'+dur+' min</div>':'')
-      +'</div>'
-      +'</a>';
+      +'</div>';
+    // Info section
+    const infoHtml='<div style="padding:8px 10px 9px;background:#fff">'
+      +(access?'<span style="display:inline-block;background:'+badgeColor+';color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;margin-bottom:5px;letter-spacing:.3px">'+access+'</span><br>':'')
+      +'<span style="font-size:12px;font-weight:500;color:#111;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+title+'</span>'
+      +(dur?'<div style="font-size:10px;color:#bbb;margin-top:3px">'+dur+' min</div>':'')
+      +'</div>';
+    return '<a href="'+link+'" target="_blank" style="display:block;border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;text-decoration:none;background:#fff;-webkit-tap-highlight-color:transparent">'
+      +thumbHtml+infoHtml+'</a>';
   }).join('');
   const t=document.getElementById('vid-sec-title');
   if(t)t.textContent=lang==='th'?'ฝึกโยคะออนไลน์':'Practice yoga online';
