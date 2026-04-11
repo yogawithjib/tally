@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Yoga with Jib</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤸🏻</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
@@ -223,15 +224,15 @@ body{background:#fafafa;min-height:100vh}
 /* SUPER ADMIN */
 .sa-screen{display:none}.sa-screen.on{display:block}
 #sa-login-screen.on{display:flex}
-.sa-login-box{background:#111;border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
-.sa-login-hd{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;text-align:center}
-.sa-login-sub{font-size:12px;font-weight:300;color:#666;text-align:center;margin-bottom:1.25rem}
-.sa-dot{width:13px;height:13px;border-radius:50%;border:2px solid #333;background:#111;transition:all .15s}
+.sa-login-box{background:#f7f7f7;border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
+.sa-login-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
+.sa-login-sub{font-size:12px;font-weight:300;color:#888;text-align:center;margin-bottom:1.25rem}
+.sa-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bd);background:#fff;transition:all .15s}
 .sa-dot.on{background:var(--pink);border-color:var(--pink)}
-.sa-nb{background:#222;border:1px solid #333;border-radius:12px;padding:12px 4px;font-size:17px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .12s;color:#fff}
-.sa-nb:hover{background:#333}.sa-nb:active{transform:scale(.95)}
-.sa-nb .ns{font-size:7px;font-weight:300;color:#555;letter-spacing:1px}
-.sa-nb.del{font-size:15px;color:#666}.sa-nb.z{grid-column:2}
+.sa-nb{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px 4px;font-size:17px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .12s;color:#111}
+.sa-nb:hover{background:var(--pl);border-color:var(--pm)}.sa-nb:active{transform:scale(.95)}
+.sa-nb .ns{font-size:7px;font-weight:300;color:var(--gl);letter-spacing:1px}
+.sa-nb.del{font-size:15px;color:var(--gr)}.sa-nb.z{grid-column:2}
 .sa-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
 .sa-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem;border-bottom:1px solid #f0f0f0;margin-bottom:1.25rem}
 .sa-title{font-size:20px;font-weight:600;color:#111}
@@ -325,10 +326,10 @@ body{background:#fafafa;min-height:100vh}
   <div class="slogin-box">
     <div class="slogin-hd" id="sl-hd">What's your name?</div>
     <div class="slogin-sub" id="sl-sub2">Type the nickname your teacher gave you</div>
-    <input class="name-input" id="student-name-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <input class="name-input" id="student-name-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="username"/>
     <button class="find-btn" id="find-btn" onclick="findStudent()">Find my classes →</button>
     <div class="find-err" id="find-err"></div>
-    <div class="find-hint" id="find-hint">Your nickname is set by your teacher.<br>Type it exactly as they added you.</div>
+    <div class="find-hint" id="find-hint">Enter your username — ask your teacher if you don't know it.</div>
   </div>
   <div class="llinks">
     <button class="llink" onclick="goHome()">← Back</button>
@@ -544,8 +545,8 @@ body{background:#fafafa;min-height:100vh}
 
 <!-- SA CHANGE PIN MODAL -->
 <div class="mbg" id="sa-cp-m" style="display:none">
-  <div class="modal" style="background:#111">
-    <div class="mhd" id="sa-cpt" style="color:#fff">New admin PIN</div>
+  <div class="modal">
+    <div class="mhd" id="sa-cpt">New admin PIN</div>
     <div style="text-align:center;margin-bottom:1rem">
       <div class="dots" id="sa-cp-dots" style="justify-content:center">
         <div class="sa-dot" id="sa-cp0"></div><div class="sa-dot" id="sa-cp1"></div>
@@ -559,7 +560,7 @@ body{background:#fafafa;min-height:100vh}
       <button class="sa-nb z" onclick="sacpp('0')">0</button><button class="sa-nb del" onclick="sacpd()">⌫</button>
     </div>
     <div class="sa-err" id="sa-cperr"></div>
-    <div class="macts"><button class="bc" onclick="cm('sa-cp-m')" style="color:#ccc;background:#222;border-color:#333">Cancel</button></div>
+    <div class="macts"><button class="bc" onclick="cm('sa-cp-m')" >Cancel</button></div>
   </div>
 </div>
 
@@ -593,7 +594,7 @@ body{background:#fafafa;min-height:100vh}
       <div class="psym" id="ps">🌸</div>
       <div><div class="pname" id="pn">Nickname</div><div class="ppkg" id="pp">10 classes</div></div>
     </div>
-    <div class="field"><label id="lbl-name-f">Nickname</label><input id="inp" type="text" placeholder="e.g. Noon, Best, Fah" oninput="upPrev()"/></div>
+    <div class="field"><label id="lbl-name-f">Nickname</label><input id="inp" type="text" placeholder="e.g. noon123, best_yoga" oninput="upPrev()"/></div>
     <div class="field"><label id="lbl-sym-f">Symbol</label><div class="sgrid" id="sg"></div></div>
     <div class="field"><label id="lbl-col-f">Color</label><div class="crow" id="cr"></div></div>
     <div class="div"></div>
@@ -892,9 +893,9 @@ const TR={
     sub:'class tracker',langBtn:'TH',hTitle:'Welcome! Who are you?',hSub:'Choose your role to continue',
     roleStudent:"I'm a student",roleStudentSub:'Check my classes',
     roleTeacher:"I'm a teacher",roleTeacherSub:'Manage students',
-    slSub:'student',slHd:"What's your name?",slSub2:'Type the nickname your teacher gave you',
-    findBtn:'Find my classes →',findHint:'Your nickname is set by your teacher.\nType it exactly as they added you.',
-    notFound:"Name not found. Check spelling or ask your teacher.",
+    slSub:'student',slHd:"Enter your username",slSub2:'Enter your username — ask your teacher if you don\'t know it',
+    findBtn:'Find my classes →',findHint:'Username ของคุณถูกตั้งโดยครู\nถ้าไม่รู้ให้ถามครูได้เลยนะคะ',
+    notFound:"Username not found. Check spelling or ask your teacher.",
     tsSub:'teacher login',tsTitle:'Select your name',tsSub2:'Then enter your PIN',
     newTeacher:"+ I'm a new teacher",
     suSub:'new teacher',suHd:'Create your account',suSub2:'Takes 30 seconds',
@@ -907,8 +908,8 @@ const TR={
     logoutBtn:'← Back',payMsg:'Your classes are all used up! 🧘‍♀️\nPlease renew your package to continue.\nTransfer to the account below and let your teacher know.',
     lblBank:'Bank',lblAcctName:'Account name',lblAcctNum:'Account number',
     copyBtn:'Copy account number',copiedBtn:'Copied ✓',
-    mhdAdd:'New student',addPrivTxt:'Use nickname only. No full names or personal details.',
-    lblNameF:'Nickname',clsLbl:'classes',pinWrong:'Wrong PIN',
+    mhdAdd:'New student',addPrivTxt:'Use a simple username. No full names, phone numbers or personal details.',
+    lblNameF:'Username',clsLbl:'classes',pinWrong:'Wrong PIN',
     bankSaved:'Bank details saved 🏦',noStudents:'No students yet',
     addToBegin:'Add a student to begin',removed:'Entry removed',
     hUsed:'used',hLeft:'remaining',confirmRemove:'Remove this entry?',
@@ -916,10 +917,10 @@ const TR={
   th:{
     sub:'ติดตามคลาส',langBtn:'EN',hTitle:'ยินดีต้อนรับ! คุณคือใคร?',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
     roleStudent:'ฉันเป็นนักเรียน',roleStudentSub:'ดูคลาสของฉัน',
-    roleTeacher:'ฉันเป็นครู',roleTeacherSub:'จัดการนักเรียน',
-    slSub:'นักเรียน',slHd:'ชื่อของคุณคืออะไร?',slSub2:'พิมพ์ชื่อเล่นที่ครูตั้งให้คุณ',
-    findBtn:'ค้นหาคลาสของฉัน →',findHint:'ชื่อเล่นของคุณถูกตั้งโดยครู\nพิมพ์ตรงๆ เหมือนที่ครูเพิ่มคุณ',
-    notFound:'ไม่พบชื่อนี้ กรุณาตรวจสอบการสะกดหรือถามครู',
+    roleTeacher:'ฉันเป็นครู',roleTeacherSub:'จัดการข้อมูล',
+    slSub:'นักเรียน',slHd:'ใส่ username ของคุณ',slSub2:'ใส่ username ของคุณ ถ้าไม่รู้ให้ถามครูได้เลย',
+    findBtn:'ค้นหาคลาส →',findHint:'ชื่อเล่นของคุณถูกตั้งโดยครู\nพิมพ์ตรงๆ เหมือนที่ครูเพิ่มคุณ',
+    notFound:'ไม่พบ username นี้ กรุณาตรวจสอบหรือถามครูได้เลยค่ะ',
     tsSub:'ล็อกอินครู',tsTitle:'เลือกชื่อของคุณ',tsSub2:'แล้วใส่ PIN',
     newTeacher:'+ ฉันเป็นครูใหม่',
     suSub:'ครูใหม่',suHd:'สร้างบัญชีของคุณ',suSub2:'ใช้เวลาแค่ 30 วินาที',
@@ -932,8 +933,8 @@ const TR={
     logoutBtn:'← กลับ',payMsg:'คลาสของคุณหมดแล้วค่ะ 🧘‍♀️\nกรุณาต่อแพ็คเกจเพื่อจองคลาสต่อไป\nโอนเงินมาที่บัญชีด้านล่าง แล้วแจ้งครูได้เลยนะคะ',
     lblBank:'ธนาคาร',lblAcctName:'ชื่อบัญชี',lblAcctNum:'เลขบัญชี',
     copyBtn:'คัดลอกเลขบัญชี',copiedBtn:'คัดลอกแล้ว ✓',
-    mhdAdd:'เพิ่มนักเรียน',addPrivTxt:'ใช้ชื่อเล่นเท่านั้น ห้ามใส่ชื่อจริงหรือข้อมูลส่วนตัว',
-    lblNameF:'ชื่อเล่น',clsLbl:'คลาส',pinWrong:'PIN ไม่ถูกต้อง',
+    mhdAdd:'เพิ่มนักเรียน',addPrivTxt:'ใส่ username ง่ายๆ ห้ามใช้ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว',
+    lblNameF:'Username',clsLbl:'คลาส',pinWrong:'PIN ไม่ถูกต้อง',
     bankSaved:'บันทึกข้อมูลธนาคารแล้ว 🏦',noStudents:'ยังไม่มีนักเรียน',
     addToBegin:'เพิ่มนักเรียนเพื่อเริ่มต้น',removed:'ลบรายการแล้ว',
     hUsed:'ใช้แล้ว',hLeft:'เหลือ',confirmRemove:'ลบรายการนี้ออก?',
@@ -1356,7 +1357,7 @@ document.getElementById('su-name').addEventListener('keydown',e=>{if(e.key==='En
 /* ═══════════════════════════════════════════
    SUPER ADMIN
 ═══════════════════════════════════════════ */
-let saPin = '0000'; // default — change on first login
+let saPin = '1242'; // default — change on first login
 let sapi = '', sacps = 'new', sacpf = '', sacpi = '';
 
 function loadSaPin(){try{saPin=localStorage.getItem('yj_sapin')||'0000';}catch(e){}}
@@ -1490,15 +1491,12 @@ function deleteTeacher(id,name){
 }
 
 /* GAS EXPORT */
-const GAS_SCRIPT = `// ═══════════════════════════════════════════
-// Yoga with Jib — Class Tracker GAS Backend
+const GAS_SCRIPT = `// Yoga with Jib - Class Tracker GAS Backend
 // Handles: Data export + LINE + Email notifications
-// ═══════════════════════════════════════════
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
-    
+    var data = JSON.parse(e.postData.contents);
     if (data.action === 'notify') {
       return handleNotify(data);
     } else {
@@ -1509,13 +1507,10 @@ function doPost(e) {
   }
 }
 
-// ── NOTIFICATION HANDLER ──
 function handleNotify(data) {
-  const results = {ok: true, line: false, email: false};
-  
-  const msg = buildMessage(data);
-  
-  // LINE Notify
+  var results = {ok: true, line: false, email: false};
+  var msg = buildMessage(data);
+
   if (data.lineToken) {
     try {
       UrlFetchApp.fetch('https://notify-api.line.me/api/notify', {
@@ -1526,61 +1521,58 @@ function handleNotify(data) {
       results.line = true;
     } catch(e) { results.lineError = e.message; }
   }
-  
-  // Email
+
   if (data.email) {
     try {
-      const subject = '💳 Class payment from ' + data.studentSym + ' ' + data.studentName;
+      var subject = 'Class payment from ' + data.studentSym + ' ' + data.studentName;
       MailApp.sendEmail(data.email, subject, msg);
       results.email = true;
     } catch(e) { results.emailError = e.message; }
   }
-  
+
   results.ok = results.line || results.email;
   return respond(results);
 }
 
 function buildMessage(d) {
-  let msg = '\n🧘 Class payment notification';
-  msg += '\n━━━━━━━━━━━━━━━━';
-  msg += '\n👤 Student: ' + d.studentSym + ' ' + d.studentName;
-  msg += '\n📦 Package: ' + d.packageSize + ' classes';
-  if (d.amount) msg += '\n💰 Amount: ฿' + d.amount;
-  if (d.note) msg += '\n📝 Note: ' + d.note;
-  msg += '\n🕐 Time: ' + d.timestamp;
-  msg += '\n━━━━━━━━━━━━━━━━';
-  msg += '\nPlease confirm and update their class count.';
+  var msg = '';
+  msg += 'Class payment notification';
+  msg += ' | Student: ' + d.studentSym + ' ' + d.studentName;
+  msg += ' | Package: ' + d.packageSize + ' classes';
+  if (d.amount) msg += ' | Amount: ' + d.amount;
+  if (d.note) msg += ' | Note: ' + d.note;
+  msg += ' | Time: ' + d.timestamp;
+  msg += ' | Please confirm and update their class count.';
   return msg;
 }
 
-// ── EXPORT HANDLER ──
 function handleExport(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  let sheet = ss.getSheetByName('Teachers') || ss.insertSheet('Teachers');
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  var sheet = ss.getSheetByName('Teachers') || ss.insertSheet('Teachers');
   sheet.clearContents();
   sheet.appendRow(['Name', 'Students', 'Classes Used', 'Classes Remaining']);
-  data.teachers.forEach(t => {
+  data.teachers.forEach(function(t) {
     sheet.appendRow([t.name, t.studentCount, t.used, t.remaining]);
   });
-  
-  let sSheet = ss.getSheetByName('Students') || ss.insertSheet('Students');
+
+  var sSheet = ss.getSheetByName('Students') || ss.insertSheet('Students');
   sSheet.clearContents();
   sSheet.appendRow(['Teacher', 'Student', 'Package', 'Used', 'Remaining', 'Last class']);
-  data.students.forEach(s => {
-    const last = s.history && s.history.length ? s.history[0] : '-';
+  data.students.forEach(function(s) {
+    var last = s.history && s.history.length ? s.history[0] : '-';
     sSheet.appendRow([s.teacher, s.name, s.total, s.used, s.remaining, last]);
   });
-  
-  let hSheet = ss.getSheetByName('History') || ss.insertSheet('History');
+
+  var hSheet = ss.getSheetByName('History') || ss.insertSheet('History');
   hSheet.clearContents();
   hSheet.appendRow(['Teacher', 'Student', 'Class #', 'Date']);
-  data.students.forEach(s => {
-    (s.history || []).forEach((d, i) => {
+  data.students.forEach(function(s) {
+    (s.history || []).forEach(function(d, i) {
       hSheet.appendRow([s.teacher, s.name, i+1, d]);
     });
   });
-  
+
   return respond({ok: true});
 }
 
