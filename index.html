@@ -830,7 +830,7 @@ body{background:#fafafa;min-height:100vh}
 
     <!-- TEACHER CONTACT -->
     <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:1rem;margin-bottom:1rem" id="stu-contact-box">
-      <div style="font-size:11px;font-weight:600;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📞 ถามครูให้แน่ใจ</div>
+      <div style="font-size:11px;font-weight:600;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px" data-i18n="contactTitle">📞 ถามครูให้แน่ใจ</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px" id="stu-teacher-info">
         <div style="width:36px;height:36px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" id="stu-t-ava"></div>
         <div style="font-size:14px;font-weight:500;color:#111" id="stu-t-name"></div>
@@ -854,7 +854,7 @@ body{background:#fafafa;min-height:100vh}
 
     <!-- BANK INFO -->
     <div id="stu-bank-section">
-      <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏦 รายละเอียดบัญชี</div>
+      <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="bankTitle">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
@@ -871,7 +871,7 @@ body{background:#fafafa;min-height:100vh}
 
     <!-- NOTIFY TEACHER SECTION -->
     <div id="notify-section" style="margin-top:12px;border-top:1px solid var(--bd);padding-top:12px">
-      <div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px" id="notify-title">โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲</div>
+      <div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px" id="notify-title" id="notify-title-lbl">โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲</div>
       <div id="notify-form" style="display:flex;flex-direction:column;gap:8px">
         <div>
           <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-amt-lbl">จำนวนที่โอน</label>
@@ -1329,6 +1329,14 @@ const TR={
     logoutBtn:'← Back',payMsg:'Your classes are all used up! 🧘‍♀️\nPlease renew your package to continue.\nTransfer to the account below and let your teacher know.',
     lblBank:'Bank',lblAcctName:'Account name',lblAcctNum:'Account number',
     copyBtn:'Copy account number',copiedBtn:'Copied ✓',
+    notifyTitle:'Transferred? Notify your teacher 📲',
+    notifyAmt:'Amount transferred',
+    notifyNote:'Note (optional)',
+    notifyPh:'e.g. via K-Bank',
+    notifyBtn:'Notify teacher',
+    contactTitle:'📞 Contact your teacher first',
+    bankTitle:'🏦 Transfer details',
+    stuVerify:"Always check with your teacher before transferring. Bank details can change — confirm it is the right account first.",
     mhdAdd:'New student',addPrivTxt:'Use a simple username. No full names, phone numbers or personal details.',
     lblNameF:'Username',clsLbl:'classes',pinWrong:'Wrong PIN',
     bankSaved:'Bank details saved 🏦',noStudents:'No students yet',
@@ -1354,6 +1362,7 @@ const TR={
     logoutBtn:'← กลับ',payMsg:'คลาสของคุณหมดแล้วค่ะ 🧘‍♀️\nกรุณาต่อแพ็คเกจเพื่อจองคลาสต่อไป\nโอนเงินมาที่บัญชีด้านล่าง แล้วแจ้งครูได้เลยนะคะ',
     lblBank:'ธนาคาร',lblAcctName:'ชื่อบัญชี',lblAcctNum:'เลขบัญชี',
     copyBtn:'คัดลอกเลขบัญชี',copiedBtn:'คัดลอกแล้ว ✓',
+    notifyTitle:'โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲',notifyAmt:'จำนวนที่โอน',notifyNote:'บันทึกเพิ่มเติม (ไม่ใส่ก็ได้)',notifyPh:'โอนผ่านธนาคารกสิกรไทย',notifyBtn:'แจ้งครู',contactTitle:'📞 ถามครูให้แน่ใจ',bankTitle:'🏦 รายละเอียดบัญชี',stuVerify:'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้ง',
     mhdAdd:'เพิ่มนักเรียน',addPrivTxt:'ใส่ username ง่ายๆ ห้ามใช้ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว',
     lblNameF:'Username',clsLbl:'คลาส',pinWrong:'PIN ไม่ถูกต้อง',
     bankSaved:'บันทึกข้อมูลธนาคารแล้ว 🏦',noStudents:'ยังไม่มีนักเรียน',
@@ -1419,6 +1428,17 @@ function applyLang(){
   ['cls-lbl1','cls-lbl2','cls-lbl3','tcls-lbl1','tcls-lbl2','tcls-lbl3'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=L.clsLbl;});
   renderTeacherList();
   if(currentStudentData)renderStudentView(currentStudentData.student, currentStudentData.teacher);
+  // Update topup modal text
+  const setT=(id,k)=>{const e=document.getElementById(id);if(e&&L[k])e.textContent=L[k];};
+  setT('notify-title','notifyTitle');
+  setT('notify-amt-lbl','notifyAmt');
+  setT('notify-msg-lbl','notifyNote');
+  setT('notify-btn-lbl','notifyBtn');
+  const ph=document.getElementById('notify-note');if(ph)ph.placeholder=L.notifyPh||'';
+  const cv=document.getElementById('stu-verify-msg');if(cv)cv.textContent=L.stuVerify||'';
+  const ct=document.querySelector('#stu-contact-box .font-size-11px');
+  // contact title
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(L[k])el.textContent=L[k];});
 }
 
 
@@ -1746,7 +1766,8 @@ function openHist(id){
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   document.getElementById('h-sym').textContent=s.sym;
   document.getElementById('h-name').textContent=esc(s.n);
-  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · ${s.t-s.u} ${t('hLeft')}`;
+  const remH=s.t-s.u;
+  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · `+(remH<0?`${Math.abs(remH)} ${lang==='th'?'ติดหนี้':'owes'}`:`${remH} ${t('hLeft')}`);
   renderHistList(s,S);
   document.getElementById('hist-m').style.display='flex';
 }
@@ -1762,7 +1783,7 @@ function renderHistList(s,S){
     <div class="h-item">
       <div class="h-num">${i+1}</div>
       <div style="flex:1"><div class="h-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</div></div>
-      <button class="h-undo" onclick="undoEntry('${s.id}',${s.h.indexOf(e)})">${lang==='th'?'ยกเลิก':'Undo'}</button>
+      <button class="h-undo" onclick="undoEntry('${s.id}',${s.h.indexOf(e)})">${lang==='th'?'ลบ':'Remove'}</button>
     </div>`).join('');
 }
 function undoEntry(id,idx){
@@ -1770,7 +1791,8 @@ function undoEntry(id,idx){
   if(!confirm(t('confirmRemove')))return;
   s.h.splice(idx,1);s.u=Math.max(0,s.u-1);
   saveStudents(currentTeacherId,S);renderA();renderHistList(s,S);
-  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · ${s.t-s.u} ${t('hLeft')}`;
+  const remH=s.t-s.u;
+  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · `+(remH<0?`${Math.abs(remH)} ${lang==='th'?'ติดหนี้':'owes'}`:`${remH} ${t('hLeft')}`);
   toast(t('removed'));
 }
 function openFix(){
