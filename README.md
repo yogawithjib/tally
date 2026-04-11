@@ -20,15 +20,6 @@ A clean, minimal class tracking app for yoga teachers. Students buy prepaid pack
 - Shows all students' name, symbol, class balance and status
 - Read-only — students can look but not change anything
 - Share the URL with your students so they can check anytime
-
-### Admin view (PIN protected)
-- Tap the tiny **⚙** at the bottom of the student view to open the PIN screen
-- Default PIN is **1234** — change it immediately after first login
-- **−** deducts one class · **＋** adds a new package
-- **✎** opens the fix panel to correct any mistakes
-- **👁** returns to student view
-- **Change PIN** link is on the login screen
-
 ---
 
 ## Adding Fabfeltscript Bold (optional)
