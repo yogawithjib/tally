@@ -314,6 +314,29 @@ body{background:#fafafa;min-height:100vh}
 .price-input-wrap span{font-size:14px;color:var(--gl)}
 .price-input-wrap input{border:none;outline:none;font-size:14px;color:#111;width:100%;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;background:transparent}
 
+
+/* TEACHER USERNAME LOGIN */
+#teacher-login-screen.on{display:flex}
+#teacher-login-screen{flex-direction:column;align-items:center;padding:2rem 0;min-height:60vh;justify-content:center}
+.tlogin-box{background:#f5f5f5;border-radius:24px;padding:2rem 1.75rem;width:100%;max-width:320px;border:1px solid #e8e8e8}
+.tlogin-hd{font-size:16px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
+.tlogin-sub{font-size:12px;font-weight:300;color:#999;text-align:center;margin-bottom:1.5rem;line-height:1.6}
+.t-name-input{width:100%;border:1px solid #ddd;border-radius:12px;padding:13px 16px;font-size:15px;color:#111;background:#fff;outline:none;transition:border-color .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-bottom:8px}
+.t-name-input:focus{border-color:#aaa}
+.t-name-input::placeholder{color:#bbb;font-weight:300}
+.t-find-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#111;color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s}
+.t-find-btn:hover{opacity:.88}
+.t-find-err{color:#f87171;font-size:12px;text-align:center;margin-top:8px;min-height:16px}
+/* Spacing improvements */
+.role-grid{margin-bottom:2rem}
+.home-hero{padding:2rem 0 2.5rem}
+.library-section{padding:2rem 0 1.5rem;margin-top:2.5rem}
+
+.debt-banner{background:#FFE0EC;border:1.5px solid #fb2a7b;border-radius:14px;padding:1rem 1.25rem;margin-bottom:12px;text-align:center}
+.debt-amount{font-size:28px;font-weight:600;color:#7a0030}
+.debt-lbl{font-size:13px;color:#7a0030;margin-top:2px;font-weight:300}
+.debt-note{font-size:11px;color:#999;margin-top:6px;font-weight:300}
+.sdebt{background:#FFE0EC;color:#7a0030}
 </style>
 </head>
 <body>
@@ -397,6 +420,26 @@ body{background:#fafafa;min-height:100vh}
   </div>
 </div>
 
+
+<!-- TEACHER USERNAME LOGIN -->
+<div id="teacher-login-screen" class="screen">
+  <div class="hd" style="width:100%">
+    <div><div class="logo" onclick="homeLogoTap()" style="cursor:pointer;font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink)">Yoga with Jib</div><div class="sub">teacher login</div></div>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-tl">TH</button>
+  </div>
+  <div class="tlogin-box">
+    <div class="tlogin-hd">🧘🏻‍♀️ Teacher login</div>
+    <div class="tlogin-sub" id="tl-sub">Enter your username to continue</div>
+    <input class="t-name-input" id="teacher-username-input" type="text"
+      autocomplete="off" autocorrect="off" spellcheck="false" placeholder="username" maxlength="40"/>
+    <button class="t-find-btn" onclick="findTeacher()">Continue →</button>
+    <div class="t-find-err" id="t-find-err"></div>
+  </div>
+  <div class="llinks" style="margin-top:1rem">
+    <button class="llink" onclick="goHome()">← Back</button>
+  </div>
+</div>
+
 <!-- TEACHER SELECT -->
 <div id="teacher-select-screen" class="screen">
   <div class="hd">
@@ -457,8 +500,13 @@ body{background:#fafafa;min-height:100vh}
       <div class="privacy-text" id="priv-text">Please use nicknames only. Do not enter students' full names, phone numbers, ID numbers, or any sensitive personal information.</div>
     </div>
     <div class="auth-field">
-      <label id="su-name-lbl">Your teacher name</label>
+      <label id="su-name-lbl">Display name</label>
       <input id="su-name" type="text" placeholder="e.g. Jib, Noon, Best" maxlength="40"/>
+    </div>
+    <div class="auth-field">
+      <label id="su-user-lbl">Username (for login)</label>
+      <input id="su-username" type="text" placeholder="e.g. jib_yoga, noon123" maxlength="40" autocorrect="off" autocapitalize="none"/>
+      <div style="font-size:11px;color:var(--gl);font-weight:300;margin-top:4px">Lowercase letters and numbers only. Cannot be changed.</div>
     </div>
     <div class="auth-field">
       <label id="su-emo-lbl">Pick your avatar</label>
@@ -659,23 +707,24 @@ body{background:#fafafa;min-height:100vh}
 <!-- SA CHANGE PIN MODAL -->
 <div class="mbg" id="sa-cp-m" style="display:none">
   <div class="modal">
-    <div class="mhd" id="sa-cpt">New admin PIN</div>
-    <div style="text-align:center;margin-bottom:1rem">
-      <div class="dots" id="sa-cp-dots" style="justify-content:center">
-        <div class="sa-dot" id="sa-cp0"></div><div class="sa-dot" id="sa-cp1"></div>
-        <div class="sa-dot" id="sa-cp2"></div><div class="sa-dot" id="sa-cp3"></div>
-      </div>
+    <div class="mhd">Change admin password</div>
+    <div style="font-size:12px;color:var(--gl);margin-bottom:14px;line-height:1.6">Min 8 characters, must include letters and numbers</div>
+    <div class="field" style="margin-bottom:10px">
+      <label>New password</label>
+      <input id="sa-new-pw" type="password" placeholder="New password" maxlength="50" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:14px;color:#111;outline:none;font-family:inherit"/>
     </div>
-    <div class="pad">
-      <button class="sa-nb" onclick="sacpp('1')">1</button><button class="sa-nb" onclick="sacpp('2')">2</button><button class="sa-nb" onclick="sacpp('3')">3</button>
-      <button class="sa-nb" onclick="sacpp('4')">4</button><button class="sa-nb" onclick="sacpp('5')">5</button><button class="sa-nb" onclick="sacpp('6')">6</button>
-      <button class="sa-nb" onclick="sacpp('7')">7</button><button class="sa-nb" onclick="sacpp('8')">8</button><button class="sa-nb" onclick="sacpp('9')">9</button>
-      <button class="sa-nb z" onclick="sacpp('0')">0</button><button class="sa-nb del" onclick="sacpd()">⌫</button>
+    <div class="field" style="margin-bottom:6px">
+      <label>Confirm password</label>
+      <input id="sa-confirm-pw" type="password" placeholder="Confirm password" maxlength="50" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:14px;color:#111;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')saveSaPassword()"/>
     </div>
+    <div id="sa-pw-strength" style="font-size:11px;min-height:16px;margin-bottom:8px"></div>
     <div class="sa-err" id="sa-cperr"></div>
-    <div class="macts"><button class="bc" onclick="cm('sa-cp-m')" >Cancel</button></div>
+    <div class="macts">
+      <button class="bc" onclick="cm('sa-cp-m')">Cancel</button>
+      <button class="bs" onclick="saveSaPassword()">Save</button>
+    </div>
   </div>
-</div>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1397,7 +1446,7 @@ function goHome(){
     }
   }).catch(()=>{});
 }
-function showTeacherList(){go('teacher-select-screen');renderTeacherList();}
+function showTeacherList(){go('teacher-login-screen');setTimeout(()=>{const i=document.getElementById('teacher-username-input');if(i){i.value='';i.focus();}document.getElementById('t-find-err').textContent='';},100);}
 
 /* ── STUDENT LOGIN ── */
 async function findStudent(){
@@ -1451,11 +1500,16 @@ function today(){return new Date().toISOString().split('T')[0];}
 function renderStudentView(s, tc){
   const rem=s.t-s.u, c=s.c||COL[0];
   const pct=rem/s.t;
-  const scl=rem===0?'sout':pct<=.25?'slow':'sok';
-  const stx=rem===0?t('out'):pct<=.25?t('low'):t('active');
+  const scl=rem<0?'sdebt':rem===0?'sout':pct<=.25?'slow':'sok';
+  const stx=rem<0?(lang==='th'?`ติดหนี้ ${Math.abs(rem)} คลาส`:`Owes ${Math.abs(rem)} class${Math.abs(rem)!==1?'es':''}`):(rem===0?t('out'):pct<=.25?t('low'):t('active'));
   const wMain=(t('wMain')||'Hi {name}! 🙏').replace('{name}', s.n);
-  const histHtml = s.h&&s.h.length
-    ? s.h.map((e,i)=>`<div class="hist-item-row"><span class="hi-num">${s.h.length-i}</span><span class="hi-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</span></div>`).join('')
+  const sortedH = s.h&&s.h.length ? [...s.h].sort((a,b)=>{
+    const da=a.d?new Date(a.d):new Date(a.ts);
+    const db2=b.d?new Date(b.d):new Date(b.ts);
+    return da-db2;
+  }) : [];
+  const histHtml = sortedH.length
+    ? sortedH.map((e,i)=>`<div class="hist-item-row"><span class="hi-num">${i+1}</span><span class="hi-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</span></div>`).join('')
     : `<div class="no-hist-txt">${t('noHist')}</div>`;
 
   const area=document.getElementById('student-card-area');
@@ -1464,15 +1518,9 @@ function renderStudentView(s, tc){
       <div class="sc-sym">${s.sym}</div>
       <div class="sc-name" style="color:${c.tx}">${wMain}</div>
       <div class="sc-teacher" style="color:${c.tx}">with ${tc?tc.name:''}</div>
-      <div class="sc-ring-wrap">
-        ${bigRing(rem,s.t,c)}
-        <div class="sc-ring-inner">
-          <div class="sc-rem" style="color:${c.tx}">${rem}</div>
-          <div class="sc-lbl" style="color:${c.tx}">${t('left')}</div>
-        </div>
-      </div>
+      ${rem<0?`<div class='debt-banner'><div class='debt-amount'>−${Math.abs(rem)}</div><div class='debt-lbl'>${lang==='th'?'คลาสที่ค้างชำระ':'classes owed'}</div><div class='debt-note'>${lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance'}</div></div>`:`<div class='sc-ring-wrap'>${bigRing(rem,s.t,c)}<div class='sc-ring-inner'><div class='sc-rem' style='color:${c.tx}'>${rem}</div><div class='sc-lbl' style='color:${c.tx}'>${t('left')}</div></div></div>`}
       <div class="sc-status ${scl}">${stx}</div>
-      ${rem===0?`<button onclick="showPay()" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:12px;font-family:inherit">🙏 ${lang==='th'?'ต่อแพ็คเกจ':'Renew package'}</button>`:''}
+      ${rem<=0?`<button onclick='openStuTopup()' style='width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน / Pay now':'Pay now'}</button>`:''}
       <button class="topup-student-btn" onclick="openStuTopup()">
         💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}
       </button>
@@ -1522,6 +1570,27 @@ function copyAcct(){
 }
 function fallbackCopy(txt){const e=document.createElement('textarea');e.value=txt;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);}
 
+
+/* ── TEACHER USERNAME LOGIN ── */
+function findTeacher(){
+  const raw=document.getElementById('teacher-username-input').value.trim().toLowerCase();
+  if(!raw){document.getElementById('t-find-err').textContent=lang==='th'?'กรุณาใส่ username':'Please enter your username';return;}
+  const teachers=getTeachers();
+  const tc=teachers.find(t=>(t.username||t.name.toLowerCase())===raw);
+  if(!tc){
+    document.getElementById('t-find-err').textContent=lang==='th'?'ไม่พบ username กรุณาตรวจสอบ':'Username not found. Please check.';
+    document.getElementById('teacher-username-input').classList.add('shake');
+    setTimeout(()=>document.getElementById('teacher-username-input').classList.remove('shake'),400);
+    return;
+  }
+  document.getElementById('t-find-err').textContent='';
+  currentTeacherId=tc.id;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${maskName(tc.name)}`;
+  pi='';dots(['d0','d1','d2','d3'],0);
+  document.getElementById('lerr').textContent='';
+  go('login-screen');
+}
+
 /* ── TEACHER LIST ── */
 function renderTeacherList(){
   const list=document.getElementById('teacher-list');if(!list)return;
@@ -1531,7 +1600,7 @@ function renderTeacherList(){
     const cnt=getStudents(tc.id).length;
     return`<div class="teacher-card" onclick="selectTeacher('${tc.id}')">
       <div class="teacher-avatar">${tc.emoji||'🧘‍♀️'}</div>
-      <div class="teacher-info"><div class="teacher-name">${esc(tc.name)}</div><div class="teacher-count">${cnt} student${cnt!==1&&lang==='en'?'s':''}</div></div>
+      <div class="teacher-info"><div class="teacher-name">${maskName(tc.name)}</div><div class="teacher-count">${lang==='th'?'แตะเพื่อเข้าสู่ระบบ':'Tap to log in'}</div></div>
       <div class="teacher-arrow">›</div>
     </div>`;
   }).join('');
@@ -1558,12 +1627,15 @@ function sunp(n){if(supi.length>=4)return;supi+=n;dots(['su-d0','su-d1','su-d2',
 function sund(){supi=supi.slice(0,-1);dots(['su-d0','su-d1','su-d2','su-d3'],supi.length);}
 function createTeacher(){
   const name=sanitizeInput(document.getElementById('su-name').value,MAX_NAME);
-  if(!name){document.getElementById('su-err').textContent='Please enter your name';return;}
-  if(supi.length<4){document.getElementById('su-err').textContent='Please set a 4-digit PIN';return;}
+  const usernameRaw=document.getElementById('su-username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+  if(!name){document.getElementById('su-err').textContent='Please enter your display name';return;}
+  if(!usernameRaw){document.getElementById('su-err').textContent='Please enter a username';return;}
+  if(usernameRaw.length<3){document.getElementById('su-err').textContent='Username must be at least 3 characters';return;}
   const teachers=getTeachers();
+  if(teachers.find(t=>(t.username||t.name.toLowerCase())===usernameRaw)){document.getElementById('su-err').textContent='Username already taken. Choose another.';return;}
   const id='t_'+Date.now();
   hashPin(supi).then(h=>{
-    teachers.push({id,name,emoji:suEmoSel,pin:h});
+    teachers.push({id,name,username:usernameRaw,emoji:suEmoSel,pin:h});
     saveTeachers(teachers);
     currentTeacherId=id;
     const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=suEmoSel;
@@ -1637,11 +1709,11 @@ function renderA(){
       <span class="a-sym">${s.sym}</span>
       <div class="a-name" style="color:${c.tx}">${esc(s.n)}</div>
       <div class="a-counts">
-        <div class="a-stat"><div class="a-val" style="color:${c.tx}">${rem}</div><div class="a-lbl">${t('left')}</div></div>
+        <div class="a-stat"><div class="a-val" style="color:${rem<0?'#fb2a7b':c.tx}">${rem}</div><div class="a-lbl" style="color:${rem<0?'#fb2a7b':'inherit'}">${rem<0?(lang==='th'?'ติดหนี้':'owes'):t('left')}</div></div>
         <div class="a-stat"><div class="a-val" style="color:${c.tx}">${s.u}</div><div class="a-lbl">${t('hUsed')}</div></div>
       </div>
       <div class="a-btns">
-        <button class="a-btn" onclick="openDeduct('${s.id}')" ${rem===0?'disabled':''}>−</button>
+        <button class="a-btn" onclick="openDeduct('${s.id}')" >−</button>
         <button class="a-btn sm" onclick="openHist('${s.id}')">📋</button>
         <button class="a-btn sm" onclick="openEdit('${s.id}')" title="Edit">✏️</button>
         <button class="a-btn" onclick="openTop('${s.id}')">＋</button>
@@ -1655,12 +1727,12 @@ function openDeduct(id){
   dedId=id;
   document.getElementById('dt-sym').textContent=s.sym;
   document.getElementById('dt-name').textContent=esc(s.n);
-  document.getElementById('dt-rem').textContent=`${s.t-s.u} left`;
+  const dtR=s.t-s.u;document.getElementById('dt-rem').textContent=dtR<0?`Owes ${Math.abs(dtR)} class${Math.abs(dtR)!==1?'es':''}`:`${dtR} left`;
   document.getElementById('dt-date').value=today();
   document.getElementById('date-m').style.display='flex';
 }
 function confirmDeduct(){
-  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===dedId);if(!s||s.u>=s.t)return;
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===dedId);if(!s)return;
   const dateVal=document.getElementById('dt-date').value||today();
   s.u++;if(!s.h)s.h=[];s.h.unshift({ts:Date.now(),d:dateVal});
   saveStudents(currentTeacherId,S);renderA();cm('date-m');toast(`${s.sym} ${s.n} · ${s.t-s.u} left`);
@@ -1681,11 +1753,16 @@ function openHist(id){
 function renderHistList(s,S){
   const el=document.getElementById('h-list');
   if(!s.h||!s.h.length){el.innerHTML=`<div class="h-empty">${t('noHist')||'No history'}</div>`;return;}
-  el.innerHTML=s.h.map((e,i)=>`
+  const sorted=[...s.h].sort((a,b)=>{
+    const da=a.d?new Date(a.d):new Date(a.ts);
+    const db2=b.d?new Date(b.d):new Date(b.ts);
+    return da-db2;
+  });
+  el.innerHTML=sorted.map((e,i)=>`
     <div class="h-item">
-      <div class="h-num">${s.h.length-i}</div>
+      <div class="h-num">${i+1}</div>
       <div style="flex:1"><div class="h-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</div></div>
-      <button class="h-undo" onclick="undoEntry('${s.id}',${i})">${lang==='th'?'ยกเลิก':'Undo'}</button>
+      <button class="h-undo" onclick="undoEntry('${s.id}',${s.h.indexOf(e)})">${lang==='th'?'ยกเลิก':'Undo'}</button>
     </div>`).join('');
 }
 function undoEntry(id,idx){
@@ -1799,6 +1876,7 @@ document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',function
 document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveSt();});
 document.getElementById('student-name-input').addEventListener('keydown',e=>{if(e.key==='Enter')findStudent();});
 document.getElementById('su-name').addEventListener('keydown',e=>{if(e.key==='Enter')createTeacher();});
+document.getElementById('teacher-username-input').addEventListener('keydown',e=>{if(e.key==='Enter')findTeacher();});
 
 
 
