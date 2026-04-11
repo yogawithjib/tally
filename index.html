@@ -1126,7 +1126,7 @@ body{background:#fafafa;min-height:100vh}
           <button onclick="copyContact('line')" style="background:none;border:1px solid #bae6fd;border-radius:6px;padding:2px 8px;font-size:11px;color:#0369a1;cursor:pointer;font-family:inherit">Copy</button>
         </div>
       </div>
-      <div id="stu-no-contact" style="display:none;font-size:12px;color:#64748b;font-weight:300">ครูยังไม่ได้ใส่เบอร์ในระบบ ติดต่อครูช่องทางเดิมได้เลย</div>
+      <div id="stu-no-contact" style="display:none;font-size:12px;color:#64748b;font-weight:300"></div>
     </div>
 
     <!-- BANK INFO -->
@@ -2949,7 +2949,9 @@ function openStuTopup(){
 
   document.getElementById('stu-phone-row').style.display=hasPhone?'block':'none';
   document.getElementById('stu-line-row').style.display=hasLine?'block':'none';
-  document.getElementById('stu-no-contact').style.display=(!hasPhone&&!hasLine)?'block':'none';
+  const noContactEl=document.getElementById('stu-no-contact');
+  noContactEl.style.display=(!hasPhone&&!hasLine)?'block':'none';
+  noContactEl.textContent=lang==='th'?'ครูยังไม่ได้ใส่เบอร์ในระบบ ติดต่อครูช่องทางเดิมได้เลย':"Your teacher hasn't put their number here. Contact them how you usually do instead.";
 
   if(hasPhone)document.getElementById('stu-phone-val').textContent=ct.phone;
   if(hasLine)document.getElementById('stu-line-val').textContent=ct.line;
