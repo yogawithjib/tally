@@ -1361,12 +1361,14 @@ function buildStudentCard(student,teacher){
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
 <button class="btn btn-ghost btn-sm" data-action="topup">✨ ${t('topupClasses')}</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
+<button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
 </div>`;
   
   card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
   card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
   card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
+  card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
   card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   return card;
 }
@@ -1760,7 +1762,7 @@ function screenSuperAdminPin(s){
   const card=el('div','card');
   card.style.marginTop='24px';
   card.innerHTML=`<div class="text-center">
-<div style="font-size:28px">🛡️</div>
+<div style="font-size:28px">🐯</div>
 <div class="bold mt-8">${t('superAdmin')}</div>
 <div class="text-pink text-sm mt-4">${lang==='th'?'PIN 6 หลัก':'6-digit PIN'}</div>
 </div>
@@ -1794,7 +1796,7 @@ async function screenSuperAdmin(s){
 
   const h=el('div','card');
   h.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between">
-    <div class="bold" style="font-size:16px">🛡️ ${t('superAdmin')}</div>
+    <div class="bold" style="font-size:16px">🐯 ${t('superAdmin')}</div>
     <button id="change-pin-btn" style="background:none;border:none;color:var(--pink);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0">🔑 ${lang==='th'?'เปลี่ยน PIN':'Change PIN'}</button>
   </div>`;
   s.appendChild(h);
@@ -1921,11 +1923,12 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
       // Wire up download buttons
       // 1. All students
       $('dl-students').onclick=()=>{
-        const rows=[['Teacher','Teacher Email','Student Name','Username','Sold','Used','Remaining','Package ฿','Last Class','Has PIN']];
+        const rows=[['Teacher','Teacher Email','Student Name','Username','Sold','Used','Remaining','Package ฿','Last Class','Has PIN','All Class Dates']];
         for(const b of teacherBreakdown){
           const students=C.get('students_'+b.teacher.id)||[];
           for(const st of students){
-            const last=(st.h||[]).slice(-1)[0]||'';
+            const hist=(st.h||[]);
+            const last=hist.slice(-1)[0]||'';
             rows.push([
               b.teacher.name||b.teacher.username,
               b.teacher.username,
@@ -1933,6 +1936,7 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
               st.t||0,st.u||0,st.c||0,
               st.price||0,last,
               st.pin?'yes':'no',
+              hist.join(' | '),
             ]);
           }
         }
@@ -2031,8 +2035,15 @@ async function renderAdminTab(container,tab){
 ${students.slice(0,6).map(st=>`<span class="pill ${(st.c||0)<=0?'pill-red':(st.c||0)<=2?'pill-amber':'pill-pink'}">${st.sym} ${st.c||0}</span>`).join('')}
 ${students.length>6?`<span class="pill" style="background:var(--grey-l);color:var(--grey)">+${students.length-6}</span>`:''}
 </div>
-<button class="btn btn-danger btn-sm" data-tid="${teacher.id}" data-tname="${teacher.name||teacher.username}">🗑 ${t('delete')}</button>`;
+<div style="display:flex;gap:6px">
+<button class="btn btn-ghost btn-sm" data-reset-pin="${teacher.id}" data-tname="${teacher.name||teacher.username}">🔑 ${lang==='th'?'รีเซ็ต PIN':'Reset PIN'}</button>
+<button class="btn btn-danger btn-sm" data-tid="${teacher.id}" data-tname="${teacher.name||teacher.username}">🗑 ${t('delete')}</button>
+</div>`;
 
+        card.querySelector('[data-reset-pin]').onclick=e=>{
+          const tid=e.currentTarget.dataset.resetPin,tname=e.currentTarget.dataset.tname;
+          showResetTeacherPinModal(tid,tname);
+        };
         card.querySelector('[data-tid]').onclick=e=>{
           const tid=e.currentTarget.dataset.tid,tname=e.currentTarget.dataset.tname;
           confirmDeleteTeacher(tid,tname,()=>render(screenSuperAdmin));
@@ -2344,6 +2355,86 @@ function showChangeAdminPinModal(){
       errDiv.style.display='';errDiv.textContent='Error: '+e.message;
     }
     $('cp-save').disabled=false;
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESET PIN MODALS
+// ═══════════════════════════════════════════════════════════
+function showResetTeacherPinModal(teacherId,teacherName){
+  const{close}=showModal(`<div class="modal-title">🔑 Reset PIN — ${teacherName}</div>
+<p class="text-sm text-grey" style="margin-bottom:14px">${lang==='th'?'ตั้ง PIN ใหม่ให้ครู (4 หลัก)':'Set a new PIN for this teacher (4 digits)'}</p>
+<div class="input-group"><label class="input-label">${lang==='th'?'PIN ใหม่':'New PIN'}</label>
+<input class="input" id="rtp-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="new-password"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ยืนยัน PIN':'Confirm PIN'}</label>
+<input class="input" id="rtp-pin2" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="new-password"></div>
+<button class="btn btn-primary btn-full mt-8" id="rtp-save">${t('save')}</button>
+<div id="rtp-err" class="alert alert-err mt-8" style="display:none"></div>
+<div id="rtp-ok" class="alert alert-ok mt-8" style="display:none"></div>`);
+
+  $('rtp-save').onclick=async()=>{
+    const pin=$('rtp-pin').value, pin2=$('rtp-pin2').value;
+    const errDiv=$('rtp-err'), okDiv=$('rtp-ok');
+    errDiv.style.display='none';okDiv.style.display='none';
+    if(pin.length!==4||!/^\d{4}$/.test(pin)){errDiv.style.display='';errDiv.textContent=lang==='th'?'PIN ต้องเป็นตัวเลข 4 หลัก':'PIN must be 4 digits';return;}
+    if(pin!==pin2){errDiv.style.display='';errDiv.textContent=t('pinMismatch');return;}
+    $('rtp-save').disabled=true;
+    try{
+      const hashed=await hashPin(pin);
+      await fbWrite(`teachers/${teacherId}`,{pin:hashed});
+      const teachers=C.get('teachers')||[];
+      const idx=teachers.findIndex(t=>t.id===teacherId);
+      if(idx>=0){teachers[idx].pin=hashed;C.set('teachers',teachers);}
+      bfClear(teacherId);
+      okDiv.style.display='';okDiv.textContent=`✅ PIN ${lang==='th'?'รีเซ็ตแล้ว':'reset successfully'}`;
+      setTimeout(close,1500);
+    }catch(e){errDiv.style.display='';errDiv.textContent='Error: '+e.message;$('rtp-save').disabled=false;}
+  };
+}
+
+function showResetStudentPinModal(student,teacher){
+  const{close}=showModal(`<div class="modal-title">🔑 Reset PIN — ${student.n||student.sym}</div>
+<p class="text-sm text-grey" style="margin-bottom:14px">${lang==='th'?'ตั้ง PIN ใหม่ให้นักเรียน (4 หลัก) หรือล้าง PIN เพื่อให้นักเรียนตั้งเอง':'Set a new 4-digit PIN, or clear it so the student sets their own on next login'}</p>
+<div class="input-group"><label class="input-label">${lang==='th'?'PIN ใหม่ (เว้นว่างเพื่อล้าง)':'New PIN (leave blank to clear)'}</label>
+<input class="input" id="rsp-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="new-password"></div>
+<div class="input-group" id="rsp-confirm-row"><label class="input-label">${lang==='th'?'ยืนยัน PIN':'Confirm PIN'}</label>
+<input class="input" id="rsp-pin2" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="new-password"></div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn btn-ghost flex-1" id="rsp-clear">🗑 ${lang==='th'?'ล้าง PIN':'Clear PIN'}</button>
+<button class="btn btn-primary flex-1" id="rsp-save">🔑 ${t('save')}</button>
+</div>
+<div id="rsp-err" class="alert alert-err mt-8" style="display:none"></div>
+<div id="rsp-ok" class="alert alert-ok mt-8" style="display:none"></div>`);
+
+  async function doReset(newHash){
+    try{
+      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{pin:newHash});
+      student.pin=newHash;
+      const students=C.get('students_'+teacher.id)||[];
+      const idx=students.findIndex(s=>s.id===student.id);
+      if(idx>=0){students[idx].pin=newHash;C.set('students_'+teacher.id,students);}
+      bfClear(student.id);
+      $('rsp-ok').style.display='';
+      $('rsp-ok').textContent=newHash?`✅ PIN ${lang==='th'?'รีเซ็ตแล้ว':'reset'}`:`✅ PIN ${lang==='th'?'ล้างแล้ว นักเรียนจะตั้งใหม่เองตอน login':'cleared — student will set a new one on next login'}`;
+      setTimeout(close,1800);
+    }catch(e){$('rsp-err').style.display='';$('rsp-err').textContent='Error: '+e.message;}
+  }
+
+  $('rsp-clear').onclick=async()=>{
+    $('rsp-clear').disabled=true;$('rsp-save').disabled=true;
+    $('rsp-err').style.display='none';
+    await doReset(null);
+  };
+
+  $('rsp-save').onclick=async()=>{
+    const pin=$('rsp-pin').value, pin2=$('rsp-pin2').value;
+    const errDiv=$('rsp-err');errDiv.style.display='none';
+    if(!pin){errDiv.style.display='';errDiv.textContent=lang==='th'?'ใส่ PIN หรือกด "ล้าง PIN"':'Enter a PIN or tap "Clear PIN"';return;}
+    if(pin.length!==4||!/^\d{4}$/.test(pin)){errDiv.style.display='';errDiv.textContent=lang==='th'?'PIN ต้องเป็นตัวเลข 4 หลัก':'PIN must be 4 digits';return;}
+    if(pin!==pin2){errDiv.style.display='';errDiv.textContent=t('pinMismatch');return;}
+    $('rsp-save').disabled=true;$('rsp-clear').disabled=true;
+    const hashed=await hashPin(pin);
+    await doReset(hashed);
   };
 }
 
