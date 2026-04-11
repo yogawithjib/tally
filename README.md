@@ -1,6 +1,6 @@
 # 🧘‍♀️ Yoga with Jib — Class Tracker
 
-A clean, minimal class tracking app for yoga teachers. Students buy prepaid packages (20, 30, or 40 classes) and you deduct one each time they attend. Students can see their own balance on the same page.
+A clean, minimal class tracking app for yoga teachers. Students buy prepaid packages and you deduct one each time they attend. Students can see their own balance on the same page.
 
 ---
 
