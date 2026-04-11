@@ -10,7 +10,7 @@
 @font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
 body{background:#fafafa;min-height:100vh}
-.page{max-width:680px;margin:0 auto;padding:0 1.25rem 3rem}
+.page{max-width:680px;margin:0 auto;padding:0 1.5rem 4rem}
 :root{--pink:#fb2a7b;--pl:#fff0f6;--pm:#ffd0e8;--bd:#ebebeb;--gr:#888;--gl:#bbb}
 .screen{display:none}.screen.on{display:block}
 #login-screen.on,#signup-screen.on,#student-login-screen.on{display:flex}
@@ -97,7 +97,7 @@ body{background:#fafafa;min-height:100vh}
 
 /* STUDENT PERSONAL VIEW */
 #student-view-screen .sv-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
-.student-card-big{border-radius:24px;padding:2rem 1.5rem;text-align:center;max-width:320px;margin:0 auto 1.5rem}
+.student-card-big{border-radius:24px;padding:2rem 1.5rem;text-align:center;max-width:340px;margin:0 auto 1.5rem}
 .sc-sym{font-size:52px;margin-bottom:12px}
 .sc-name{font-size:20px;font-weight:600;margin-bottom:6px}
 .sc-teacher{font-size:12px;font-weight:300;opacity:.6;margin-bottom:20px}
@@ -348,14 +348,14 @@ body{background:#fafafa;min-height:100vh}
 .home-hero{padding:2rem 0 2.5rem}
 .role-grid{gap:14px;margin-bottom:2.5rem}
 .role-card{padding:1.75rem 1rem;border-radius:22px}
-.library-section{padding:2rem 0 1.5rem;margin-top:2.5rem;border-top:1px solid #f0f0f0}
+.library-section{padding:2rem .25rem 1.5rem;margin-top:2.5rem;border-top:1px solid #f0f0f0}
 .slogin-box,.tlogin-box,.stu-pin-box,.auth-box{margin:0 auto 1.5rem}
 /* Section spacing */
 .sc-ring-wrap{margin:1.25rem auto}
 .sc-status{margin-bottom:1rem}
 .hist-section{margin-top:1rem}
 /* Admin spacing */
-.adm-grid{gap:14px;padding-bottom:1rem}
+.adm-grid{gap:14px;padding-bottom:1rem;padding-left:.25rem;padding-right:.25rem}
 .a-card{padding:1.25rem 1rem 1rem;border-radius:22px}
 /* Consistent button spacing */
 .topup-student-btn{margin-bottom:10px}
@@ -364,8 +364,14 @@ body{background:#fafafa;min-height:100vh}
 .teacher-list{gap:12px;margin-bottom:1.5rem}
 .teacher-card{padding:1.1rem 1.25rem;border-radius:18px}
 
+
+#av{padding:0}
+#av .nav-bar{padding-left:1.5rem;padding-right:1.5rem}
+#ac{padding:0 1.5rem}
+#av .library-section{padding-left:1.5rem;padding-right:1.5rem}
+
 /* WAYFINDING NAV BAR */
-.nav-bar{display:flex;align-items:center;gap:8px;padding:.75rem 0;margin-bottom:.5rem;border-bottom:1px solid #f5f5f5}
+.nav-bar{display:flex;align-items:center;gap:8px;padding:.75rem .25rem;margin-bottom:.75rem;border-bottom:1px solid #f5f5f5}
 .nav-back{background:none;border:none;cursor:pointer;font-size:13px;color:var(--gl);font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;display:flex;align-items:center;gap:4px;padding:4px 0;transition:color .15s}
 .nav-back:hover{color:#111}
 .nav-crumb{font-size:12px;color:#ccc}
@@ -993,6 +999,10 @@ body{background:#fafafa;min-height:100vh}
     <div id="stu-bank-section">
       <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="bankTitle">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
+        <div id="stu-price-row" style="display:none;background:#fff0f6;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:1px solid #ffd0e8">
+          <div style="font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">&#128176; Amount to transfer</div>
+          <div id="stu-price-val" style="font-size:18px;font-weight:600;color:var(--pink)"></div>
+        </div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
         <div class="pay-bank-row">
@@ -2417,13 +2427,23 @@ shuffleLibrary();
 let notifyPkgVal=10;
 
 function selNotifyPkg(el){
-  el.parentElement.querySelectorAll('.pko').forEach(e=>{
+  el.parentElement.querySelectorAll('.pko').forEach(function(e){
     e.classList.remove('on');
     e.style.borderColor='var(--bd)';e.style.background='#fff';e.style.color='var(--gr)';
   });
   el.classList.add('on');
   el.style.borderColor='var(--pink)';el.style.background='var(--pl)';el.style.color='var(--pink)';
   notifyPkgVal=parseInt(el.dataset.v);
+  // Recalculate price proportionally
+  if(currentStudentData&&currentStudentData.student.price){
+    const s=currentStudentData.student;
+    const baseClasses=s.t||10;
+    const pricePerClass=s.price/baseClasses;
+    const calc=Math.round(pricePerClass*notifyPkgVal);
+    document.getElementById('notify-amount').value=calc;
+    const priceEl=document.getElementById('stu-price-val');
+    if(priceEl)priceEl.textContent='฿'+calc.toLocaleString()+' / '+notifyPkgVal+' classes';
+  }
 }
 
 function resetNotify(){
@@ -2786,6 +2806,17 @@ function openStuTopup(){
   document.getElementById('stu-lbl-num').textContent=t('lblAcctNum');
   document.getElementById('stu-pm-bank').textContent=dBank||notSet;
   document.getElementById('stu-pm-name').textContent=dName||notSet;
+  // Show price if set
+  const priceEl=document.getElementById('stu-price-row');
+  if(s.price&&s.price>0){
+    priceEl.style.display='block';
+    document.getElementById('stu-price-val').textContent='฿'+s.price.toLocaleString()+' / package';
+    // Auto-fill amount field
+    document.getElementById('notify-amount').value=s.price;
+  } else {
+    priceEl.style.display='none';
+    document.getElementById('notify-amount').value='';
+  }
   document.getElementById('stu-masked-num').textContent=dNum?maskAcct(dNum):notSet;
 
   const revealBtn=document.getElementById('stu-reveal-btn');
