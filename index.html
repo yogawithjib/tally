@@ -892,6 +892,10 @@ body{background:#fafafa;min-height:100vh}
     <div id="stu-bank-section">
       <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="bankTitle">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
+        <div id="stu-price-row" style="display:none;background:#fff0f6;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:1px solid #ffd0e8">
+          <div style="font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">💰 Amount to transfer</div>
+          <div id="stu-price-val" style="font-size:18px;font-weight:600;color:var(--pink)"></div>
+        </div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
         <div class="pay-bank-row">
@@ -1672,7 +1676,7 @@ function findTeacher(){
   }
   document.getElementById('t-find-err').textContent='';
   currentTeacherId=tc.id;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${maskName(tc.name)}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${esc(tc.name)}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -1687,7 +1691,7 @@ function renderTeacherList(){
     const cnt=getStudents(tc.id).length;
     return`<div class="teacher-card" onclick="selectTeacher('${tc.id}')">
       <div class="teacher-avatar">${tc.emoji||'🧘‍♀️'}</div>
-      <div class="teacher-info"><div class="teacher-name">${maskName(tc.name)}</div><div class="teacher-count">${lang==='th'?'แตะเพื่อเข้าสู่ระบบ':'Tap to log in'}</div></div>
+      <div class="teacher-info"><div class="teacher-name">${esc(tc.name)}</div><div class="teacher-count">${lang==='th'?'แตะเพื่อเข้าสู่ระบบ':'Tap to log in'}</div></div>
       <div class="teacher-arrow">›</div>
     </div>`;
   }).join('');
@@ -1696,7 +1700,7 @@ function renderTeacherList(){
 function selectTeacher(id){
   currentTeacherId=id;
   const tc=getTeachers().find(x=>x.id===id);if(!tc)return;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${maskName(tc.name)}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${esc(tc.name)}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -1789,7 +1793,29 @@ function renderA(){
   const S=getStudents(currentTeacherId);
   const el=document.getElementById('ac');
   if(!S.length){el.innerHTML=`<div class="empty"><div class="ei">🧘‍♀️</div><p>${t('addToBegin')}</p></div>`;return;}
-  el.innerHTML=`<div class="adm-grid">${S.map(s=>{
+  const tUsed=S.reduce((a,s)=>a+s.u,0);
+  const tTotal=S.reduce((a,s)=>a+s.t,0);
+  const tRem=tTotal-tUsed;
+  const tDebt=S.filter(s=>s.t-s.u<0).reduce((a,s)=>a+Math.abs(s.t-s.u),0);
+  const statsBar=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;padding:0 .25rem">
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
+      <div style="font-size:22px;font-weight:600;color:var(--pink)">${S.length}</div>
+      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'นักเรียน':'Students'}</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
+      <div style="font-size:22px;font-weight:600;color:#111">${tTotal}</div>
+      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'ทั้งหมด':'Sold'}</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
+      <div style="font-size:22px;font-weight:600;color:#111">${tUsed}</div>
+      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'ใช้แล้ว':'Used'}</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
+      <div style="font-size:22px;font-weight:600;color:${tDebt>0?'var(--pink)':'#2dbd60'}">${tDebt>0?'-'+tDebt:tRem}</div>
+      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${tDebt>0?(lang==='th'?'ค้าง':'Debt'):(lang==='th'?'เหลือ':'Left')}</div>
+    </div>
+  </div>`;
+  el.innerHTML=statsBar+`<div class="adm-grid">${S.map(s=>{
     const rem=s.t-s.u,c=s.c||COL[0];
     return`<div class="a-card" style="background:${c.bg}">
       <button class="x-btn" onclick="del('${s.id}')">×</button>
@@ -2096,11 +2122,16 @@ function renderSaDashboard(){
     S.forEach(s=>{totalUsed+=s.u;totalRemaining+=(s.t-s.u);totalClasses+=s.t;});
   });
 
+  // compute debt separately
+  let totalDebt=0;
+  teachers.forEach(tc=>{getStudents(tc.id).forEach(s=>{if(s.t-s.u<0)totalDebt+=Math.abs(s.t-s.u);});});
   document.getElementById('sa-stats').innerHTML=`
     <div class="sa-stat-card"><div class="sa-stat-val">${teachers.length}</div><div class="sa-stat-lbl">Teachers</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalStudents}</div><div class="sa-stat-lbl">Students</div></div>
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalClasses}</div><div class="sa-stat-lbl">Total classes sold</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalUsed}</div><div class="sa-stat-lbl">Classes used</div></div>
-    <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes left</div></div>`;
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes remaining</div></div>
+    <div class="sa-stat-card"><div class="sa-stat-val" style="color:${totalDebt>0?'var(--pink)':'inherit'}">${totalDebt}</div><div class="sa-stat-lbl">Classes in debt</div></div>`;
 
   const list=document.getElementById('sa-teacher-list');
   if(!teachers.length){list.innerHTML='<div class="empty"><p>No teachers yet</p></div>';return;}
@@ -2606,6 +2637,17 @@ function openStuTopup(){
   document.getElementById('stu-pm-bank').textContent=dBank||notSet;
   document.getElementById('stu-pm-name').textContent=dName||notSet;
   document.getElementById('stu-masked-num').textContent=dNum?maskAcct(dNum):notSet;
+  // Show price
+  const priceRow=document.getElementById('stu-price-row');
+  const priceEl=document.getElementById('stu-price-val');
+  if(s.price&&s.price>0&&priceRow&&priceEl){
+    priceRow.style.display='block';
+    priceEl.textContent='฿'+s.price.toLocaleString()+' / package ('+s.t+' classes)';
+    document.getElementById('notify-amount').value=s.price;
+  } else if(priceRow){
+    priceRow.style.display='none';
+    document.getElementById('notify-amount').value='';
+  }
 
   const revealBtn=document.getElementById('stu-reveal-btn');
   revealBtn.textContent=lang==='th'?'แสดงเลขเต็ม / Tap to reveal':'Tap to reveal full number';
