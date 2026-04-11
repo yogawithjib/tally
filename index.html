@@ -985,7 +985,142 @@ body{background:#fafafa;min-height:100vh}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+
+
+/* ═══════════════════════════════════════════
+   FIREBASE CONFIG + INIT
+═══════════════════════════════════════════ */
+// Firebase loads dynamically — db set after SDK ready
+let db = null;
+const firebaseConfig = {
+  apiKey: "AIzaSyANdDXBBSYXwU61jBZBIrudOubV3rLJiYQ",
+  authDomain: "tally-679b9.firebaseapp.com",
+  projectId: "tally-679b9",
+  storageBucket: "tally-679b9.firebasestorage.app",
+  messagingSenderId: "962509453877",
+  appId: "1:962509453877:web:144f66036ccd77f4138f7c"
+};
+
+function loadFirebase(){
+  return new Promise(function(resolve){
+    if(typeof firebase !== 'undefined'&&firebase.firestore){
+      if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      db=firebase.firestore();
+      resolve();return;
+    }
+    var loaded=0;
+    function tryInit(){
+      loaded++;
+      if(loaded<2)return;
+      try{
+        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db=firebase.firestore();
+        console.log('Firebase ready');
+      }catch(e){console.warn('Firebase init failed',e);}
+      resolve();
+    }
+    function addScript(src){
+      var s=document.createElement('script');
+      s.src=src;
+      s.onload=tryInit;
+      s.onerror=function(){console.warn('Failed to load:',src);tryInit();};
+      document.head.appendChild(s);
+    }
+    // Try jsdelivr CDN (more reliable)
+    addScript('https://cdn.jsdelivr.net/npm/firebase@10.8.0/firebase-app-compat.js');
+    addScript('https://cdn.jsdelivr.net/npm/firebase@10.8.0/firebase-firestore-compat.js');
+  });
+}
+
+// ── FIRESTORE HELPERS ──
+async function fsGetTeachers(){
+  if(!db)return lsGetTeachers();
+  try{
+    const snap=await db.collection('teachers').get();
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){console.warn('FB read error',e);return lsGetTeachers();}
+}
+async function fsSaveTeacher(tc){
+  if(!db)return;
+  try{const {id,...data}=tc;await db.collection('teachers').doc(id).set(data);}
+  catch(e){console.warn('FB write error',e);}
+}
+async function fsDeleteTeacher(id){
+  if(!db)return;
+  try{
+    await db.collection('teachers').doc(id).delete();
+    // delete all students
+    const snap=await db.collection('teachers').doc(id).collection('students').get();
+    const batch=db.batch();
+    snap.docs.forEach(d=>batch.delete(d.ref));
+    await batch.commit();
+  }catch(e){console.warn('FB delete error',e);}
+}
+async function fsGetStudents(tid){
+  if(!db)return lsGetStudents(tid);
+  try{
+    const snap=await db.collection('teachers').doc(tid).collection('students').get();
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){console.warn('FB read error',e);return lsGetStudents(tid);}
+}
+async function fsSaveStudents(tid,students){
+  if(!db)return;
+  try{
+    const batch=db.batch();
+    const ref=db.collection('teachers').doc(tid).collection('students');
+    // Delete all first then re-save
+    const snap=await ref.get();
+    snap.docs.forEach(d=>batch.delete(d.ref));
+    students.forEach(s=>{
+      const {id,...data}=s;
+      batch.set(ref.doc(id),data);
+    });
+    await batch.commit();
+  }catch(e){console.warn('FB write error',e);}
+}
+async function fsGetBank(tid){
+  if(!db)return{bank:'',name:'',num:''};
+  try{
+    const doc=await db.collection('banks').doc(tid).get();
+    if(doc.exists)return doc.data();
+    return {bank:'',name:'',num:''};
+  }catch(e){return {bank:'',name:'',num:''};}
+}
+async function fsSaveBank(tid,b){
+  if(!db)return;
+  try{await db.collection('banks').doc(tid).set(b);}catch(e){console.warn(e);}
+}
+async function fsGetContact(tid){
+  if(!db)return{phone:'',line:'',email:'',lineToken:''};
+  try{
+    const doc=await db.collection('contacts').doc(tid).get();
+    if(doc.exists)return doc.data();
+    return {phone:'',line:'',email:'',lineToken:''};
+  }catch(e){return {phone:'',line:'',email:'',lineToken:''};}
+}
+async function fsSaveContact(tid,c){
+  if(!db)return;
+  try{await db.collection('contacts').doc(tid).set(c);}catch(e){console.warn(e);}
+}
+
+// ── OFFLINE FALLBACK (localStorage) ──
+function lsGetTeachers(){try{return JSON.parse(localStorage.getItem('yj_teachers')||'[]');}catch(e){return[];}}
+function lsGetStudents(tid){try{return JSON.parse(localStorage.getItem('yj_s_'+tid)||'[]');}catch(e){return[];}}
+
+// Show sync status
+function showSyncStatus(msg,ok=true){
+  const existing=document.getElementById('sync-status');
+  if(existing)existing.remove();
+  const el=document.createElement('div');
+  el.id='sync-status';
+  el.textContent=msg;
+  el.style.cssText='position:fixed;top:12px;right:12px;background:'+(ok?'#111':'#E24B4A')+';color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;z-index:300;opacity:1;transition:opacity 1s;font-family:inherit';
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),1000);},2000);
+}
+
 
 /* ═══════════════════════════════════════════
    SECURITY LAYER
@@ -1172,12 +1307,29 @@ let cps='new', cpf='', cpi='';
 function t(k){return TR[lang][k]||k;}
 
 /* ── STORAGE ── */
-function getTeachers(){try{return JSON.parse(localStorage.getItem('yj_teachers')||'[]');}catch(e){return[];}}
-function saveTeachers(arr){localStorage.setItem('yj_teachers',JSON.stringify(arr));}
-function getStudents(tid){try{return JSON.parse(localStorage.getItem('yj_s_'+tid)||'[]');}catch(e){return[];}}
-function saveStudents(tid,arr){localStorage.setItem('yj_s_'+tid,JSON.stringify(arr));}
-function getBank(tid){try{const b=JSON.parse(localStorage.getItem('yj_b_'+tid)||'{}');return{bank:b.bank||'',name:b.name||'',num:b.num||''};}catch(e){return{bank:'',name:'',num:''};}}
-function saveBank2(tid,b){localStorage.setItem('yj_b_'+tid,JSON.stringify(b));}
+// ── SYNC STORAGE: Firebase + localStorage fallback ──
+function getTeachers(){
+  // Return from localStorage cache (Firebase updates it via listener)
+  try{return JSON.parse(localStorage.getItem('yj_teachers')||'[]');}catch(e){return[];}
+}
+function saveTeachers(arr){
+  localStorage.setItem('yj_teachers',JSON.stringify(arr));
+  // Sync each teacher to Firebase
+  arr.forEach(tc=>fsSaveTeacher(tc));
+}
+function getStudents(tid){
+  try{return JSON.parse(localStorage.getItem('yj_s_'+tid)||'[]');}catch(e){return[];}
+}
+function saveStudents(tid,arr){
+  localStorage.setItem('yj_s_'+tid,JSON.stringify(arr));
+  fsSaveStudents(tid,arr).then(()=>showSyncStatus('✓ Synced'));
+}
+function getBank(tid){
+  try{const b=JSON.parse(localStorage.getItem('yj_b_'+tid)||'{}');return{bank:b.bank||'',name:b.name||'',num:b.num||''};}catch(e){return{bank:'',name:'',num:''};}}
+function saveBank2(tid,b){
+  localStorage.setItem('yj_b_'+tid,JSON.stringify(b));
+  fsSaveBank(tid,b);
+}
 
 /* ── LANG ── */
 function toggleLang(){lang=lang==='en'?'th':'en';localStorage.setItem('yj_lang',lang);applyLang();}
@@ -1208,14 +1360,41 @@ function applyLang(){
 
 /* ── SCREENS ── */
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
-function goHome(){currentTeacherId=null;currentStudentData=null;pi='';endSession();go('home-screen');}
+function goHome(){
+  currentTeacherId=null;currentStudentData=null;pi='';endSession();
+  go('home-screen');
+  // Refresh teachers from Firebase
+  fsGetTeachers().then(teachers=>{
+    if(teachers.length){
+      localStorage.setItem('yj_teachers',JSON.stringify(teachers));
+      // Also refresh each teacher's students
+      const promises=teachers.map(tc=>
+        fsGetStudents(tc.id).then(students=>{
+          if(students.length)localStorage.setItem('yj_s_'+tc.id,JSON.stringify(students));
+        })
+      );
+      Promise.all(promises).then(()=>{renderTeacherList();applyLang();});
+    }
+  }).catch(()=>{});
+}
 function showTeacherList(){go('teacher-select-screen');renderTeacherList();}
 
 /* ── STUDENT LOGIN ── */
-function findStudent(){
+async function findStudent(){
   const raw=document.getElementById('student-name-input').value.trim();
   if(!raw){document.getElementById('find-err').textContent=t('notFound');return;}
   const name=raw.toLowerCase();
+  // Pull fresh from Firebase first
+  try{
+    const fbTeachers=await fsGetTeachers();
+    if(fbTeachers.length){
+      localStorage.setItem('yj_teachers',JSON.stringify(fbTeachers));
+      for(const tc of fbTeachers){
+        const s=await fsGetStudents(tc.id);
+        if(s.length)localStorage.setItem('yj_s_'+tc.id,JSON.stringify(s));
+      }
+    }
+  }catch(e){}
   const teachers=getTeachers();
   let found=null, foundTeacher=null;
   for(const tc of teachers){
@@ -1424,6 +1603,10 @@ function hcp(){
 
 /* ── ADMIN ── */
 function renderA(){
+  // Refresh from Firebase
+  fsGetStudents(currentTeacherId).then(fbS=>{
+    if(fbS.length){localStorage.setItem('yj_s_'+currentTeacherId,JSON.stringify(fbS));}
+  }).catch(()=>{});
   const S=getStudents(currentTeacherId);
   const el=document.getElementById('ac');
   if(!S.length){el.innerHTML=`<div class="empty"><div class="ei">🧘‍♀️</div><p>${t('addToBegin')}</p></div>`;return;}
@@ -1743,6 +1926,7 @@ function deleteTeacher(id,name){
   saveTeachers(teachers);
   localStorage.removeItem('yj_s_'+id);
   localStorage.removeItem('yj_b_'+id);
+  fsDeleteTeacher(id);
   renderSaDashboard();
   toast(name+' deleted');
 }
@@ -2282,6 +2466,20 @@ applyLang();
 loadSaPin();
 migrateBankData();
 shuffleLibrary();
+// Load Firebase first, then pull data
+loadFirebase().then(()=>{
+  fsGetTeachers().then(teachers=>{
+  if(teachers.length){
+    localStorage.setItem('yj_teachers',JSON.stringify(teachers));
+    const promises=teachers.map(tc=>
+      fsGetStudents(tc.id).then(students=>{
+        if(students.length)localStorage.setItem('yj_s_'+tc.id,JSON.stringify(students));
+      })
+    );
+    Promise.all(promises).then(()=>{renderTeacherList();applyLang();showSyncStatus('✓ Online');});
+  }
+}).catch(()=>showSyncStatus('Offline mode',false));
+}).catch(()=>{console.warn('Firebase failed to load');});
 </script>
 </body>
 </html>
