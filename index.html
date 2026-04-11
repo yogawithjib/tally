@@ -440,6 +440,38 @@ body{background:#fafafa;min-height:100vh}
   </div>
 </div>
 
+
+<!-- STUDENT PIN SCREEN -->
+<div id="student-pin-screen" class="screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
+  <div style="background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px;margin:0 auto 1.5rem">
+    <div style="font-size:36px;text-align:center;margin-bottom:8px" id="stu-pin-avatar">🌸</div>
+    <div style="font-size:15px;font-weight:600;color:#111;margin-bottom:4px;text-align:center" id="stu-pin-hd">Set your PIN</div>
+    <div style="font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem;line-height:1.5" id="stu-pin-sub">Choose a 4-digit PIN to keep your info private</div>
+    <div class="dots" id="stu-pin-dots" style="justify-content:center">
+      <div class="dot" id="sp-d0"></div><div class="dot" id="sp-d1"></div>
+      <div class="dot" id="sp-d2"></div><div class="dot" id="sp-d3"></div>
+    </div>
+    <div class="pad">
+      <button class="nb" onclick="spnp('1')">1<span class="ns"></span></button>
+      <button class="nb" onclick="spnp('2')">2<span class="ns">ABC</span></button>
+      <button class="nb" onclick="spnp('3')">3<span class="ns">DEF</span></button>
+      <button class="nb" onclick="spnp('4')">4<span class="ns">GHI</span></button>
+      <button class="nb" onclick="spnp('5')">5<span class="ns">JKL</span></button>
+      <button class="nb" onclick="spnp('6')">6<span class="ns">MNO</span></button>
+      <button class="nb" onclick="spnp('7')">7<span class="ns">PQRS</span></button>
+      <button class="nb" onclick="spnp('8')">8<span class="ns">TUV</span></button>
+      <button class="nb" onclick="spnp('9')">9<span class="ns">WXYZ</span></button>
+      <button class="nb z" onclick="spnp('0')">0</button>
+      <button class="nb del" onclick="spnd()">&#9003;</button>
+    </div>
+    <div class="lerr" id="stu-pin-err"></div>
+    <div style="font-size:11px;color:var(--gl);text-align:center;margin-top:10px" id="stu-pin-forgot"></div>
+  </div>
+  <div class="llinks" style="margin-top:1rem">
+    <button class="llink" onclick="goHome()">&#8592; Back</button>
+  </div>
+</div>
+
 <!-- TEACHER SELECT -->
 <div id="teacher-select-screen" class="screen">
   <div class="hd">
@@ -538,7 +570,8 @@ body{background:#fafafa;min-height:100vh}
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn-sv">TH</button>
   </div>
   <div id="student-card-area"></div>
-  <button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
+  <button onclick="openStudentChangePin()" style="width:100%;padding:9px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--gr);font-size:13px;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-bottom:6px;max-width:320px;display:block;margin-left:auto;margin-right:auto" id="change-pin-btn">&#128274; Change PIN</button>
+<button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
 </div>
 
 <!-- ADMIN VIEW -->
@@ -596,21 +629,24 @@ body{background:#fafafa;min-height:100vh}
           <span id="disc-lbl">Legal disclaimer / ข้อจำกัดความรับผิดชอบ</span>
         </button>
         <div class="disc-body" id="disc-body">
-          <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
-          <p style="margin-bottom:8px">This application ("Tally by Yoga with Jib") is provided as a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">1. Data & Privacy</strong><br>
-          This app stores only nicknames (usernames) and class counts. No full names, ID numbers, phone numbers, payment card details, or sensitive personal data should be entered. The app developer accepts no responsibility for any sensitive information entered by users in violation of these guidelines. Data is stored locally on your device and is not transmitted to any third party except via Google Apps Script if configured by your teacher.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>
-          This app displays teacher bank account information for the sole purpose of facilitating class package payments. Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts, fraudulent accounts, or any financial disputes arising from transfers made through or inspired by this app.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>
-          Class deduction records are maintained in good faith. In the event of any discrepancy between the app record and actual classes attended, the student and teacher should resolve the matter directly. Yoga with Jib is not liable for data loss, technical errors, or record inaccuracies.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>
-          This app is provided "as is" without warranty of any kind. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability of this service.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">5. Third-Party Services</strong><br>
-          This app may integrate with LINE Notify, Google Apps Script, and GitHub Pages. Use of these services is subject to their respective terms of service. Yoga with Jib is not responsible for their availability or data handling practices.</p>
-          <p style="margin-bottom:8px"><strong style="color:#555">ภาษาไทย (สรุป)</strong><br>
-          แอปนี้จัดทำขึ้นเพื่อความสะดวกในการติดตามคลาสโยคะเท่านั้น กรุณาอย่าใส่ข้อมูลส่วนตัวที่ละเอียดอ่อน เช่น ชื่อจริง เบอร์โทร หรือข้อมูลบัตรธนาคาร ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการโอนเงินผิดบัญชี การสูญหายของข้อมูล หรือข้อพิพาทระหว่างครูและนักเรียน กรุณายืนยันข้อมูลธนาคารกับครูโดยตรงก่อนโอนเงินทุกครั้ง</p>
-          <p style="color:#bbb;font-size:10px">Last updated: April 2026 · <a href="/cdn-cgi/l/email-protection#523b3c343d122b3d3533253b263a383b307c313d3f">Contact</a></p>
+          <div id="disc-en">
+            <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
+            <p style="margin-bottom:8px">This application is a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">1. Data &amp; Privacy</strong><br>This app stores only usernames and class counts. No full names, ID numbers, or phone numbers should be entered.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>Always verify bank details directly with your teacher before transferring. Yoga with Jib accepts no liability for incorrect payments.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>Records are maintained in good faith. Discrepancies should be resolved between teacher and student.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>This app is provided "as is" without warranty.</p>
+            <p style="color:#bbb;font-size:10px;margin-top:8px">Last updated: April 2026</p>
+          </div>
+          <div id="disc-th" style="display:none">
+            <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — แอปติดตามคลาสโยคะ</strong></p>
+            <p style="margin-bottom:8px">แอปนี้จัดทำขึ้นเพื่อเป็นเครื่องมือติดตามแพ็คเกจคลาสโยคะ การใช้แอปนี้ถือว่าคุณยอมรับข้อกำหนดต่อไปนี้</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">1. ข้อมูลและความเป็นส่วนตัว</strong><br>แอปนี้จัดเก็บเฉพาะชื่อเล่นและจำนวนคลาส ห้ามใส่ชื่อจริง เลขบัตร หรือเบอร์โทร</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">2. การชำระเงิน</strong><br>กรุณายืนยันข้อมูลบัญชีกับครูก่อนโอนทุกครั้ง Yoga with Jib ไม่รับผิดชอบต่อการโอนผิดบัญชี</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">3. บันทึกคลาส</strong><br>หากมีความคลาดเคลื่อนให้ครูและนักเรียนตกลงกันโดยตรง</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">4. ความพร้อมใช้งาน</strong><br>แอปนี้ให้บริการตามสภาพที่เป็น ไม่มีการรับประกัน</p>
+            <p style="color:#bbb;font-size:10px;margin-top:8px">อัปเดตล่าสุด: เมษายน 2569</p>
+          </div>
         </div>
       </div>
     </div>
@@ -905,6 +941,34 @@ body{background:#fafafa;min-height:100vh}
   </div>
 </div>
 
+
+<!-- STUDENT CHANGE PIN MODAL -->
+<div class="mbg" id="stu-change-pin-m" style="display:none">
+  <div class="modal" style="max-width:300px">
+    <div class="mhd" id="scp-title" style="text-align:center">Change PIN</div>
+    <div style="font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem" id="scp-sub">Enter your current PIN first</div>
+    <div class="dots" id="scp-dots" style="justify-content:center">
+      <div class="dot" id="scp-d0"></div><div class="dot" id="scp-d1"></div>
+      <div class="dot" id="scp-d2"></div><div class="dot" id="scp-d3"></div>
+    </div>
+    <div class="pad">
+      <button class="nb" onclick="scpnp('1')">1<span class="ns"></span></button>
+      <button class="nb" onclick="scpnp('2')">2<span class="ns">ABC</span></button>
+      <button class="nb" onclick="scpnp('3')">3<span class="ns">DEF</span></button>
+      <button class="nb" onclick="scpnp('4')">4<span class="ns">GHI</span></button>
+      <button class="nb" onclick="scpnp('5')">5<span class="ns">JKL</span></button>
+      <button class="nb" onclick="scpnp('6')">6<span class="ns">MNO</span></button>
+      <button class="nb" onclick="scpnp('7')">7<span class="ns">PQRS</span></button>
+      <button class="nb" onclick="scpnp('8')">8<span class="ns">TUV</span></button>
+      <button class="nb" onclick="scpnp('9')">9<span class="ns">WXYZ</span></button>
+      <button class="nb z" onclick="scpnp('0')">0</button>
+      <button class="nb del" onclick="scpnd()">&#9003;</button>
+    </div>
+    <div class="lerr" id="scp-err"></div>
+    <div class="macts"><button class="bc" onclick="cm('stu-change-pin-m')">Cancel</button></div>
+  </div>
+</div>
+
 <!-- BANK PIN CONFIRM -->
 <div class="mbg" id="bank-pin-m" style="display:none">
   <div class="modal" style="max-width:300px">
@@ -1010,7 +1074,10 @@ body{background:#fafafa;min-height:100vh}
   <div class="modal wide">
     <div class="h-header"><div class="h-sym" id="h-sym"></div><div><div class="h-name" id="h-name"></div><div class="h-meta" id="h-meta"></div></div></div>
     <div class="h-list" id="h-list"></div>
-    <div class="macts"><button class="bs" onclick="cm('hist-m')">Close</button></div>
+    <div class="macts">
+      <button class="bc" onclick="resetStudentPin(currentHistStudent);cm('hist-m')" style="font-size:12px">&#128274; Reset PIN</button>
+      <button class="bs" onclick="cm('hist-m')">Close</button>
+    </div>
   </div>
 </div>
 
@@ -1499,8 +1566,8 @@ async function findStudent(){
   }
   document.getElementById('find-err').textContent='';
   currentStudentData={student:found, teacher:foundTeacher};
-  renderStudentView(found, foundTeacher);
-  go('student-view-screen');
+  if(found.pin){goToStudentPin(found,'verify');}
+  else{goToStudentPin(found,'set');}
 }
 
 /* ── STUDENT VIEW ── */
@@ -1763,6 +1830,7 @@ function del(id){
   saveStudents(currentTeacherId,S.filter(x=>x.id!==id));renderA();
 }
 function openHist(id){
+  currentHistStudent=id;
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   document.getElementById('h-sym').textContent=s.sym;
   document.getElementById('h-name').textContent=esc(s.n);
@@ -2309,6 +2377,160 @@ async function sendNotification(){
       lang==='th'?'ส่งไม่สำเร็จ กรุณาติดต่อครูโดยตรง':'Send failed. Please contact your teacher directly.';
     btn.disabled=false;btn.style.opacity='1';
     document.getElementById('notify-btn-lbl').textContent=lang==='th'?'แจ้งครู':'Notify teacher';
+  }
+}
+
+
+/* ── STUDENT PIN ── */
+let sppi='', spMode='set', sppFirst='';
+
+function spnp(n){
+  if(sppi.length>=4)return;
+  sppi+=n;dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
+  if(sppi.length===4)setTimeout(handleStudentPin,120);
+}
+function spnd(){
+  sppi=sppi.slice(0,-1);
+  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
+  document.getElementById('stu-pin-err').textContent='';
+}
+
+async function handleStudentPin(){
+  if(!currentStudentData)return;
+  const {student:s,teacher:tc}=currentStudentData;
+  if(spMode==='set'){
+    sppFirst=sppi;sppi='';spMode='confirm';
+    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ยืนยัน PIN':'Confirm your PIN';
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN อีกครั้ง':'Enter your PIN again to confirm';
+    dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);return;
+  }
+  if(spMode==='confirm'){
+    if(sppi!==sppFirst){
+      document.getElementById('stu-pin-err').textContent=lang==='th'?'PIN ไม่ตรงกัน':"PINs don't match";
+      document.getElementById('stu-pin-dots').classList.add('shake');
+      setTimeout(function(){
+        document.getElementById('stu-pin-dots').classList.remove('shake');
+        sppi='';sppFirst='';spMode='set';
+        document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
+        document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลัก':'Choose a 4-digit PIN to keep your info private';
+        dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+        document.getElementById('stu-pin-err').textContent='';
+      },700);return;
+    }
+    hashPin(sppi).then(function(hashed){
+      const students=getStudents(tc.id);
+      const st=students.find(function(x){return x.id===s.id;});
+      if(st){st.pin=hashed;saveStudents(tc.id,students);}
+      currentStudentData.student.pin=hashed;
+      toast(lang==='th'?'ตั้ง PIN เรียบร้อย':'PIN set!');
+      showStudentView();
+    });return;
+  }
+  if(spMode==='verify'){
+    const lockKey='student_'+s.id;
+    if(isLockedOut(lockKey)){showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);return;}
+    const ok=await verifyPin(sppi,s.pin);
+    if(ok){resetPinAttempts(lockKey);showStudentView();}
+    else{
+      const attempts=incPinAttempts(lockKey);
+      const rem=MAX_ATTEMPTS-attempts;
+      if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);}
+      else{document.getElementById('stu-pin-err').textContent=(lang==='th'?'PIN ไม่ถูกต้อง':'Wrong PIN')+(rem<=2?' ('+rem+' left)':'');}
+      document.getElementById('stu-pin-dots').classList.add('shake');
+      setTimeout(function(){document.getElementById('stu-pin-dots').classList.remove('shake');sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);},600);
+    }
+  }
+}
+
+function showStudentView(){
+  if(!currentStudentData)return;
+  sppi='';sppFirst='';spMode='set';
+  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+  document.getElementById('student-pin-screen').style.display='none';
+  renderStudentView(currentStudentData.student,currentStudentData.teacher);
+  go('student-view-screen');
+}
+
+function goToStudentPin(student,mode){
+  spMode=mode;sppi='';sppFirst='';
+  document.getElementById('stu-pin-avatar').textContent=student.sym||'🌸';
+  if(mode==='verify'){
+    document.getElementById('stu-pin-hd').textContent=student.n;
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN ของคุณ':'Enter your PIN to continue';
+    document.getElementById('stu-pin-forgot').textContent=lang==='th'?'ลืม PIN? ติดต่อครูเพื่อ reset':'Forgot PIN? Ask your teacher to reset it.';
+  } else {
+    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลักเพื่อรักษาข้อมูล':'Choose a 4-digit PIN to keep your info private';
+    document.getElementById('stu-pin-forgot').textContent='';
+  }
+  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+  document.getElementById('stu-pin-err').textContent='';
+  document.getElementById('student-pin-screen').style.display='flex';
+  go('student-pin-screen');
+}
+
+let currentHistStudent=null;
+function resetStudentPin(sid){
+  if(!confirm(lang==='th'?'รีเซ็ต PIN ของนักเรียน?':'Reset this student PIN?'))return;
+  const S=getStudents(currentTeacherId);
+  const s=S.find(function(x){return x.id===sid;});
+  if(s){delete s.pin;saveStudents(currentTeacherId,S);toast('PIN reset');}
+}
+
+/* ── STUDENT CHANGE PIN ── */
+let scppi='',scpMode='verify',scpFirst='';
+
+function openStudentChangePin(){
+  if(!currentStudentData||!currentStudentData.student.pin){
+    toast(lang==='th'?'ไม่มี PIN ที่ตั้งไว้':'No PIN set yet');return;
+  }
+  scppi='';scpFirst='';scpMode='verify';
+  dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);
+  document.getElementById('scp-title').textContent=lang==='th'?'เปลี่ยน PIN':'Change PIN';
+  document.getElementById('scp-sub').textContent=lang==='th'?'ใส่ PIN ปัจจุบันก่อน':'Enter your current PIN first';
+  document.getElementById('scp-err').textContent='';
+  document.getElementById('stu-change-pin-m').style.display='flex';
+}
+function scpnp(n){
+  if(scppi.length>=4)return;
+  scppi+=n;dots(['scp-d0','scp-d1','scp-d2','scp-d3'],scppi.length);
+  if(scppi.length===4)setTimeout(handleSCP,120);
+}
+function scpnd(){scppi=scppi.slice(0,-1);dots(['scp-d0','scp-d1','scp-d2','scp-d3'],scppi.length);document.getElementById('scp-err').textContent='';}
+async function handleSCP(){
+  const s=currentStudentData.student,tc=currentStudentData.teacher;
+  if(scpMode==='verify'){
+    const ok=await verifyPin(scppi,s.pin);
+    if(!ok){
+      document.getElementById('scp-err').textContent=lang==='th'?'PIN ไม่ถูกต้อง':'Wrong PIN';
+      document.getElementById('scp-dots').classList.add('shake');
+      setTimeout(function(){document.getElementById('scp-dots').classList.remove('shake');scppi='';dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);document.getElementById('scp-err').textContent='';},600);
+      return;
+    }
+    scppi='';scpMode='new';
+    document.getElementById('scp-title').textContent=lang==='th'?'PIN ใหม่':'New PIN';
+    document.getElementById('scp-sub').textContent=lang==='th'?'เลือก PIN ใหม่ 4 หลัก':'Choose a new 4-digit PIN';
+    document.getElementById('scp-err').textContent='';
+    dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);return;
+  }
+  if(scpMode==='new'){scpFirst=scppi;scppi='';scpMode='confirm';
+    document.getElementById('scp-title').textContent=lang==='th'?'ยืนยัน PIN':'Confirm PIN';
+    document.getElementById('scp-sub').textContent=lang==='th'?'ใส่ PIN อีกครั้ง':'Enter PIN again';
+    dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);return;
+  }
+  if(scpMode==='confirm'){
+    if(scppi!==scpFirst){
+      document.getElementById('scp-err').textContent=lang==='th'?'PIN ไม่ตรงกัน':'PINs do not match';
+      setTimeout(function(){scppi='';scpFirst='';scpMode='new';document.getElementById('scp-title').textContent=lang==='th'?'PIN ใหม่':'New PIN';dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);document.getElementById('scp-err').textContent='';},700);return;
+    }
+    hashPin(scppi).then(function(hashed){
+      const students=getStudents(tc.id);
+      const st=students.find(function(x){return x.id===s.id;});
+      if(st){st.pin=hashed;saveStudents(tc.id,students);}
+      currentStudentData.student.pin=hashed;
+      cm('stu-change-pin-m');
+      toast(lang==='th'?'เปลี่ยน PIN เรียบร้อย':'PIN changed!');
+    });
   }
 }
 
