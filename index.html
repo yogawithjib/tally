@@ -684,35 +684,7 @@ body{background:#fafafa;min-height:100vh}
 
 
     <!-- LIBRARY SECTION -->
-    <div class="library-section" id="lib-sec-2">
-      <div class="lib-title">✨ Explore more</div>
-      <a class="lib-link" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank">
-        <div class="lib-dot"></div>
-        <span class="lib-en">Beginner's guide</span><span class="lib-th">คู่มือผู้ฝึกใหม่</span>
-        <span class="lib-arr">→</span>
-      </a>
-      <a class="lib-link" href="https://yogawithjib.github.io/library/quiz.html" target="_blank">
-        <div class="lib-dot"></div>
-        <span class="lib-en">Teacher personality quiz</span><span class="lib-th">คุณเป็นครูโยคะแบบไหน?</span>
-        <span class="lib-arr">→</span>
-      </a>
-      <a class="lib-link" href="https://yogawithjib.github.io/library/videos.html" target="_blank">
-        <div class="lib-dot"></div>
-        <span class="lib-en">Practice yoga online</span><span class="lib-th">ฝึกโยคะออนไลน์</span>
-        <span class="lib-arr">→</span>
-      </a>
-      <a class="lib-link" href="https://yogawithjib.github.io/library/pranayama.html" target="_blank">
-        <div class="lib-dot"></div>
-        <span class="lib-en">Box breathing</span><span class="lib-th">ฝึกหายใจรูปกล่อง</span>
-        <span class="lib-arr">→</span>
-      </a>
-      <a class="lib-link" href="https://yogawithjib.github.io/library/diary.html" target="_blank">
-        <div class="lib-dot"></div>
-        <span class="lib-en">A yoga teacher's diary</span><span class="lib-th">ไดอารี่ครูโยคะ</span>
-        <span class="lib-arr">→</span>
-      </a>
-    </div>
-
+    
       <!-- DISCLAIMER -->
       <div class="disclaimer">
         <button class="disc-toggle" onclick="toggleDisc()">
@@ -3182,7 +3154,7 @@ function toggleDisc(){
 
 
 function shuffleLibrary(){
-  ['lib-sec-1','lib-sec-2','lib-sec-student'].forEach(function(id){
+  ['lib-sec-1','lib-sec-student'].forEach(function(id){
     var sec=document.getElementById(id);
     if(!sec)return;
     var links=Array.from(sec.querySelectorAll('.lib-link'));
