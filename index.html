@@ -56,8 +56,8 @@ body{background:#fafafa;min-height:100vh}
 .teacher-info{flex:1}.teacher-name{font-size:15px;font-weight:500;color:#111}
 .teacher-count{font-size:12px;font-weight:300;color:var(--gl);margin-top:2px}
 .teacher-arrow{font-size:18px;color:var(--gl)}
-.new-teacher-btn{width:100%;padding:12px;border-radius:12px;border:1.5px dashed var(--bd);background:#fff;font-size:14px;font-weight:400;color:var(--gr);cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
-.new-teacher-btn:hover{border-color:var(--pink);color:var(--pink);background:var(--pl)}
+.new-teacher-btn{width:auto;padding:8px 20px;border-radius:50px;border:1px dotted #fb2a7b;background:#fff;font-size:14px;font-weight:400;color:#fb2a7b;cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;display:block;margin:0 auto}
+.new-teacher-btn:hover{background:var(--pl)}
 
 /* PRIVACY BOX */
 .privacy-box{background:#f7f7f7;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;border-left:3px solid var(--pink)}
@@ -1122,8 +1122,8 @@ const TR={
     tsSub:'teacher login',tsTitle:'Select your name',tsSub2:'Then enter your PIN',
     newTeacher:"+ I'm a new teacher",
     suSub:'new teacher',suHd:'Create your account',suSub2:'Takes 30 seconds',
-    privTitle:'🔒 Privacy notice',
-    privText:"Please use nicknames only. Do not enter students' full names, phone numbers, ID numbers, or any sensitive personal information.",
+    privTitle:'🔒 Disclaimer',
+    privText:'This app is free and built with good intentions but cannot take responsibility for any data you choose to enter. We recommend avoiding sensitive personal information and using the app at your own responsibility.',
     suNameLbl:'Your teacher name',suEmoLbl:'Pick your avatar',suPinLbl:'Set a 4-digit PIN',
     suCreateBtn:'Create account',loginSub:'Enter your PIN',
     wMain:'Hi {name}! 🙏',active:'Active',low:'Running low',out:'All used',left:'left',
@@ -1138,7 +1138,7 @@ const TR={
     hUsed:'used',hLeft:'remaining',confirmRemove:'Remove this entry?',
   },
   th:{
-    sub:'ข้อมูลคลาสโยคะ',langBtn:'EN',hTitle:'ยินดีต้อนรับ! คุณคือใคร?',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
+    sub:'ข้อมูลคลาสโยคะ',langBtn:'EN',hTitle:'ฮาโหล นี่เป็นนักเรียนหรือเป็นครูน้า~',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
     roleStudent:'ฉันเป็นนักเรียน',roleStudentSub:'ดูคลาสของฉัน',
     roleTeacher:'ฉันเป็นครู',roleTeacherSub:'จัดการข้อมูล',
     slSub:'นักเรียน',slHd:'ใส่ username ของคุณ',slSub2:'ใส่ username ของคุณ ถ้าไม่รู้ให้ถามครูได้เลย',
@@ -1147,8 +1147,8 @@ const TR={
     tsSub:'ล็อกอินครู',tsTitle:'เลือกชื่อของคุณ',tsSub2:'แล้วใส่ PIN',
     newTeacher:'+ ฉันเป็นครูใหม่',
     suSub:'ครูใหม่',suHd:'สร้างบัญชีของคุณ',suSub2:'ใช้เวลาแค่ 30 วินาที',
-    privTitle:'🔒 ประกาศความเป็นส่วนตัว',
-    privText:'กรุณาใช้ชื่อเล่นเท่านั้น ห้ามใส่ชื่อจริง-นามสกุล หมายเลขโทรศัพท์ หรือข้อมูลส่วนตัวใดๆ',
+    privTitle:'🔒 ข้อจำกัดความรับผิดชอบ',
+    privText:'ระบบนี้ฟรี ทำด้วยความตั้งใจ แต่ไม่สามารถรับผิดชอบต่อข้อมูลที่คุณเลือกใส่เข้ามาได้ แนะนำให้หลีกเลี่ยงการใส่ข้อมูลที่มีความละเอียดอ่อนและรับผิดชอบการใช้งานด้วยตัวเอง',
     suNameLbl:'ชื่อครู',suEmoLbl:'เลือกอวตาร',suPinLbl:'ตั้ง PIN 4 หลัก',
     suCreateBtn:'สร้างบัญชี',loginSub:'ใส่ PIN ของคุณ',
     wMain:'สวัสดี {name}! 🙏',active:'Active',low:'เหลือน้อย',out:'หมดแล้ว',left:'เหลือ',
