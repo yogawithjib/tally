@@ -849,9 +849,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 <div class="mbg" id="contact-m" style="display:none">
   <div class="modal">
     <div class="mhd">📱 Contact info</div>
-    <div style="font-size:12px;font-weight:300;color:var(--gl);margin-bottom:1rem;line-height:1.6">
-      Your students will see this when they want to top up — so they can reach you to confirm.
-    </div>
+    <div id="contact-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:12px;line-height:1.5"></div>
     <div style="font-size:11px;font-weight:300;color:var(--gl);margin-bottom:12px;line-height:1.6">
       Shown to students when they top up. Used to send you payment notifications.
     </div>
@@ -1083,7 +1081,8 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 <div class="mbg" id="bank-m" style="display:none">
   <div class="modal">
     <div class="mhd">Bank details</div>
-    <div class="secure-badge">🔒 Encrypted &amp; PIN protected</div>
+    <div id="bank-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:8px;line-height:1.5"></div>
+    <div class="secure-badge">🔒 Encrypted locally · plain text shared with students</div>
     <div class="bank-settings-row">
       <div class="setting-field"><label>Bank name</label><input id="b-bank" type="text" placeholder="e.g. Kasikorn, SCB" maxlength="40"/></div>
       <div class="setting-field"><label>Account name</label><input id="b-name" type="text" maxlength="60"/></div>
@@ -1966,24 +1965,34 @@ function openBank(){
   document.getElementById('bpin-err').textContent='';
   document.getElementById('bank-pin-m').style.display='flex';
 }
-function openBankActual(){
-  const bk=getBank(currentTeacherId);
-  document.getElementById('b-bank').value=decryptBank(bk.bank,currentTeacherId);
-  document.getElementById('b-name').value=decryptBank(bk.name,currentTeacherId);
-  document.getElementById('b-num').value=decryptBank(bk.num,currentTeacherId);
+async function openBankActual(){
+  // Fetch plain text from Firebase first, fall back to decrypted localStorage
+  let rawBank='',rawName='',rawNum='';
+  try{
+    const fb=await fsGetBank(currentTeacherId);
+    if(fb&&fb.bank&&!fb.enc){rawBank=fb.bank;rawName=fb.name||'';rawNum=fb.num||'';}
+    else{const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
+  }catch(e){const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
+  document.getElementById('b-bank').value=rawBank;
+  document.getElementById('b-name').value=rawName;
+  document.getElementById('b-num').value=rawNum;
+  // Show current-saved preview
+  const prev=document.getElementById('bank-saved-preview');
+  if(prev){
+    prev.textContent=rawBank&&rawName?rawBank+' · '+rawName+(rawNum?' · '+maskAcct(rawNum):''):'';
+    prev.style.display=(rawBank||rawName)?'block':'none';
+  }
   document.getElementById('bank-m').style.display='flex';
 }
 function saveBank(){
   const rawBank=document.getElementById('b-bank').value.trim();
   const rawName=document.getElementById('b-name').value.trim();
   const rawNum=document.getElementById('b-num').value.trim();
-  const bk={
-    bank:encryptBank(rawBank,currentTeacherId),
-    name:encryptBank(rawName,currentTeacherId),
-    num:encryptBank(rawNum,currentTeacherId),
-    enc:true
-  };
-  saveBank2(currentTeacherId,bk);
+  // Encrypted to localStorage (protects on teacher's device)
+  const enc={bank:encryptBank(rawBank,currentTeacherId),name:encryptBank(rawName,currentTeacherId),num:encryptBank(rawNum,currentTeacherId),enc:true};
+  localStorage.setItem('yj_b_'+currentTeacherId,JSON.stringify(enc));
+  // Plain text to Firebase (students read from here)
+  fsSaveBank(currentTeacherId,{bank:rawBank,name:rawName,num:rawNum,enc:false});
   cm('bank-m');toast(t('bankSaved'));
 }
 
@@ -2469,12 +2478,26 @@ function getContact(tid){
 }
 function saveContactData(tid,c){localStorage.setItem('yj_c_'+tid,JSON.stringify(c));}
 
-function openContact(){
-  const c=getContact(currentTeacherId);
-  document.getElementById('c-phone').value=c.phone;
-  document.getElementById('c-line').value=c.line;
-  document.getElementById('c-email').value=c.email;
-
+async function openContact(){
+  // Fetch from Firebase first, fall back to localStorage
+  let c={phone:'',line:'',email:''};
+  try{const fc=await fsGetContact(currentTeacherId);if(fc&&(fc.phone||fc.email||fc.line))c=fc;}
+  catch(e){c=getContact(currentTeacherId);}
+  // Sync to localStorage so it's available offline
+  if(c.phone||c.email||c.line)saveContactData(currentTeacherId,c);
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-line').value=c.line||'';
+  document.getElementById('c-email').value=c.email||'';
+  // Show current-saved preview
+  const prev=document.getElementById('contact-saved-preview');
+  if(prev){
+    const parts=[];
+    if(c.phone)parts.push(c.phone);
+    if(c.line)parts.push('LINE: '+c.line);
+    if(c.email)parts.push(c.email);
+    prev.textContent=parts.length?parts.join('  ·  '):'';
+    prev.style.display=parts.length?'block':'none';
+  }
   document.getElementById('contact-m').style.display='flex';
   setTimeout(()=>document.getElementById('c-phone').focus(),60);
 }
