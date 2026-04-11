@@ -337,6 +337,10 @@ body{background:#fafafa;min-height:100vh}
 .debt-lbl{font-size:13px;color:#7a0030;margin-top:2px;font-weight:300}
 .debt-note{font-size:11px;color:#999;margin-top:6px;font-weight:300}
 .sdebt{background:#FFE0EC;color:#7a0030}
+.stu-pin-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
+.stu-pin-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
+.stu-pin-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem;line-height:1.5}
+.stu-pin-avatar{font-size:36px;text-align:center;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -437,6 +441,38 @@ body{background:#fafafa;min-height:100vh}
   </div>
   <div class="llinks" style="margin-top:1rem">
     <button class="llink" onclick="goHome()">← Back</button>
+  </div>
+</div>
+
+
+<!-- STUDENT PIN SCREEN -->
+<div id="student-pin-screen" class="screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
+  <div class="stu-pin-box">
+    <div class="stu-pin-avatar" id="stu-pin-avatar">&#127800;</div>
+    <div class="stu-pin-hd" id="stu-pin-hd">Set your PIN</div>
+    <div class="stu-pin-sub" id="stu-pin-sub">Choose a 4-digit PIN to keep your info private</div>
+    <div class="dots" id="stu-pin-dots" style="justify-content:center">
+      <div class="dot" id="sp-d0"></div><div class="dot" id="sp-d1"></div>
+      <div class="dot" id="sp-d2"></div><div class="dot" id="sp-d3"></div>
+    </div>
+    <div class="pad">
+      <button class="nb" onclick="spnp('1')">1<span class="ns"></span></button>
+      <button class="nb" onclick="spnp('2')">2<span class="ns">ABC</span></button>
+      <button class="nb" onclick="spnp('3')">3<span class="ns">DEF</span></button>
+      <button class="nb" onclick="spnp('4')">4<span class="ns">GHI</span></button>
+      <button class="nb" onclick="spnp('5')">5<span class="ns">JKL</span></button>
+      <button class="nb" onclick="spnp('6')">6<span class="ns">MNO</span></button>
+      <button class="nb" onclick="spnp('7')">7<span class="ns">PQRS</span></button>
+      <button class="nb" onclick="spnp('8')">8<span class="ns">TUV</span></button>
+      <button class="nb" onclick="spnp('9')">9<span class="ns">WXYZ</span></button>
+      <button class="nb z" onclick="spnp('0')">0</button>
+      <button class="nb del" onclick="spnd()">&#9003;</button>
+    </div>
+    <div class="lerr" id="stu-pin-err"></div>
+    <div style="font-size:11px;color:var(--gl);text-align:center;margin-top:10px" id="stu-pin-forgot"></div>
+  </div>
+  <div class="llinks" style="margin-top:1rem">
+    <button class="llink" onclick="go('student-login-screen')">&#8592; Back</button>
   </div>
 </div>
 
@@ -615,6 +651,37 @@ body{background:#fafafa;min-height:100vh}
       </div>
     </div>
 
+
+    <!-- LIBRARY IN ADMIN -->
+    <div class="library-section" id="lib-sec-admin" style="margin-top:1.5rem">
+      <div class="lib-title">&#10024; Resources</div>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Beginner's guide</span><span class="lib-th">คู่มือผู้ฝึกใหม่</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/quiz.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Teacher personality quiz</span><span class="lib-th">คุณเป็นครูโยคะแบบไหน?</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/videos.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Practice yoga online</span><span class="lib-th">ฝึกโยคะออนไลน์</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/pranayama.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Box breathing</span><span class="lib-th">ฝึกหายใจรูปกล่อง</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/diary.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">A yoga teacher's diary</span><span class="lib-th">ไดอารี่ครูโยคะ</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+    </div>
+
 </div>
 
 </div><!-- /page -->
@@ -764,7 +831,7 @@ body{background:#fafafa;min-height:100vh}
       <label id="lbl-price-f">Price per package (optional)</label>
       <div class="price-input-wrap">
         <span>฿</span>
-        <input id="inp-price" type="number" placeholder="e.g. 2000" min="0" maxlength="10"/>
+        <input id="inp-price" type="number" placeholder="price per package" id="price-ph-1" min="0" maxlength="10"/>
       </div>
     </div>
     <div class="field"><label id="lbl-pkg-f">Package</label>
@@ -875,7 +942,7 @@ body{background:#fafafa;min-height:100vh}
       <div id="notify-form" style="display:flex;flex-direction:column;gap:8px">
         <div>
           <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-amt-lbl">จำนวนที่โอน</label>
-          <input id="notify-amount" type="number" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+          <input id="notify-amount" type="number" placeholder="price per package" id="price-ph-1" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
         </div>
         <div>
           <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-pkg-lbl">Package</label>
@@ -951,7 +1018,7 @@ body{background:#fafafa;min-height:100vh}
       <label>Price per package (optional)</label>
       <div class="price-input-wrap">
         <span>฿</span>
-        <input id="edit-price" type="number" placeholder="e.g. 2000" min="0" maxlength="10"/>
+        <input id="edit-price" type="number" placeholder="price per package" id="price-ph-1" min="0" maxlength="10"/>
       </div>
     </div>
     <div class="field"><label>Total package size</label>
@@ -1010,7 +1077,10 @@ body{background:#fafafa;min-height:100vh}
   <div class="modal wide">
     <div class="h-header"><div class="h-sym" id="h-sym"></div><div><div class="h-name" id="h-name"></div><div class="h-meta" id="h-meta"></div></div></div>
     <div class="h-list" id="h-list"></div>
-    <div class="macts"><button class="bs" onclick="cm('hist-m')">Close</button></div>
+    <div class="macts">
+      <button class="bc" onclick="resetStudentPin(currentHistStudent);cm('hist-m')" style="font-size:12px">&#128274; Reset PIN</button>
+      <button class="bs" onclick="cm('hist-m')">Close</button>
+    </div>
   </div>
 </div>
 
@@ -1337,7 +1407,7 @@ const TR={
     contactTitle:'📞 Contact your teacher first',
     bankTitle:'🏦 Transfer details',
     stuVerify:"Always check with your teacher before transferring. Bank details can change — confirm it is the right account first.",
-    mhdAdd:'New student',addPrivTxt:'Use a simple username. No full names, phone numbers or personal details.',
+    mhdAdd:'New student',addPrivTxt:'Use a simple unique username (no duplicates). Students set their own PIN on first login — you never see it. To reset a forgotten PIN: open their history and tap Reset PIN.',
     lblNameF:'Username',clsLbl:'classes',pinWrong:'Wrong PIN',
     bankSaved:'Bank details saved 🏦',noStudents:'No students yet',
     addToBegin:'Add a student to begin',removed:'Entry removed',
@@ -1439,6 +1509,8 @@ function applyLang(){
   const ct=document.querySelector('#stu-contact-box .font-size-11px');
   // contact title
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(L[k])el.textContent=L[k];});
+  const pricePh=lang==='th'?'ราคาต่อแพ็คเกจ':'price per package';
+  ['price-ph-1','price-ph-2'].forEach(function(id){const e=document.getElementById(id);if(e)e.placeholder=pricePh;});
 }
 
 
@@ -1499,8 +1571,22 @@ async function findStudent(){
   }
   document.getElementById('find-err').textContent='';
   currentStudentData={student:found, teacher:foundTeacher};
-  renderStudentView(found, foundTeacher);
-  go('student-view-screen');
+  // Pull fresh bank + contact from Firebase
+  if(db){
+    Promise.all([
+      fsGetBank(foundTeacher.id),
+      fsGetContact(foundTeacher.id)
+    ]).then(function(results){
+      const bk=results[0],ct=results[1];
+      if(bk&&(bk.bank||bk.num)){localStorage.setItem('yj_b_'+foundTeacher.id,JSON.stringify(bk));}
+      if(ct&&(ct.phone||ct.email)){localStorage.setItem('yj_c_'+foundTeacher.id,JSON.stringify(ct));}
+    }).catch(function(){});
+  }
+  if(found.pin){
+    goToStudentPin(found,'verify');
+  } else {
+    goToStudentPin(found,'set');
+  }
 }
 
 /* ── STUDENT VIEW ── */
@@ -1762,6 +1848,7 @@ function del(id){
   saveStudents(currentTeacherId,S.filter(x=>x.id!==id));renderA();
 }
 function openHist(id){
+  currentHistStudent=id;
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   document.getElementById('h-sym').textContent=s.sym;
   document.getElementById('h-name').textContent=esc(s.n);
@@ -2311,6 +2398,129 @@ async function sendNotification(){
   }
 }
 
+
+/* -- STUDENT PIN -- */
+let sppi='', spMode='set', sppFirst='';
+
+function spnp(n){
+  if(sppi.length>=4)return;
+  sppi+=n;dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
+  if(sppi.length===4)setTimeout(handleStudentPin,120);
+}
+function spnd(){
+  sppi=sppi.slice(0,-1);
+  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
+  document.getElementById('stu-pin-err').textContent='';
+}
+
+async function handleStudentPin(){
+  if(!currentStudentData)return;
+  const {student:s, teacher:tc}=currentStudentData;
+
+  if(spMode==='set'){
+    sppFirst=sppi;sppi='';spMode='confirm';
+    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ยืนยัน PIN':'Confirm your PIN';
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN อีกครั้งเพื่อยืนยัน':'Enter your PIN again to confirm';
+    dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+    return;
+  }
+
+  if(spMode==='confirm'){
+    if(sppi!==sppFirst){
+      document.getElementById('stu-pin-err').textContent=lang==='th'?"PIN ไม่ตรงกัน":"PINs don't match";
+      document.getElementById('stu-pin-dots').classList.add('shake');
+      setTimeout(function(){
+        document.getElementById('stu-pin-dots').classList.remove('shake');
+        sppi='';sppFirst='';spMode='set';
+        document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
+        document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลักเพื่อรักษาข้อมูลของคุณ':'Choose a 4-digit PIN to keep your info private';
+        dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+        document.getElementById('stu-pin-err').textContent='';
+      },700);
+      return;
+    }
+    hashPin(sppi).then(function(hashed){
+      const students=getStudents(tc.id);
+      const st=students.find(function(x){return x.id===s.id;});
+      if(st){st.pin=hashed;saveStudents(tc.id,students);}
+      currentStudentData.student.pin=hashed;
+      toast(lang==='th'?'ตั้ง PIN เรียบร้อยแล้ว':'PIN set!');
+      showStudentView();
+    });
+    return;
+  }
+
+  if(spMode==='verify'){
+    const lockKey='student_'+s.id;
+    if(isLockedOut(lockKey)){showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);return;}
+    const ok=await verifyPin(sppi,s.pin);
+    if(ok){
+      resetPinAttempts(lockKey);
+      showStudentView();
+    } else {
+      const attempts=incPinAttempts(lockKey);
+      const rem2=MAX_ATTEMPTS-attempts;
+      if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);}
+      else{document.getElementById('stu-pin-err').textContent=(lang==='th'?'PIN ไม่ถูกต้อง':'Wrong PIN')+(rem2<=2?' ('+rem2+' left)':'');}
+      document.getElementById('stu-pin-dots').classList.add('shake');
+      setTimeout(function(){document.getElementById('stu-pin-dots').classList.remove('shake');sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);},600);
+    }
+    return;
+  }
+}
+
+function showStudentView(){
+  if(!currentStudentData)return;
+  const tc=currentStudentData.teacher;
+  // Pull latest student data from Firebase
+  if(db){
+    fsGetStudents(tc.id).then(function(students){
+      if(students.length){
+        localStorage.setItem('yj_s_'+tc.id,JSON.stringify(students));
+        const fresh=students.find(function(x){return x.id===currentStudentData.student.id;});
+        if(fresh){
+          fresh.pin=currentStudentData.student.pin; // keep PIN in memory
+          currentStudentData.student=fresh;
+        }
+      }
+      renderStudentView(currentStudentData.student, tc);
+      go('student-view-screen');
+    }).catch(function(){
+      renderStudentView(currentStudentData.student, tc);
+      go('student-view-screen');
+    });
+  } else {
+    renderStudentView(currentStudentData.student, tc);
+    go('student-view-screen');
+  }
+}
+
+function goToStudentPin(student, mode){
+  spMode=mode; sppi=''; sppFirst='';
+  document.getElementById('stu-pin-avatar').textContent=student.sym||'🌸';
+  if(mode==='verify'){
+    document.getElementById('stu-pin-hd').textContent=student.n;
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN ของคุณเพื่อเข้าสู่ระบบ':'Enter your PIN to continue';
+    document.getElementById('stu-pin-forgot').textContent=lang==='th'?'ลืม PIN? ติดต่อครูเพื่อ reset':'Forgot PIN? Ask your teacher to reset it.';
+  } else {
+    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
+    document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลักเพื่อรักษาข้อมูลของคุณ':'Choose a 4-digit PIN to keep your info private';
+    document.getElementById('stu-pin-forgot').textContent='';
+  }
+  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
+  document.getElementById('stu-pin-err').textContent='';
+  document.getElementById('student-pin-screen').style.display='flex';
+  go('student-pin-screen');
+}
+
+let currentHistStudent=null;
+function resetStudentPin(sid){
+  if(!confirm(lang==='th'?'รีเซ็ต PIN ของนักเรียน?':'Reset this student PIN?'))return;
+  const S=getStudents(currentTeacherId);
+  const s=S.find(function(x){return x.id===sid;});
+  if(s){delete s.pin;saveStudents(currentTeacherId,S);toast('PIN reset');}
+}
+
 /* ── CONTACT INFO ── */
 function getContact(tid){
   try{const c=JSON.parse(localStorage.getItem('yj_c_'+tid)||'{}');
@@ -2586,7 +2796,7 @@ function toggleDisc(){
 
 
 function shuffleLibrary(){
-  ['lib-sec-1','lib-sec-2'].forEach(function(id){
+  ['lib-sec-1','lib-sec-2','lib-sec-admin'].forEach(function(id){
     var sec=document.getElementById(id);
     if(!sec)return;
     var links=Array.from(sec.querySelectorAll('.lib-link'));
