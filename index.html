@@ -1882,7 +1882,7 @@ async function syncToGAS(){
   });
 
   try{
-    const res=await fetch(url,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+    const res=await fetch(url,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'}});
     const json=await res.json();
     if(json.ok){toast('✓ Exported to Google Sheets!');}
     else{toast('Error: '+json.error);}
@@ -1965,7 +1965,11 @@ async function sendNotification(){
   };
 
   try{
-    const res=await fetch(gasUrl,{method:'POST',body:JSON.stringify(payload)});
+    const res=await fetch(gasUrl,{
+      method:'POST',
+      body:JSON.stringify(payload),
+      headers:{'Content-Type':'text/plain'}
+    });
     const json=await res.json();
     if(json.ok){
       document.getElementById('notify-form').style.display='none';
