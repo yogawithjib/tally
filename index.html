@@ -625,7 +625,7 @@ body{background:#fafafa;min-height:100vh}
         <button class="gas-sync-btn" id="gas-sync-btn" onclick="syncToGAS()">Export ↗</button>
       </div>
       <div class="gas-note">
-        Deploy a Google Apps Script web app to receive data. 
+        Deploy a Google Apps Script web app to export data &amp; receive email notifications.
         <a href="#" onclick="showGasInstructions();return false;">How to set up →</a>
       </div>
     </div>
@@ -747,13 +747,7 @@ body{background:#fafafa;min-height:100vh}
       <label>Email (for notifications)</label>
       <input id="c-email" type="email" placeholder="your@email.com"/>
     </div>
-    <div style="background:#f0fff4;border:1px solid #86efac;border-radius:10px;padding:.85rem;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:600;color:#166534;margin-bottom:5px">📲 LINE Notify token</div>
-      <input id="c-line-token" type="text" placeholder="Paste your LINE Notify token" style="width:100%;border:1px solid #86efac;border-radius:8px;padding:8px 10px;font-size:13px;color:#111;background:#fff;outline:none;font-family:inherit;margin-bottom:6px"/>
-      <div style="font-size:11px;color:#16a34a;font-weight:300;line-height:1.5">
-        Get your token from <strong>notify-bot.line.me</strong> → Log in → Generate token → 1:1 chat with LINE Notify → copy token here
-      </div>
-    </div>
+
     <div class="macts">
       <button class="bc" onclick="cm('contact-m')">Cancel</button>
       <button class="bs" onclick="saveContact()">Save</button>
@@ -780,7 +774,7 @@ body{background:#fafafa;min-height:100vh}
 
     <!-- TEACHER CONTACT -->
     <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:1rem;margin-bottom:1rem" id="stu-contact-box">
-      <div style="font-size:11px;font-weight:600;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📞 Contact your teacher first</div>
+      <div style="font-size:11px;font-weight:600;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📞 ถามครูให้แน่ใจ</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px" id="stu-teacher-info">
         <div style="width:36px;height:36px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" id="stu-t-ava"></div>
         <div style="font-size:14px;font-weight:500;color:#111" id="stu-t-name"></div>
@@ -799,12 +793,12 @@ body{background:#fafafa;min-height:100vh}
           <button onclick="copyContact('line')" style="background:none;border:1px solid #bae6fd;border-radius:6px;padding:2px 8px;font-size:11px;color:#0369a1;cursor:pointer;font-family:inherit">Copy</button>
         </div>
       </div>
-      <div id="stu-no-contact" style="display:none;font-size:12px;color:#64748b;font-weight:300">Contact info not set yet — ask your teacher directly.</div>
+      <div id="stu-no-contact" style="display:none;font-size:12px;color:#64748b;font-weight:300">ครูยังไม่ได้ใส่เบอร์ในระบบ ติดต่อครูช่องทางเดิมได้เลย</div>
     </div>
 
     <!-- BANK INFO -->
     <div id="stu-bank-section">
-      <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏦 Transfer details</div>
+      <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
@@ -821,10 +815,10 @@ body{background:#fafafa;min-height:100vh}
 
     <!-- NOTIFY TEACHER SECTION -->
     <div id="notify-section" style="margin-top:12px;border-top:1px solid var(--bd);padding-top:12px">
-      <div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px" id="notify-title">Already transferred? Let your teacher know 📲</div>
+      <div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px" id="notify-title">โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲</div>
       <div id="notify-form" style="display:flex;flex-direction:column;gap:8px">
         <div>
-          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-amt-lbl">Amount transferred (optional)</label>
+          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-amt-lbl">จำนวนที่โอน</label>
           <input id="notify-amount" type="number" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
         </div>
         <div>
@@ -836,11 +830,11 @@ body{background:#fafafa;min-height:100vh}
           </div>
         </div>
         <div>
-          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-msg-lbl">Note (optional)</label>
-          <input id="notify-note" type="text" placeholder="e.g. Transferred via K-Bank" maxlength="100" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-msg-lbl">บันทึกเพิ่มเติม (ไม่ใส่ก็ได้)</label>
+          <input id="notify-note" type="text" placeholder="โอนผ่านธนาคารกสิกรไทย" maxlength="100" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
         </div>
         <button id="notify-send-btn" onclick="sendNotification()" style="width:100%;padding:12px;border-radius:12px;border:none;background:#111;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px">
-          <span>📲</span><span id="notify-btn-lbl">Notify teacher</span>
+          <span>📲</span><span id="notify-btn-lbl">แจ้งครู</span>
         </button>
         <div id="notify-err" style="font-size:11px;color:var(--pink);text-align:center;min-height:14px"></div>
       </div>
@@ -851,7 +845,7 @@ body{background:#fafafa;min-height:100vh}
         <div style="font-size:12px;font-weight:300;color:#16a34a;margin-top:4px" id="notify-success-sub">They'll confirm your payment shortly</div>
       </div>
     </div>
-    <button class="pay-close-btn" onclick="cm('student-topup-m');resetNotify()" style="margin-top:8px" id="stu-topup-close">Close</button>
+    <button class="pay-close-btn" onclick="cm('student-topup-m');resetNotify()" style="margin-top:8px" id="stu-topup-close">ปิด</button>
   </div>
 </div>
 
@@ -1941,7 +1935,7 @@ async function sendNotification(){
 
   const payload={
     action:'notify',
-    lineToken:decryptBank(ct.lineToken,tc.id),
+    lineToken:'',
     email:ct.email,
     teacherName:tc.name,
     studentName:s.n,
@@ -1980,7 +1974,7 @@ async function sendNotification(){
 /* ── CONTACT INFO ── */
 function getContact(tid){
   try{const c=JSON.parse(localStorage.getItem('yj_c_'+tid)||'{}');
-    return{phone:c.phone||'',line:c.line||'',email:c.email||'',lineToken:c.lineToken||''};}
+    return{phone:c.phone||'',line:c.line||'',email:c.email||'',lineToken:''};}
   catch(e){return{phone:'',line:'',email:'',lineToken:''};}
 }
 function saveContactData(tid,c){localStorage.setItem('yj_c_'+tid,JSON.stringify(c));}
@@ -1990,7 +1984,7 @@ function openContact(){
   document.getElementById('c-phone').value=c.phone;
   document.getElementById('c-line').value=c.line;
   document.getElementById('c-email').value=c.email;
-  document.getElementById('c-line-token').value=decryptBank(c.lineToken,currentTeacherId);
+
   document.getElementById('contact-m').style.display='flex';
   setTimeout(()=>document.getElementById('c-phone').focus(),60);
 }
@@ -1999,7 +1993,7 @@ function saveContact(){
     phone:sanitizeInput(document.getElementById('c-phone').value,40),
     line:sanitizeInput(document.getElementById('c-line').value,60),
     email:sanitizeInput(document.getElementById('c-email').value,80),
-    lineToken:encryptBank(document.getElementById('c-line-token').value.trim(),currentTeacherId)
+    lineToken:''
   };
   saveContactData(currentTeacherId,c);
   cm('contact-m');
@@ -2020,7 +2014,7 @@ function openStuTopup(){
   document.getElementById('stu-topup-title').textContent=lang==='th'?'ต่อแพ็คเกจ':'Top up classes';
   document.getElementById('stu-topup-sub').textContent=lang==='th'?'พร้อมที่จะเรียนต่อแล้วใช่ไหม?':'Ready to continue your yoga journey?';
   document.getElementById('stu-verify-msg').textContent=lang==='th'
-    ?'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้งนะคะ ข้อมูลธนาคารอาจมีการเปลี่ยนแปลง — ยืนยันให้แน่ใจก่อนโอนเลยค่ะ'
+    ?'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้ง ข้อมูลธนาคารอาจมีการเปลี่ยนแปลง ยืนยันให้แน่ใจก่อนโอน'
     :'Always check with your teacher before transferring. Bank details can change — confirm it is the right account first.';
 
   // teacher contact
