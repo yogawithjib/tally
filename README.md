@@ -1,73 +1,89 @@
-# 🧘‍♀️ Yoga with Jib — Class Tracker
+# 🧘🏻‍♀️ Yoga with Jib — Class Tracker
 
-A clean, minimal class tracking app for yoga teachers. Students buy prepaid packages and you deduct one each time they attend. Students can see their own balance on the same page.
+**A beautiful, secure class tracking app built for yoga teachers and their students.**
 
----
-
-## How to deploy (GitHub Pages)
-
-1. Go to [github.com](https://github.com) and create a free account
-2. Click **New repository** → name it `yoga-with-jib` → set to **Public** → click **Create**
-3. Click **Add file → Upload files** → drag `index.html` in → click **Commit changes**
-4. Go to **Settings → Pages** → Source: **Deploy from branch → main** → Save
-5. Wait ~1 minute → your app is live at `https://yourusername.github.io/yoga-with-jib`
+👉 **[Open the app → yogawithjib.github.io/tally](https://yogawithjib.github.io/tally)**
 
 ---
 
-## How to use
+## What is this?
 
-### Student view (default)
-- Shows all students' name, symbol, class balance and status
-- Read-only — students can look but not change anything
-- Share the URL with your students so they can check anytime
----
+A free, mobile-friendly web app that replaces messy spreadsheets and LINE messages for tracking yoga class packages. Teachers manage their students. Students check their own balance. Everything syncs live.
 
-## Adding Fabfeltscript Bold (optional)
-
-1. Download **Fabfeltscript Bold** from [cdnfonts.com](https://www.cdnfonts.com) or [dafont.com](https://www.dafont.com)
-2. Upload the font file (e.g. `FabfeltScript-Bold.woff2`) to your GitHub repo alongside `index.html`
-3. In `index.html`, replace the Google Fonts `<link>` tag with:
-
-```css
-@font-face {
-  font-family: 'FabfeltScript';
-  src: url('FabfeltScript-Bold.woff2') format('woff2'),
-       url('FabfeltScript-Bold.ttf') format('truetype');
-  font-weight: bold;
-}
-```
-
-4. Find `.brand-main` in the CSS and add:
-
-```css
-.brand-main {
-  font-family: 'FabfeltScript', cursive;
-}
-```
+No downloads. No app store. Just open the link on any phone.
 
 ---
 
-## Customisation
+## ✨ For students
 
-| What | Where in index.html |
-|------|-------------------|
-| Brand name | Find `Yoga with Jib` in the HTML (appears twice) |
-| Pink color | Find and replace `#fb2a7b` |
-| Package sizes | Edit the `.pkg-opt` buttons in the modals |
-| Card colors | Edit the `COLORS` array in the script |
-| Symbol options | Edit the `SYMBOLS` array in the script |
-| Default PIN | Change `'1234'` in `let pin = '1234'` |
+- Log in with your **username + PIN** — private and secure
+- See exactly how many classes you have left
+- View your full class history with dates
+- Top up your package directly — see bank details and contact your teacher in one place
+- Notify your teacher the moment you've transferred
+- Explore yoga resources: beginner's guide, online practice, breathing exercises
 
 ---
 
-## Tech
+## 🧘🏻‍♀️ For teachers
 
-- Plain HTML + CSS + JavaScript — no frameworks, no build tools
-- IBM Plex Sans via Google Fonts
-- Data saved in `localStorage` (stays on the device/browser)
-
-> **Note:** Because data is stored in `localStorage`, each device/browser has its own copy. If you want all devices to share the same data, you would need a backend database.
+- Your own **private admin panel** — PIN protected
+- Add students with custom symbols, colors and pricing
+- Deduct classes with a date picker — keeps accurate history
+- Allow class attendance even when payment hasn't come yet — debt tracking built in
+- Top up packages in one tap
+- Set your bank details and contact info — students see it when they need to pay
+- Students trigger email notifications to you when they transfer
+- Bilingual — Thai 🇹🇭 and English 🇬🇧 — switches instantly
 
 ---
 
-Made with 💗 for Yoga with Jib
+## 🔒 Privacy & security
+
+- Student info is username + class count only — no real names, no phone numbers
+- All PINs hashed with SHA-256 — never stored in plain text
+- Bank details encrypted in storage
+- Brute force protection — lockout after 5 wrong attempts
+- Auto session timeout after 10 minutes
+- Students set their own PIN on first login — teachers never see it
+- Data synced live via Firebase — accessible from any device, anywhere
+
+---
+
+## 📱 How to use it
+
+**Students:**
+1. Go to [yogawithjib.github.io/tally](https://yogawithjib.github.io/tally)
+2. Tap **I'm a student**
+3. Type your username (given to you by your teacher)
+4. Set your own PIN on first login
+5. See your classes, history, and top-up options
+
+**Teachers:**
+1. Go to [yogawithjib.github.io/tally](https://yogawithjib.github.io/tally)
+2. Tap **I'm a teacher**
+3. First time? Tap **+ I'm a new teacher** and create your account
+4. Log in with your username + PIN to manage your students
+
+---
+
+## 🌸 Built for Yoga with Jib
+
+This app is built and maintained for [Yoga with Jib](https://yogawithjib.github.io). It is purpose-built for this community of teachers and students.
+
+Explore more from Yoga with Jib:
+- [Beginner's guide](https://yogawithjib.github.io/library/forbeginners.html)
+- [Teacher personality quiz](https://yogawithjib.github.io/library/quiz.html)
+- [Practice yoga online](https://yogawithjib.github.io/library/videos.html)
+- [Box breathing](https://yogawithjib.github.io/library/pranayama.html)
+- [A yoga teacher's diary](https://yogawithjib.github.io/library/diary.html)
+
+---
+
+## 💬 Questions?
+
+Contact your teacher directly — they'll get you set up. 🙏
+
+---
+
+*Free to use · No app download needed · Works on any phone or browser*

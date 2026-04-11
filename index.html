@@ -442,8 +442,6 @@ body{background:#fafafa;min-height:100vh}
 
     </div>
 
-</div>
-
 <!-- STUDENT LOGIN -->
 <div id="student-login-screen" class="screen">
   <div class="hd" style="width:100%">
@@ -692,21 +690,26 @@ body{background:#fafafa;min-height:100vh}
           <span id="disc-lbl">Legal disclaimer / ข้อจำกัดความรับผิดชอบ</span>
         </button>
         <div class="disc-body" id="disc-body">
-          <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
-          <p style="margin-bottom:8px">This application ("Tally by Yoga with Jib") is provided as a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">1. Data & Privacy</strong><br>
-          This app stores only nicknames (usernames) and class counts. No full names, ID numbers, phone numbers, payment card details, or sensitive personal data should be entered. The app developer accepts no responsibility for any sensitive information entered by users in violation of these guidelines. Data is stored locally on your device and is not transmitted to any third party except via Google Apps Script if configured by your teacher.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>
-          This app displays teacher bank account information for the sole purpose of facilitating class package payments. Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts, fraudulent accounts, or any financial disputes arising from transfers made through or inspired by this app.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>
-          Class deduction records are maintained in good faith. In the event of any discrepancy between the app record and actual classes attended, the student and teacher should resolve the matter directly. Yoga with Jib is not liable for data loss, technical errors, or record inaccuracies.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>
-          This app is provided "as is" without warranty of any kind. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability of this service.</p>
-          <p style="margin-bottom:6px"><strong style="color:#555">5. Third-Party Services</strong><br>
-          This app may integrate with LINE Notify, Google Apps Script, and GitHub Pages. Use of these services is subject to their respective terms of service. Yoga with Jib is not responsible for their availability or data handling practices.</p>
-          <p style="margin-bottom:8px"><strong style="color:#555">ภาษาไทย (สรุป)</strong><br>
-          แอปนี้จัดทำขึ้นเพื่อความสะดวกในการติดตามคลาสโยคะเท่านั้น กรุณาอย่าใส่ข้อมูลส่วนตัวที่ละเอียดอ่อน เช่น ชื่อจริง เบอร์โทร หรือข้อมูลบัตรธนาคาร ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการโอนเงินผิดบัญชี การสูญหายของข้อมูล หรือข้อพิพาทระหว่างครูและนักเรียน กรุณายืนยันข้อมูลธนาคารกับครูโดยตรงก่อนโอนเงินทุกครั้ง</p>
-          <p style="color:#bbb;font-size:10px">Last updated: April 2026 · <a href="/cdn-cgi/l/email-protection#523b3c343d122b3d3533253b263a383b307c313d3f">Contact</a></p>
+          <div id="disc-en">
+            <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
+            <p style="margin-bottom:8px">This application ("Tally by Yoga with Jib") is a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">1. Data &amp; Privacy</strong><br>This app stores only usernames and class counts. No full names, ID numbers, phone numbers, or sensitive personal data should be entered. The developer accepts no responsibility for any sensitive information entered in violation of these guidelines.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts or any financial disputes arising from use of this app.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>Records are maintained in good faith. Any discrepancy should be resolved directly between teacher and student. Yoga with Jib is not liable for data loss or inaccuracies.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>This app is provided "as is" without warranty. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability.</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">5. Third-Party Services</strong><br>This app integrates with Google Apps Script, Firebase, and GitHub Pages, subject to each provider&#39;s terms. Yoga with Jib is not responsible for their availability or data handling.</p>
+            <p style="color:#bbb;font-size:10px;margin-top:8px">Last updated: April 2026</p>
+          </div>
+          <div id="disc-th" style="display:none">
+            <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — แอปติดตามคลาสโยคะ</strong></p>
+            <p style="margin-bottom:8px">แอปพลิเคชันนี้ ("Tally by Yoga with Jib") จัดทำขึ้นเพื่อเป็นเครื่องมือช่วยติดตามแพ็คเกจคลาสโยคะที่ชำระเงินล่วงหน้า การใช้แอปนี้ถือว่าคุณรับทราบและยอมรับข้อกำหนดต่อไปนี้</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">1. ข้อมูลและความเป็นส่วนตัว</strong><br>แอปนี้จัดเก็บเฉพาะชื่อเล่น (username) และจำนวนคลาสเท่านั้น ห้ามใส่ชื่อจริง เลขบัตรประชาชน หมายเลขโทรศัพท์ หรือข้อมูลส่วนตัวที่ละเอียดอ่อน ผู้พัฒนาไม่รับผิดชอบต่อข้อมูลที่ผู้ใช้กรอกเข้ามาโดยขัดต่อแนวทางนี้</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">2. การชำระเงิน</strong><br>กรุณายืนยันข้อมูลบัญชีกับครูโดยตรงก่อนโอนเงินทุกครั้ง Yoga with Jib ไม่รับผิดชอบต่อการโอนเงินผิดบัญชีหรือข้อพิพาททางการเงินใดๆ ที่เกิดจากการใช้แอปนี้</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">3. บันทึกคลาส</strong><br>การบันทึกดำเนินการด้วยความสุจริต หากมีความคลาดเคลื่อนใดๆ ให้ครูและนักเรียนตกลงกันโดยตรง Yoga with Jib ไม่รับผิดชอบต่อการสูญหายของข้อมูลหรือความไม่ถูกต้อง</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">4. ความพร้อมใช้งาน</strong><br>แอปนี้ให้บริการ "ตามสภาพที่เป็น" โดยไม่มีการรับประกัน Yoga with Jib ไม่รับประกันความเสถียรหรือความต่อเนื่องของบริการ</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">5. บริการของบุคคลที่สาม</strong><br>แอปนี้เชื่อมต่อกับ Google Apps Script, Firebase และ GitHub Pages ซึ่งอยู่ภายใต้ข้อกำหนดของแต่ละผู้ให้บริการ Yoga with Jib ไม่รับผิดชอบต่อความพร้อมใช้งานหรือการจัดการข้อมูลของบริการเหล่านั้น</p>
+            <p style="color:#bbb;font-size:10px;margin-top:8px">อัปเดตล่าสุด: เมษายน 2569</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1728,6 +1731,17 @@ function applyLang(){
   const ct=document.querySelector('#stu-contact-box .font-size-11px');
   // contact title
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(L[k])el.textContent=L[k];});
+  // Disclaimer toggle label
+  const discLbl=document.getElementById('disc-lbl');
+  if(discLbl)discLbl.textContent=lang==='th'?'ข้อจำกัดความรับผิดชอบ':'Legal disclaimer';
+  const discEn=document.getElementById('disc-en');
+  const discTh=document.getElementById('disc-th');
+  if(discEn)discEn.style.display=lang==='th'?'none':'block';
+  if(discTh)discTh.style.display=lang==='th'?'block':'none';
+  const discEn=document.getElementById('disc-content-en');
+  const discTh=document.getElementById('disc-content-th');
+  if(discEn)discEn.style.display=lang==='th'?'none':'block';
+  if(discTh)discTh.style.display=lang==='th'?'block':'none';
   const pricePh=lang==='th'?'ราคาต่อแพ็คเกจ':'price per package';
   ['price-ph-1','price-ph-2'].forEach(function(id){const e=document.getElementById(id);if(e)e.placeholder=pricePh;});
 }
