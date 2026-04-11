@@ -308,6 +308,12 @@ body{background:#fafafa;min-height:100vh}
 .disc-body.open{display:block}
 .disc-body a{color:var(--pink);text-decoration:none}
 
+
+.price-tag{font-size:10px;font-weight:500;color:rgba(0,0,0,.4);margin-top:3px}
+.price-input-wrap{display:flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:8px;padding:6px 11px;background:#fff}
+.price-input-wrap span{font-size:14px;color:var(--gl)}
+.price-input-wrap input{border:none;outline:none;font-size:14px;color:#111;width:100%;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;background:transparent}
+
 </style>
 </head>
 <body>
@@ -574,29 +580,23 @@ body{background:#fafafa;min-height:100vh}
   </div>
   <div class="sa-login-box">
     <div class="sa-login-hd">Admin access</div>
-    <div class="sa-login-sub">Triple-tap logo to exit</div>
-    <div class="dots" id="sa-dots" style="justify-content:center">
-      <div class="sa-dot" id="sa-d0"></div><div class="sa-dot" id="sa-d1"></div>
-      <div class="sa-dot" id="sa-d2"></div><div class="sa-dot" id="sa-d3"></div>
+    <div class="sa-login-sub" style="margin-bottom:1.25rem">Triple-tap logo to enter</div>
+    <div style="position:relative;margin-bottom:10px">
+      <input id="sa-pw-input" type="password" placeholder="Enter password"
+        style="width:100%;background:#222;border:1px solid #333;border-radius:10px;padding:12px 44px 12px 14px;font-size:15px;color:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"
+        onkeydown="if(event.key==='Enter')chkSaPin()"/>
+      <button onclick="toggleSaPw()" id="sa-pw-toggle"
+        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;cursor:pointer;font-size:15px">👁</button>
     </div>
-    <div class="pad">
-      <button class="sa-nb" onclick="sanp('1')">1<span class="ns"></span></button>
-      <button class="sa-nb" onclick="sanp('2')">2<span class="ns">ABC</span></button>
-      <button class="sa-nb" onclick="sanp('3')">3<span class="ns">DEF</span></button>
-      <button class="sa-nb" onclick="sanp('4')">4<span class="ns">GHI</span></button>
-      <button class="sa-nb" onclick="sanp('5')">5<span class="ns">JKL</span></button>
-      <button class="sa-nb" onclick="sanp('6')">6<span class="ns">MNO</span></button>
-      <button class="sa-nb" onclick="sanp('7')">7<span class="ns">PQRS</span></button>
-      <button class="sa-nb" onclick="sanp('8')">8<span class="ns">TUV</span></button>
-      <button class="sa-nb" onclick="sanp('9')">9<span class="ns">WXYZ</span></button>
-      <button class="sa-nb z" onclick="sanp('0')">0</button>
-      <button class="sa-nb del" onclick="sand()">⌫</button>
-    </div>
+    <button onclick="chkSaPin()"
+      style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-bottom:4px">
+      Enter
+    </button>
     <div class="sa-err" id="sa-err"></div>
   </div>
   <div class="llinks" style="margin-top:1rem">
     <button class="llink" onclick="saBack()">← Back</button>
-    <button class="llink" onclick="startSaCp()">Change admin PIN</button>
+    <button class="llink" onclick="startSaCp()">Change admin password</button>
   </div>
 </div>
 
@@ -711,6 +711,13 @@ body{background:#fafafa;min-height:100vh}
     <div class="field"><label id="lbl-sym-f">Symbol</label><div class="sgrid" id="sg"></div></div>
     <div class="field"><label id="lbl-col-f">Color</label><div class="crow" id="cr"></div></div>
     <div class="div"></div>
+    <div class="field">
+      <label id="lbl-price-f">Price per package (optional)</label>
+      <div class="price-input-wrap">
+        <span>฿</span>
+        <input id="inp-price" type="number" placeholder="e.g. 2000" min="0" maxlength="10"/>
+      </div>
+    </div>
     <div class="field"><label id="lbl-pkg-f">Package</label>
       <div class="pkrow" id="pkr">
         <div class="pko on" data-v="10" onclick="spk(this)">10<span id="cls-lbl1">classes</span></div>
@@ -891,6 +898,13 @@ body{background:#fafafa;min-height:100vh}
     <div class="field"><label>Symbol</label><div class="sgrid" id="edit-sg"></div></div>
     <div class="field"><label>Color</label><div class="crow" id="edit-cr"></div></div>
     <div class="div"></div>
+    <div class="field">
+      <label>Price per package (optional)</label>
+      <div class="price-input-wrap">
+        <span>฿</span>
+        <input id="edit-price" type="number" placeholder="e.g. 2000" min="0" maxlength="10"/>
+      </div>
+    </div>
     <div class="field"><label>Total package size</label>
       <div style="display:flex;align-items:center;gap:12px">
         <button onclick="adjEditPkg(-5)" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--bd);background:#fff;font-size:18px;cursor:pointer">−</button>
@@ -1358,6 +1372,12 @@ function applyLang(){
   if(currentStudentData)renderStudentView(currentStudentData.student, currentStudentData.teacher);
 }
 
+
+function maskName(name){
+  if(!name||name.length===0)return'***';
+  return name[0]+'*'.repeat(Math.max(2,name.length-1));
+}
+
 /* ── SCREENS ── */
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
 function goHome(){
@@ -1520,7 +1540,7 @@ function renderTeacherList(){
 function selectTeacher(id){
   currentTeacherId=id;
   const tc=getTeachers().find(x=>x.id===id);if(!tc)return;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${tc.name}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${maskName(tc.name)}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -1740,6 +1760,7 @@ function stpk(el){document.querySelectorAll('#tpkr .pko').forEach(e=>e.classList
 function openAdd(){
   ssym=SYM[0];scol=COL[0];pkv=10;
   document.getElementById('inp').value='';
+  document.getElementById('inp-price').value='';
   document.getElementById('ps').textContent=ssym;
   document.getElementById('pn').textContent=t('lblNameF');
   document.getElementById('pn').style.color=scol.tx;
@@ -1754,7 +1775,8 @@ function openAdd(){
 function saveSt(){
   const n=sanitizeInput(document.getElementById('inp').value,MAX_NAME);if(!n)return;
   const S=getStudents(currentTeacherId);
-  S.push({id:'s_'+Date.now(),n,sym:ssym,c:scol,t:pkv,u:0,h:[]});
+  const priceVal=parseInt(document.getElementById('inp-price').value)||0;
+  S.push({id:'s_'+Date.now(),n,sym:ssym,c:scol,t:pkv,u:0,h:[],price:priceVal});
   saveStudents(currentTeacherId,S);renderA();cm('add-m');toast(`${ssym} ${n} added`);
 }
 function openTop(id){
@@ -1787,7 +1809,10 @@ let saPin = '1242'; // default — change on first login
 let sapi = '', sacps = 'new', sacpf = '', sacpi = '';
 
 function loadSaPin(){try{saPin=localStorage.getItem('yj_sapin')||'0000';}catch(e){}}
-function saveSaPin(p){try{localStorage.setItem('yj_sapin',p);}catch(e){}}
+function saveSaPin(p){
+  try{localStorage.setItem('yj_sapin',p);}catch(e){}
+  if(db){db.collection('system').doc('admin').set({pin:p}).catch(function(){});}
+}
 function loadGasUrl(){try{const u=localStorage.getItem('yj_gas_url')||'';const el=document.getElementById('gas-url');if(el)el.value=u;}catch(e){}}
 function saveGasUrl(u){try{localStorage.setItem('yj_gas_url',u);}catch(e){}}
 
@@ -1802,10 +1827,14 @@ function homeLogoTap(){
 function openSaLogin(){
   document.querySelectorAll('.screen,.sa-screen').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.screen,.sa-screen').forEach(s=>{s.style.display='none';});
-  sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);
   document.getElementById('sa-err').textContent='';
   const el=document.getElementById('sa-login-screen');
   el.style.display='flex';el.classList.add('on');
+  setTimeout(()=>{const i=document.getElementById('sa-pw-input');if(i){i.value='';i.focus();}},100);
+}
+function toggleSaPw(){
+  const i=document.getElementById('sa-pw-input');
+  if(i)i.type=i.type==='password'?'text':'password';
 }
 
 function saBack(){
@@ -1815,24 +1844,28 @@ function saBack(){
 }
 
 function saDots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('on',i<n);});}
-function sanp(n){if(sapi.length>=4)return;sapi+=n;saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);if(sapi.length===4)setTimeout(chkSaPin,120);}
-function sand(){sapi=sapi.slice(0,-1);saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);document.getElementById('sa-err').textContent='';}
+
 
 async function chkSaPin(){
   const lockKey='superadmin';
-  if(isLockedOut(lockKey)){showLockoutMsg('sa-err','sa-dots',lockKey);sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);return;}
-  const ok=await verifyPin(sapi,saPin);
+  const input=document.getElementById('sa-pw-input');
+  const pw=input?input.value:'';
+  if(!pw){document.getElementById('sa-err').textContent='Enter your password';return;}
+  if(isLockedOut(lockKey)){
+    showLockoutMsg('sa-err','',lockKey);
+    if(input)input.value='';return;
+  }
+  const ok=await verifyPin(pw,saPin);
   if(!ok){
     const attempts=incPinAttempts(lockKey);
     const rem=MAX_ATTEMPTS-attempts;
     if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('sa-err','sa-dots',lockKey);}
-    else{document.getElementById('sa-err').textContent='Wrong PIN'+(rem<=2?' ('+rem+' left)':'');}
-    document.getElementById('sa-dots').classList.add('shake');
-    setTimeout(()=>{document.getElementById('sa-dots').classList.remove('shake');sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);},600);
+    else{document.getElementById('sa-err').textContent='Wrong password'+(rem<=2?' ('+rem+' left)':'');}
+    if(input){input.value='';input.classList.add('shake');setTimeout(()=>input.classList.remove('shake'),400);}
     return;
   }
   resetPinAttempts(lockKey);
-  if(saPin.length<10){await storeSaPin(sapi);}
+  if(saPin.length<10){await storeSaPin(pw);}
   if(true){
     document.getElementById('sa-login-screen').style.display='none';
     document.getElementById('sa-login-screen').classList.remove('on');
@@ -1850,15 +1883,39 @@ async function chkSaPin(){
   }
 }
 
-function startSaCp(){sacps='new';sacpi='';sacpf='';document.getElementById('sa-cpt').textContent='New admin PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);document.getElementById('sa-cp-m').style.display='flex';}
-function sacpp(n){if(sacpi.length>=4)return;sacpi+=n;saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],sacpi.length);if(sacpi.length===4)setTimeout(hSaCp,120);}
-function sacpd(){sacpi=sacpi.slice(0,-1);saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],sacpi.length);}
-function hSaCp(){
-  if(sacps==='new'){sacpf=sacpi;sacpi='';sacps='confirm';document.getElementById('sa-cpt').textContent='Confirm PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);}
-  else{
-    if(sacpi!==sacpf){document.getElementById('sa-cperr').textContent="PINs don't match";document.getElementById('sa-cp-dots').classList.add('shake');setTimeout(()=>{document.getElementById('sa-cp-dots').classList.remove('shake');sacpi='';sacpf='';sacps='new';document.getElementById('sa-cpt').textContent='New admin PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);},700);return;}
-    storeSaPin(sacpf).then(()=>{cm('sa-cp-m');toast('Admin PIN updated ✓');});
-  }
+function startSaCp(){
+  document.getElementById('sa-cperr').textContent='';
+  document.getElementById('sa-pw-strength').textContent='';
+  const n=document.getElementById('sa-new-pw');
+  const c=document.getElementById('sa-confirm-pw');
+  if(n)n.value='';if(c)c.value='';
+  document.getElementById('sa-cp-m').style.display='flex';
+  setTimeout(()=>{if(n)n.focus();},100);
+  if(n)n.oninput=function(){checkPwStrength(n.value);};
+}
+function checkPwStrength(pw){
+  const el=document.getElementById('sa-pw-strength');
+  if(!pw){el.textContent='';return;}
+  const hasLetter=/[a-zA-Z]/.test(pw);
+  const hasNumber=/[0-9]/.test(pw);
+  const long=pw.length>=8;
+  if(long&&hasLetter&&hasNumber){el.textContent='✓ Strong password';el.style.color='#2dbd60';}
+  else if(pw.length>=6){el.textContent='Add letters and numbers for stronger password';el.style.color='#f5a623';}
+  else{el.textContent='Too short — min 8 characters';el.style.color='var(--pink)';}
+}
+function validatePassword(pw){
+  if(pw.length<8)return'Password must be at least 8 characters';
+  if(!/[a-zA-Z]/.test(pw))return'Password must include letters';
+  if(!/[0-9]/.test(pw))return'Password must include numbers';
+  return null;
+}
+function saveSaPassword(){
+  const newPw=document.getElementById('sa-new-pw').value;
+  const confirmPw=document.getElementById('sa-confirm-pw').value;
+  const err=validatePassword(newPw);
+  if(err){document.getElementById('sa-cperr').textContent=err;return;}
+  if(newPw!==confirmPw){document.getElementById('sa-cperr').textContent="Passwords don't match";return;}
+  storeSaPin(newPw).then(()=>{cm('sa-cp-m');toast('Admin password updated ✓');});
 }
 
 /* DASHBOARD */
@@ -2366,6 +2423,7 @@ function openEdit(id){
   editCol=s.c||COL[0];
   editPkgVal=s.t||10;
   document.getElementById('edit-inp').value=s.n;
+  document.getElementById('edit-price').value=s.price||'';
   document.getElementById('edit-ps').textContent=editSym;
   document.getElementById('edit-pn').textContent=esc(s.n);
   document.getElementById('edit-pn').style.color=editCol.tx;
@@ -2415,6 +2473,7 @@ function saveEdit(){
   const S=getStudents(currentTeacherId);
   const s=S.find(x=>x.id===editId);if(!s)return;
   s.n=n;s.sym=editSym;s.c=editCol;s.t=editPkgVal;
+  s.price=parseInt(document.getElementById('edit-price').value)||0;
   saveStudents(currentTeacherId,S);
   renderA();cm('edit-m');
   toast(`${editSym} ${n} updated`);
@@ -2468,6 +2527,15 @@ migrateBankData();
 shuffleLibrary();
 // Load Firebase first, then pull data
 loadFirebase().then(()=>{
+  // Sync admin PIN from Firebase
+  if(db){
+    db.collection('system').doc('admin').get().then(function(doc){
+      if(doc.exists&&doc.data().pin){
+        saPin=doc.data().pin;
+        try{localStorage.setItem('yj_sapin',saPin);}catch(e){}
+      }
+    }).catch(function(){});
+  }
   fsGetTeachers().then(teachers=>{
   if(teachers.length){
     localStorage.setItem('yj_teachers',JSON.stringify(teachers));
