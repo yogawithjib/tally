@@ -1,6 +1,6 @@
 # 🧘🏻‍♀️ Yoga with Jib — Class Tracker
 
-**A beautiful, secure class tracking app built for yoga teachers and their students.**
+**A class tracking app built for yoga teachers and their students.**
 
 👉 **[Open the app → yogawithjib.github.io/tally](https://yogawithjib.github.io/tally)**
 
