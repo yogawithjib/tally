@@ -1755,94 +1755,82 @@ function deleteTeacher(id,name){
 
 /* GAS EXPORT */
 const GAS_SCRIPT = `// Yoga with Jib - Class Tracker GAS Backend
-// Handles: Data export + LINE + Email notifications
 
 function doPost(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
-    if (data.action === 'notify') {
-      return handleNotify(data);
-    } else {
-      return handleExport(data);
+    var raw = '';
+    // Handle both form POST and JSON POST
+    if (e.postData) {
+      raw = e.postData.contents;
+      if (e.postData.type === 'application/x-www-form-urlencoded') {
+        raw = decodeURIComponent(raw.replace('data=','').replace(/\+/g,' '));
+      }
     }
+    var data = JSON.parse(raw);
+    var result = data.action === 'notify' ? handleNotify(data) : handleExport(data);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return respond({ok: false, error: err.message});
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ok:true,msg:'GAS running'}))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function handleNotify(data) {
-  var results = {ok: true, line: false, email: false};
+  var results = {ok:true,line:false,email:false};
   var msg = buildMessage(data);
-
   if (data.lineToken) {
     try {
       UrlFetchApp.fetch('https://notify-api.line.me/api/notify', {
-        method: 'post',
-        headers: {'Authorization': 'Bearer ' + data.lineToken},
-        payload: {'message': msg}
+        method:'post',
+        headers:{'Authorization':'Bearer '+data.lineToken},
+        payload:{'message':msg},
+        muteHttpExceptions:true
       });
       results.line = true;
-    } catch(e) { results.lineError = e.message; }
+    } catch(e){results.lineError=e.message;}
   }
-
   if (data.email) {
     try {
-      var subject = 'Class payment from ' + data.studentSym + ' ' + data.studentName;
-      MailApp.sendEmail(data.email, subject, msg);
+      MailApp.sendEmail(data.email,'Class payment from '+data.studentName,msg);
       results.email = true;
-    } catch(e) { results.emailError = e.message; }
+    } catch(e){results.emailError=e.message;}
   }
-
   results.ok = results.line || results.email;
-  return respond(results);
+  return results;
 }
 
 function buildMessage(d) {
-  var msg = '';
-  msg += 'Class payment notification';
-  msg += ' | Student: ' + d.studentSym + ' ' + d.studentName;
+  var msg = 'Class payment notification';
+  msg += ' | Student: ' + d.studentName;
   msg += ' | Package: ' + d.packageSize + ' classes';
   if (d.amount) msg += ' | Amount: ' + d.amount;
   if (d.note) msg += ' | Note: ' + d.note;
   msg += ' | Time: ' + d.timestamp;
-  msg += ' | Please confirm and update their class count.';
   return msg;
 }
 
 function handleExport(data) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-
   var sheet = ss.getSheetByName('Teachers') || ss.insertSheet('Teachers');
   sheet.clearContents();
-  sheet.appendRow(['Name', 'Students', 'Classes Used', 'Classes Remaining']);
-  data.teachers.forEach(function(t) {
-    sheet.appendRow([t.name, t.studentCount, t.used, t.remaining]);
+  sheet.appendRow(['Name','Students','Classes Used','Classes Remaining']);
+  if (data.teachers) data.teachers.forEach(function(t){
+    sheet.appendRow([t.name,t.studentCount,t.used,t.remaining]);
   });
-
   var sSheet = ss.getSheetByName('Students') || ss.insertSheet('Students');
   sSheet.clearContents();
-  sSheet.appendRow(['Teacher', 'Student', 'Package', 'Used', 'Remaining', 'Last class']);
-  data.students.forEach(function(s) {
-    var last = s.history && s.history.length ? s.history[0] : '-';
-    sSheet.appendRow([s.teacher, s.name, s.total, s.used, s.remaining, last]);
+  sSheet.appendRow(['Teacher','Student','Package','Used','Remaining','Last class']);
+  if (data.students) data.students.forEach(function(s){
+    var last = s.history&&s.history.length ? s.history[0] : '-';
+    sSheet.appendRow([s.teacher,s.name,s.total,s.used,s.remaining,last]);
   });
-
-  var hSheet = ss.getSheetByName('History') || ss.insertSheet('History');
-  hSheet.clearContents();
-  hSheet.appendRow(['Teacher', 'Student', 'Class #', 'Date']);
-  data.students.forEach(function(s) {
-    (s.history || []).forEach(function(d, i) {
-      hSheet.appendRow([s.teacher, s.name, i+1, d]);
-    });
-  });
-
-  return respond({ok: true});
-}
-
-function respond(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
+  return {ok:true};
 }`;
 
 function showGasInstructions(){
