@@ -287,6 +287,24 @@ body{background:#fafafa;min-height:100vh}
 .topup-student-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--pink);background:#fff;color:var(--pink);font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
 .topup-student-btn:hover{background:var(--pink);color:#fff}
 
+
+/* LIBRARY SECTION */
+.library-section{padding:2rem 0 1rem;border-top:1px solid var(--bd);margin-top:2rem}
+.lib-title{font-size:11px;font-weight:600;color:var(--gl);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1rem;text-align:center}
+.lib-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}
+.lib-card{border-radius:16px;padding:1rem;text-decoration:none;display:block;transition:transform .15s,opacity .15s;cursor:pointer;border:1px solid transparent}
+.lib-card:hover{transform:translateY(-2px);opacity:.92}
+.lib-icon{font-size:26px;margin-bottom:6px}
+.lib-name{font-size:12px;font-weight:600;margin-bottom:2px;line-height:1.3}
+.lib-name-th{font-size:11px;font-weight:300;opacity:.7;line-height:1.3}
+/* DISCLAIMER */
+.disclaimer{background:#fafafa;border-top:1px solid var(--bd);padding:1.25rem 0;margin-top:1rem}
+.disc-toggle{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:11px;font-weight:500;color:var(--gl);background:none;border:none;width:100%;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;padding:4px}
+.disc-toggle:hover{color:#111}
+.disc-body{display:none;font-size:11px;font-weight:300;color:#999;line-height:1.8;margin-top:10px;padding:0 .5rem}
+.disc-body.open{display:block}
+.disc-body a{color:var(--pink);text-decoration:none}
+
 </style>
 </head>
 <body>
@@ -326,7 +344,7 @@ body{background:#fafafa;min-height:100vh}
   <div class="slogin-box">
     <div class="slogin-hd" id="sl-hd">What's your name?</div>
     <div class="slogin-sub" id="sl-sub2">Type the nickname your teacher gave you</div>
-    <input class="name-input" id="student-name-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="username"/>
+    <input class="name-input" id="student-name-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="username" maxlength="40"/>
     <button class="find-btn" id="find-btn" onclick="findStudent()">Find my classes →</button>
     <div class="find-err" id="find-err"></div>
     <div class="find-hint" id="find-hint">Enter your username — ask your teacher if you don't know it.</div>
@@ -397,7 +415,7 @@ body{background:#fafafa;min-height:100vh}
     </div>
     <div class="auth-field">
       <label id="su-name-lbl">Your teacher name</label>
-      <input id="su-name" type="text" placeholder="e.g. Jib, Noon, Best"/>
+      <input id="su-name" type="text" placeholder="e.g. Jib, Noon, Best" maxlength="40"/>
     </div>
     <div class="auth-field">
       <label id="su-emo-lbl">Pick your avatar</label>
@@ -448,6 +466,63 @@ body{background:#fafafa;min-height:100vh}
     </div>
   </div>
   <div id="ac"></div>
+
+    <!-- LIBRARY SECTION -->
+    <div class="library-section" id="library-section">
+      <div class="lib-title">✨ Explore more</div>
+      <div class="lib-grid">
+        <a class="lib-card" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank"
+           style="background:#fff0f6;border-color:#ffd0e8">
+          <div class="lib-icon">🧘🏻‍♀️</div>
+          <div class="lib-name" style="color:#7a0030">Beginner's guide</div>
+          <div class="lib-name-th" style="color:#7a0030">คู่มือผู้ฝึกใหม่</div>
+        </a>
+        <a class="lib-card" href="https://yogawithjib.github.io/library/quiz.html" target="_blank"
+           style="background:#EDE0FF;border-color:#c4b5fd">
+          <div class="lib-icon">🎯</div>
+          <div class="lib-name" style="color:#3b0099">Teacher personality quiz</div>
+          <div class="lib-name-th" style="color:#3b0099">คุณเป็นครูโยคะแบบไหน?</div>
+        </a>
+        <a class="lib-card" href="https://yogawithjib.github.io/library/videos.html" target="_blank"
+           style="background:#E2F7E8;border-color:#86efac">
+          <div class="lib-icon">▶️</div>
+          <div class="lib-name" style="color:#0a5a28">Practice online</div>
+          <div class="lib-name-th" style="color:#0a5a28">ฝึกโยคะออนไลน์</div>
+        </a>
+        <a class="lib-card" href="https://yogawithjib.github.io/library/pranayama.html" target="_blank"
+           style="background:#DDEEFF;border-color:#93c5fd">
+          <div class="lib-icon">🫁</div>
+          <div class="lib-name" style="color:#0a3a6a">Box breathing</div>
+          <div class="lib-name-th" style="color:#0a3a6a">ฝึกหายใจรูปกล่อง</div>
+        </a>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="disclaimer">
+        <button class="disc-toggle" onclick="toggleDisc()">
+          <span id="disc-arrow">▸</span>
+          <span id="disc-lbl">Legal disclaimer / ข้อจำกัดความรับผิดชอบ</span>
+        </button>
+        <div class="disc-body" id="disc-body">
+          <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
+          <p style="margin-bottom:8px">This application ("Tally by Yoga with Jib") is provided as a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">1. Data & Privacy</strong><br>
+          This app stores only nicknames (usernames) and class counts. No full names, ID numbers, phone numbers, payment card details, or sensitive personal data should be entered. The app developer accepts no responsibility for any sensitive information entered by users in violation of these guidelines. Data is stored locally on your device and is not transmitted to any third party except via Google Apps Script if configured by your teacher.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>
+          This app displays teacher bank account information for the sole purpose of facilitating class package payments. Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts, fraudulent accounts, or any financial disputes arising from transfers made through or inspired by this app.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>
+          Class deduction records are maintained in good faith. In the event of any discrepancy between the app record and actual classes attended, the student and teacher should resolve the matter directly. Yoga with Jib is not liable for data loss, technical errors, or record inaccuracies.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>
+          This app is provided "as is" without warranty of any kind. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability of this service.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">5. Third-Party Services</strong><br>
+          This app may integrate with LINE Notify, Google Apps Script, and GitHub Pages. Use of these services is subject to their respective terms of service. Yoga with Jib is not responsible for their availability or data handling practices.</p>
+          <p style="margin-bottom:8px"><strong style="color:#555">ภาษาไทย (สรุป)</strong><br>
+          แอปนี้จัดทำขึ้นเพื่อความสะดวกในการติดตามคลาสโยคะเท่านั้น กรุณาอย่าใส่ข้อมูลส่วนตัวที่ละเอียดอ่อน เช่น ชื่อจริง เบอร์โทร หรือข้อมูลบัตรธนาคาร ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการโอนเงินผิดบัญชี การสูญหายของข้อมูล หรือข้อพิพาทระหว่างครูและนักเรียน กรุณายืนยันข้อมูลธนาคารกับครูโดยตรงก่อนโอนเงินทุกครั้ง</p>
+          <p style="color:#bbb;font-size:10px">Last updated: April 2026 · <a href="mailto:info@yogawithjib.com">Contact</a></p>
+        </div>
+      </div>
+    </div>
+
 </div>
 
 </div><!-- /page -->
@@ -594,7 +669,7 @@ body{background:#fafafa;min-height:100vh}
       <div class="psym" id="ps">🌸</div>
       <div><div class="pname" id="pn">Nickname</div><div class="ppkg" id="pp">10 classes</div></div>
     </div>
-    <div class="field"><label id="lbl-name-f">Nickname</label><input id="inp" type="text" placeholder="e.g. noon123, best_yoga" oninput="upPrev()"/></div>
+    <div class="field"><label id="lbl-name-f">Nickname</label><input id="inp" type="text" placeholder="e.g. noon123, best_yoga" maxlength="40" oninput="upPrev()"/></div>
     <div class="field"><label id="lbl-sym-f">Symbol</label><div class="sgrid" id="sg"></div></div>
     <div class="field"><label id="lbl-col-f">Color</label><div class="crow" id="cr"></div></div>
     <div class="div"></div>
@@ -724,7 +799,7 @@ body{background:#fafafa;min-height:100vh}
         </div>
         <div>
           <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-msg-lbl">Note (optional)</label>
-          <input id="notify-note" type="text" placeholder="e.g. Transferred via K-Bank" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+          <input id="notify-note" type="text" placeholder="e.g. Transferred via K-Bank" maxlength="100" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
         </div>
         <button id="notify-send-btn" onclick="sendNotification()" style="width:100%;padding:12px;border-radius:12px;border:none;background:#111;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px">
           <span>📲</span><span id="notify-btn-lbl">Notify teacher</span>
@@ -779,7 +854,7 @@ body{background:#fafafa;min-height:100vh}
     </div>
     <div class="field">
       <label>Nickname</label>
-      <input id="edit-inp" type="text" oninput="upEditPrev()"/>
+      <input id="edit-inp" type="text" maxlength="40" oninput="upEditPrev()"/>
     </div>
     <div class="field"><label>Symbol</label><div class="sgrid" id="edit-sg"></div></div>
     <div class="field"><label>Color</label><div class="crow" id="edit-cr"></div></div>
@@ -850,9 +925,9 @@ body{background:#fafafa;min-height:100vh}
     <div class="mhd">Bank details</div>
     <div class="secure-badge">🔒 Encrypted &amp; PIN protected</div>
     <div class="bank-settings-row">
-      <div class="setting-field"><label>Bank name</label><input id="b-bank" type="text" placeholder="e.g. Kasikorn, SCB"/></div>
-      <div class="setting-field"><label>Account name</label><input id="b-name" type="text"/></div>
-      <div class="setting-field"><label>Account number</label><input id="b-num" type="text" placeholder="xxx-x-xxxxx-x"/></div>
+      <div class="setting-field"><label>Bank name</label><input id="b-bank" type="text" placeholder="e.g. Kasikorn, SCB" maxlength="40"/></div>
+      <div class="setting-field"><label>Account name</label><input id="b-name" type="text" maxlength="60"/></div>
+      <div class="setting-field"><label>Account number</label><input id="b-num" type="text" placeholder="xxx-x-xxxxx-x" maxlength="20"/></div>
     </div>
     <div class="macts"><button class="bc" onclick="cm('bank-m')">Cancel</button><button class="bs" onclick="saveBank()">Save</button></div>
   </div>
@@ -879,6 +954,122 @@ body{background:#fafafa;min-height:100vh}
 </div>
 
 <script>
+
+/* ═══════════════════════════════════════════
+   SECURITY LAYER
+═══════════════════════════════════════════ */
+
+/* 1. HTML ESCAPING — prevent XSS */
+function esc(str){
+  if(!str)return'';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;')
+    .replace(/\//g,'&#x2F;');
+}
+
+/* 2. INPUT LENGTH LIMITS */
+const MAX_NAME=40, MAX_NOTE=100, MAX_BANK=60;
+function sanitizeInput(str,max){
+  if(!str)return'';
+  return String(str).trim().slice(0,max);
+}
+
+/* 3. PIN HASHING with SHA-256 */
+const PIN_SALT='yj_yoga_2026_salt';
+async function hashPin(pin){
+  const encoder=new TextEncoder();
+  const data=encoder.encode(pin+PIN_SALT);
+  const hashBuffer=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function verifyPin(input,stored){
+  // Support legacy plaintext PINs and migrate them
+  if(!stored)return false;
+  if(stored.length<10){
+    // Plaintext — compare directly, will be migrated on success
+    return input===stored;
+  }
+  const hashed=await hashPin(input);
+  return hashed===stored;
+}
+async function storePin(tid,pin){
+  const hashed=await hashPin(pin);
+  const teachers=getTeachers();
+  const tc=teachers.find(x=>x.id===tid);
+  if(tc){tc.pin=hashed;saveTeachers(teachers);}
+}
+async function storeSaPin(pin){
+  const hashed=await hashPin(pin);
+  saveSaPin(hashed);
+  saPin=hashed;
+}
+
+/* 4. BRUTE FORCE PROTECTION */
+const MAX_ATTEMPTS=5, LOCKOUT_SECONDS=30;
+let pinAttempts={};
+let lockoutTimers={};
+
+function getPinAttempts(key){return pinAttempts[key]||0;}
+function incPinAttempts(key){pinAttempts[key]=(pinAttempts[key]||0)+1;return pinAttempts[key];}
+function resetPinAttempts(key){pinAttempts[key]=0;}
+function isLockedOut(key){return lockoutTimers[key]&&Date.now()<lockoutTimers[key];}
+function lockout(key){lockoutTimers[key]=Date.now()+(LOCKOUT_SECONDS*1000);}
+function getLockoutRemaining(key){
+  if(!lockoutTimers[key])return 0;
+  return Math.ceil((lockoutTimers[key]-Date.now())/1000);
+}
+
+/* 5. ADMIN SESSION TIMEOUT — 10 min inactivity */
+const SESSION_MS=10*60*1000;
+let sessionTimer=null;
+let isAdminLoggedIn=false;
+
+function startSession(){
+  isAdminLoggedIn=true;
+  resetSession();
+}
+function resetSession(){
+  clearTimeout(sessionTimer);
+  sessionTimer=setTimeout(()=>{
+    if(isAdminLoggedIn){
+      isAdminLoggedIn=false;
+      // auto-lock back to home
+      goHome();
+      toast('Session expired — logged out for security');
+    }
+  },SESSION_MS);
+}
+function endSession(){
+  isAdminLoggedIn=false;
+  clearTimeout(sessionTimer);
+}
+
+// Reset timer on any user interaction in admin
+document.addEventListener('click',()=>{if(isAdminLoggedIn)resetSession();});
+document.addEventListener('keydown',()=>{if(isAdminLoggedIn)resetSession();});
+
+/* 6. RATE LIMIT DISPLAY HELPER */
+function showLockoutMsg(errId,dotsId,key){
+  const rem=getLockoutRemaining(key);
+  if(rem>0){
+    document.getElementById(errId).textContent=`Too many attempts. Try again in ${rem}s`;
+    // countdown
+    const interval=setInterval(()=>{
+      const r=getLockoutRemaining(key);
+      if(r<=0){
+        clearInterval(interval);
+        document.getElementById(errId).textContent='';
+      } else {
+        document.getElementById(errId).textContent=`Too many attempts. Try again in ${r}s`;
+      }
+    },1000);
+  }
+}
+
 const SYM=['🧘‍♀️','🌸','⭐','🌈','🦋','🌙','🔥','🌺','🐬','🦄','🌻','🍀','🦊','🐧','🎯','🌊','🐝','🍉','🎸','🦁','🐙','🌴','🎀','🐸'];
 const T_EMOJIS=['🧘‍♀️','🌺','🎯','⭐','🦋','🔥','🌙','🐬','🌸','🎸'];
 const COL=[
@@ -915,7 +1106,7 @@ const TR={
     hUsed:'used',hLeft:'remaining',confirmRemove:'Remove this entry?',
   },
   th:{
-    sub:'ติดตามคลาส',langBtn:'EN',hTitle:'ยินดีต้อนรับ! คุณคือใคร?',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
+    sub:'ข้อมูลคลาสโยคะ',langBtn:'EN',hTitle:'ยินดีต้อนรับ! คุณคือใคร?',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
     roleStudent:'ฉันเป็นนักเรียน',roleStudentSub:'ดูคลาสของฉัน',
     roleTeacher:'ฉันเป็นครู',roleTeacherSub:'จัดการข้อมูล',
     slSub:'นักเรียน',slHd:'ใส่ username ของคุณ',slSub2:'ใส่ username ของคุณ ถ้าไม่รู้ให้ถามครูได้เลย',
@@ -984,7 +1175,7 @@ function applyLang(){
 
 /* ── SCREENS ── */
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
-function goHome(){currentTeacherId=null;currentStudentData=null;pi='';go('home-screen');}
+function goHome(){currentTeacherId=null;currentStudentData=null;pi='';endSession();go('home-screen');}
 function showTeacherList(){go('teacher-select-screen');renderTeacherList();}
 
 /* ── STUDENT LOGIN ── */
@@ -1064,7 +1255,7 @@ function showPay(){
   if(!currentStudentData)return;
   const {student:s, teacher:tc}=currentStudentData;
   const bk=getBank(tc.id);
-  document.getElementById('pay-sname').textContent=`${s.sym} ${s.n}`;
+  document.getElementById('pay-sname').textContent=`${esc(s.sym)} ${esc(s.n)}`;
   document.getElementById('pay-msg').textContent=t('payMsg');
   document.getElementById('lbl-bank').textContent=t('lblBank');
   document.getElementById('lbl-acct-name').textContent=t('lblAcctName');
@@ -1108,7 +1299,7 @@ function renderTeacherList(){
     const cnt=getStudents(tc.id).length;
     return`<div class="teacher-card" onclick="selectTeacher('${tc.id}')">
       <div class="teacher-avatar">${tc.emoji||'🧘‍♀️'}</div>
-      <div class="teacher-info"><div class="teacher-name">${tc.name}</div><div class="teacher-count">${cnt} student${cnt!==1&&lang==='en'?'s':''}</div></div>
+      <div class="teacher-info"><div class="teacher-name">${esc(tc.name)}</div><div class="teacher-count">${cnt} student${cnt!==1&&lang==='en'?'s':''}</div></div>
       <div class="teacher-arrow">›</div>
     </div>`;
   }).join('');
@@ -1134,13 +1325,22 @@ function pickEmo(el,e){document.querySelectorAll('.emo-opt').forEach(x=>x.classL
 function sunp(n){if(supi.length>=4)return;supi+=n;dots(['su-d0','su-d1','su-d2','su-d3'],supi.length);}
 function sund(){supi=supi.slice(0,-1);dots(['su-d0','su-d1','su-d2','su-d3'],supi.length);}
 function createTeacher(){
-  const name=document.getElementById('su-name').value.trim();
+  const name=sanitizeInput(document.getElementById('su-name').value,MAX_NAME);
   if(!name){document.getElementById('su-err').textContent='Please enter your name';return;}
   if(supi.length<4){document.getElementById('su-err').textContent='Please set a 4-digit PIN';return;}
   const teachers=getTeachers();
   const id='t_'+Date.now();
-  teachers.push({id,name,emoji:suEmoSel,pin:supi});
-  saveTeachers(teachers);
+  hashPin(supi).then(h=>{
+    teachers.push({id,name,emoji:suEmoSel,pin:h});
+    saveTeachers(teachers);
+    currentTeacherId=id;
+    const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=suEmoSel;
+    const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=esc(name);
+    startSession();
+    toast('Welcome '+esc(name)+'! 🎉');
+    go('av');renderA();
+  });
+  return;
   currentTeacherId=id;
   const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=suEmoSel;
   const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=name;
@@ -1152,16 +1352,24 @@ function createTeacher(){
 function dots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('on',i<n);});}
 function np(n){if(pi.length>=4)return;pi+=n;dots(['d0','d1','d2','d3'],pi.length);if(pi.length===4)setTimeout(chkPin,120);}
 function nd(){pi=pi.slice(0,-1);dots(['d0','d1','d2','d3'],pi.length);document.getElementById('lerr').textContent='';}
-function chkPin(){
+async function chkPin(){
   const tc=getTeachers().find(x=>x.id===currentTeacherId);if(!tc)return;
-  if(pi===tc.pin){
+  const lockKey='teacher_'+currentTeacherId;
+  if(isLockedOut(lockKey)){showLockoutMsg('lerr','dots',lockKey);pi='';dots(['d0','d1','d2','d3'],0);return;}
+  const ok=await verifyPin(pi,tc.pin);
+  if(ok){
+    if(tc.pin.length<10){await storePin(currentTeacherId,pi);}
+    resetPinAttempts(lockKey);startSession();
     const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=tc.emoji||'🧘‍♀️';
-    const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=tc.name;
+    const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=esc(tc.name);
     go('av');renderA();
   } else {
-    document.getElementById('lerr').textContent=t('pinWrong');
+    const attempts=incPinAttempts(lockKey);
+    const rem=MAX_ATTEMPTS-attempts;
+    if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('lerr','dots',lockKey);}
+    else{document.getElementById('lerr').textContent=t('pinWrong')+(rem<=2?' ('+rem+' left)':'');}
     document.getElementById('dots').classList.add('shake');
-    setTimeout(()=>{document.getElementById('dots').classList.remove('shake');pi='';dots(['d0','d1','d2','d3'],0);document.getElementById('lerr').textContent='';},600);
+    setTimeout(()=>{document.getElementById('dots').classList.remove('shake');pi='';dots(['d0','d1','d2','d3'],0);if(!isLockedOut(lockKey))document.getElementById('lerr').textContent='';},600);
   }
 }
 
@@ -1173,8 +1381,10 @@ function hcp(){
   if(cps==='new'){cpf=cpi;cpi='';cps='confirm';document.getElementById('cpt').textContent='Confirm PIN';document.getElementById('cperr').textContent='';dots(['cp0','cp1','cp2','cp3'],0);}
   else{
     if(cpi!==cpf){document.getElementById('cperr').textContent="PINs don't match";document.getElementById('cp-dots').classList.add('shake');setTimeout(()=>{document.getElementById('cp-dots').classList.remove('shake');cpi='';cpf='';cps='new';document.getElementById('cpt').textContent='New PIN';document.getElementById('cperr').textContent='';dots(['cp0','cp1','cp2','cp3'],0);},700);return;}
-    const teachers=getTeachers();const tc=teachers.find(x=>x.id===currentTeacherId);
-    if(tc){tc.pin=cpf;saveTeachers(teachers);}
+    hashPin(cpf).then(h=>{
+      const teachers=getTeachers();const tc=teachers.find(x=>x.id===currentTeacherId);
+      if(tc){tc.pin=h;saveTeachers(teachers);}
+    });
     cm('cp-m');toast('PIN updated ✓');
   }
 }
@@ -1189,7 +1399,7 @@ function renderA(){
     return`<div class="a-card" style="background:${c.bg}">
       <button class="x-btn" onclick="del('${s.id}')">×</button>
       <span class="a-sym">${s.sym}</span>
-      <div class="a-name" style="color:${c.tx}">${s.n}</div>
+      <div class="a-name" style="color:${c.tx}">${esc(s.n)}</div>
       <div class="a-counts">
         <div class="a-stat"><div class="a-val" style="color:${c.tx}">${rem}</div><div class="a-lbl">${t('left')}</div></div>
         <div class="a-stat"><div class="a-val" style="color:${c.tx}">${s.u}</div><div class="a-lbl">${t('hUsed')}</div></div>
@@ -1208,7 +1418,7 @@ function openDeduct(id){
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   dedId=id;
   document.getElementById('dt-sym').textContent=s.sym;
-  document.getElementById('dt-name').textContent=s.n;
+  document.getElementById('dt-name').textContent=esc(s.n);
   document.getElementById('dt-rem').textContent=`${s.t-s.u} left`;
   document.getElementById('dt-date').value=today();
   document.getElementById('date-m').style.display='flex';
@@ -1227,7 +1437,7 @@ function del(id){
 function openHist(id){
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   document.getElementById('h-sym').textContent=s.sym;
-  document.getElementById('h-name').textContent=s.n;
+  document.getElementById('h-name').textContent=esc(s.n);
   document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · ${s.t-s.u} ${t('hLeft')}`;
   renderHistList(s,S);
   document.getElementById('hist-m').style.display='flex';
@@ -1261,7 +1471,7 @@ function rfl(S){
   document.getElementById('fl').innerHTML=S.map(s=>`
     <div class="mrow">
       <div class="minfo"><span class="msym2">${s.sym}</span>
-        <div><div class="mname2">${s.n}</div><div class="msub2">${s.t-s.u} left · ${s.u}/${s.t}</div></div>
+        <div><div class="mname2">${esc(s.n)}</div><div class="msub2">${s.t-s.u} left · ${s.u}/${s.t}</div></div>
       </div>
       <div class="mbtns">
         <button class="mbtn mi" onclick="adj('${s.id}',-1)" ${s.u===0?'disabled':''}>−</button>
@@ -1326,14 +1536,14 @@ function openAdd(){
   setTimeout(()=>document.getElementById('inp').focus(),60);
 }
 function saveSt(){
-  const n=document.getElementById('inp').value.trim();if(!n)return;
+  const n=sanitizeInput(document.getElementById('inp').value,MAX_NAME);if(!n)return;
   const S=getStudents(currentTeacherId);
   S.push({id:'s_'+Date.now(),n,sym:ssym,c:scol,t:pkv,u:0,h:[]});
   saveStudents(currentTeacherId,S);renderA();cm('add-m');toast(`${ssym} ${n} added`);
 }
 function openTop(id){
   tid=id;const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);
-  document.getElementById('tn').textContent=s?`${s.sym} ${s.n}`:'';
+  document.getElementById('tn').textContent=s?`${esc(s.sym)} ${esc(s.n)}`:'';
   tpkv=10;document.querySelectorAll('#tpkr .pko').forEach(e=>e.classList.toggle('on',e.dataset.v==='10'));
   document.getElementById('top-m').style.display='flex';
 }
@@ -1392,8 +1602,22 @@ function saDots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id)
 function sanp(n){if(sapi.length>=4)return;sapi+=n;saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);if(sapi.length===4)setTimeout(chkSaPin,120);}
 function sand(){sapi=sapi.slice(0,-1);saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);document.getElementById('sa-err').textContent='';}
 
-function chkSaPin(){
-  if(sapi===saPin){
+async function chkSaPin(){
+  const lockKey='superadmin';
+  if(isLockedOut(lockKey)){showLockoutMsg('sa-err','sa-dots',lockKey);sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);return;}
+  const ok=await verifyPin(sapi,saPin);
+  if(!ok){
+    const attempts=incPinAttempts(lockKey);
+    const rem=MAX_ATTEMPTS-attempts;
+    if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('sa-err','sa-dots',lockKey);}
+    else{document.getElementById('sa-err').textContent='Wrong PIN'+(rem<=2?' ('+rem+' left)':'');}
+    document.getElementById('sa-dots').classList.add('shake');
+    setTimeout(()=>{document.getElementById('sa-dots').classList.remove('shake');sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);},600);
+    return;
+  }
+  resetPinAttempts(lockKey);
+  if(saPin.length<10){await storeSaPin(sapi);}
+  if(true){
     document.getElementById('sa-login-screen').style.display='none';
     document.getElementById('sa-login-screen').classList.remove('on');
     const dash=document.getElementById('sa-dashboard-screen');
@@ -1417,7 +1641,7 @@ function hSaCp(){
   if(sacps==='new'){sacpf=sacpi;sacpi='';sacps='confirm';document.getElementById('sa-cpt').textContent='Confirm PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);}
   else{
     if(sacpi!==sacpf){document.getElementById('sa-cperr').textContent="PINs don't match";document.getElementById('sa-cp-dots').classList.add('shake');setTimeout(()=>{document.getElementById('sa-cp-dots').classList.remove('shake');sacpi='';sacpf='';sacps='new';document.getElementById('sa-cpt').textContent='New admin PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);},700);return;}
-    saPin=sacpf;saveSaPin(saPin);cm('sa-cp-m');toast('Admin PIN updated ✓');
+    storeSaPin(sacpf).then(()=>{cm('sa-cp-m');toast('Admin PIN updated ✓');});
   }
 }
 
@@ -1450,7 +1674,7 @@ function renderSaDashboard(){
         <div class="sa-tr-info">
           <div class="sa-tr-ava">${tc.emoji||'🧘‍♀️'}</div>
           <div>
-            <div class="sa-tr-name">${tc.name}</div>
+            <div class="sa-tr-name">${esc(tc.name)}</div>
             <div class="sa-tr-cnt">${S.length} student${S.length!==1?'s':''} · ${bk.bank||'No bank set'}</div>
           </div>
         </div>
@@ -1689,7 +1913,7 @@ async function sendNotification(){
 
   const payload={
     action:'notify',
-    lineToken:ct.lineToken,
+    lineToken:decryptBank(ct.lineToken,tc.id),
     email:ct.email,
     teacherName:tc.name,
     studentName:s.n,
@@ -1734,16 +1958,16 @@ function openContact(){
   document.getElementById('c-phone').value=c.phone;
   document.getElementById('c-line').value=c.line;
   document.getElementById('c-email').value=c.email;
-  document.getElementById('c-line-token').value=c.lineToken;
+  document.getElementById('c-line-token').value=decryptBank(c.lineToken,currentTeacherId);
   document.getElementById('contact-m').style.display='flex';
   setTimeout(()=>document.getElementById('c-phone').focus(),60);
 }
 function saveContact(){
   const c={
-    phone:document.getElementById('c-phone').value.trim(),
-    line:document.getElementById('c-line').value.trim(),
-    email:document.getElementById('c-email').value.trim(),
-    lineToken:document.getElementById('c-line-token').value.trim()
+    phone:sanitizeInput(document.getElementById('c-phone').value,40),
+    line:sanitizeInput(document.getElementById('c-line').value,60),
+    email:sanitizeInput(document.getElementById('c-email').value,80),
+    lineToken:encryptBank(document.getElementById('c-line-token').value.trim(),currentTeacherId)
   };
   saveContactData(currentTeacherId,c);
   cm('contact-m');
@@ -1769,7 +1993,7 @@ function openStuTopup(){
 
   // teacher contact
   document.getElementById('stu-t-ava').textContent=tc.emoji||'🧘‍♀️';
-  document.getElementById('stu-t-name').textContent=tc.name;
+  document.getElementById('stu-t-name').textContent=esc(tc.name);
 
   const hasPhone=ct.phone&&ct.phone.length>0;
   const hasLine=ct.line&&ct.line.length>0;
@@ -1884,20 +2108,22 @@ function bpnp(n){
   if(bpi.length===4)setTimeout(chkBankPin,120);
 }
 function bpnd(){bpi=bpi.slice(0,-1);dots(['bp-d0','bp-d1','bp-d2','bp-d3'],bpi.length);document.getElementById('bpin-err').textContent='';}
-function chkBankPin(){
+async function chkBankPin(){
   const tc=getTeachers().find(x=>x.id===currentTeacherId);
   if(!tc)return;
-  if(bpi===tc.pin){
+  const lockKey='bank_'+currentTeacherId;
+  if(isLockedOut(lockKey)){showLockoutMsg('bpin-err','bpin-dots',lockKey);bpi='';dots(['bp-d0','bp-d1','bp-d2','bp-d3'],0);return;}
+  const ok=await verifyPin(bpi,tc.pin);
+  if(ok){resetPinAttempts(lockKey);
     cm('bank-pin-m');
     openBankActual();
   } else {
-    document.getElementById('bpin-err').textContent='Wrong PIN';
+    const attempts=incPinAttempts('bank_'+currentTeacherId);
+    const rem=MAX_ATTEMPTS-attempts;
+    if(attempts>=MAX_ATTEMPTS){lockout('bank_'+currentTeacherId);showLockoutMsg('bpin-err','bpin-dots','bank_'+currentTeacherId);}
+    else{document.getElementById('bpin-err').textContent='Wrong PIN'+(rem<=2?' ('+rem+' left)':'');}
     document.getElementById('bpin-dots').classList.add('shake');
-    setTimeout(()=>{
-      document.getElementById('bpin-dots').classList.remove('shake');
-      bpi='';dots(['bp-d0','bp-d1','bp-d2','bp-d3'],0);
-      document.getElementById('bpin-err').textContent='';
-    },600);
+    setTimeout(()=>{document.getElementById('bpin-dots').classList.remove('shake');bpi='';dots(['bp-d0','bp-d1','bp-d2','bp-d3'],0);},600);
   }
 }
 
@@ -1931,7 +2157,7 @@ function openEdit(id){
   editPkgVal=s.t||10;
   document.getElementById('edit-inp').value=s.n;
   document.getElementById('edit-ps').textContent=editSym;
-  document.getElementById('edit-pn').textContent=s.n;
+  document.getElementById('edit-pn').textContent=esc(s.n);
   document.getElementById('edit-pn').style.color=editCol.tx;
   document.getElementById('edit-pp').textContent=`${s.t} classes (${s.t-s.u} left)`;
   document.getElementById('edit-pc').style.background=editCol.bg;
@@ -1982,6 +2208,14 @@ function saveEdit(){
   saveStudents(currentTeacherId,S);
   renderA();cm('edit-m');
   toast(`${editSym} ${n} updated`);
+}
+
+
+function toggleDisc(){
+  const body=document.getElementById('disc-body');
+  const arrow=document.getElementById('disc-arrow');
+  body.classList.toggle('open');
+  arrow.textContent=body.classList.contains('open')?'▾':'▸';
 }
 
 /* ── INIT ── */
