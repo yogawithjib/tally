@@ -6,24 +6,25 @@
 <title>Yoga with Jib</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤸🏻</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>@font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
+<style>
+@font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
 body{background:#fafafa;min-height:100vh}
-.page{max-width:480px;margin:0 auto;padding:0 1.25rem 4rem}
+.page{max-width:680px;margin:0 auto;padding:0 1.25rem 3rem}
 :root{--pink:#fb2a7b;--pl:#fff0f6;--pm:#ffd0e8;--bd:#ebebeb;--gr:#888;--gl:#bbb}
 .screen{display:none}.screen.on{display:block}
 #login-screen.on,#signup-screen.on,#student-login-screen.on{display:flex}
 
 /* HEADER */
-.hd{display:flex;align-items:center;justify-content:space-between;padding:.875rem 0 .75rem}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
 .logo{font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink);line-height:1;user-select:none}
 .sub{font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 .lang-btn{background:#fff;border:1.5px solid var(--bd);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#111;transition:all .15s;letter-spacing:1px}
 .lang-btn:hover{border-color:var(--pink);color:var(--pink)}
 
 /* HOME */
-.home-hero{text-align:center;padding:1rem 0 1.5rem}
-.home-hero-icon{font-size:28px;margin-bottom:6px}
+.home-hero{text-align:center;padding:1.5rem 0 2rem}
+.home-hero-icon{font-size:28px;margin-bottom:12px}
 .home-hero-title{font-size:17px;font-weight:500;color:#111;margin-bottom:6px}
 .home-hero-sub{font-size:13px;font-weight:300;color:var(--gl);line-height:1.6}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
@@ -64,7 +65,7 @@ body{background:#fafafa;min-height:100vh}
 .privacy-text{font-size:12px;font-weight:300;color:#555;line-height:1.7}
 
 /* AUTH BOX */
-#login-screen,#signup-screen{flex-direction:column;align-items:center;padding:1rem 0}
+#login-screen,#signup-screen{flex-direction:column;align-items:center;padding:1.5rem 0}
 .auth-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
 .auth-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:.25rem;text-align:center}
 .auth-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem}
@@ -276,18 +277,22 @@ body{background:#fafafa;min-height:100vh}
 .sa-action-btn.danger{border-color:#fca5a5;color:#dc2626}
 .sa-action-btn.danger:hover{background:#fef2f2}
 
+
 .masked-num{font-size:15px;font-weight:600;color:#111;letter-spacing:1px}
 .reveal-btn{background:none;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--gr);cursor:pointer;margin-top:4px;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .12s;display:block;width:100%}
 .reveal-btn:hover{border-color:var(--pink);color:var(--pink)}
 .secure-badge{display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:500;color:#166534;margin-bottom:.75rem}
 
+
 .topup-student-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--pink);background:#fff;color:var(--pink);font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
 .topup-student-btn:hover{background:var(--pink);color:#fff}
+
+
 
 /* LIBRARY SECTION */
 .library-section{padding:1.5rem 0 1rem;border-top:1px solid #f0f0f0;margin-top:1.5rem}
 .lib-title{font-size:10px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
-.lib-link{display:flex;align-items:center;gap:10px;padding:.65rem 0;border-bottom:1px solid #f5f5f5;text-decoration:none;transition:opacity .15s;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lib-link{display:flex;align-items:center;gap:10px;padding:.65rem 0;border-bottom:1px solid #f5f5f5;text-decoration:none;transition:opacity .15s}
 .lib-link:hover{opacity:.65}
 .lib-link:last-child{border-bottom:none}
 .lib-dot{width:7px;height:7px;border-radius:50%;background:#fb2a7b;flex-shrink:0}
@@ -303,10 +308,12 @@ body{background:#fafafa;min-height:100vh}
 .disc-body.open{display:block}
 .disc-body a{color:var(--pink);text-decoration:none}
 
+
 .price-tag{font-size:10px;font-weight:500;color:rgba(0,0,0,.4);margin-top:3px}
 .price-input-wrap{display:flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:8px;padding:6px 11px;background:#fff}
 .price-input-wrap span{font-size:14px;color:var(--gl)}
 .price-input-wrap input{border:none;outline:none;font-size:14px;color:#111;width:100%;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;background:transparent}
+
 
 /* TEACHER USERNAME LOGIN */
 #teacher-login-screen.on{display:flex}
@@ -322,7 +329,7 @@ body{background:#fafafa;min-height:100vh}
 .t-find-err{color:#f87171;font-size:12px;text-align:center;margin-top:8px;min-height:16px}
 /* Spacing improvements */
 .role-grid{margin-bottom:2rem}
-.home-hero{padding:1.25rem 0 1.75rem}
+.home-hero{padding:2rem 0 2.5rem}
 .library-section{padding:2rem 0 1.5rem;margin-top:2.5rem}
 
 .debt-banner{background:#FFE0EC;border:1.5px solid #fb2a7b;border-radius:14px;padding:1rem 1.25rem;margin-bottom:12px;text-align:center}
@@ -331,48 +338,39 @@ body{background:#fafafa;min-height:100vh}
 .debt-note{font-size:11px;color:#999;margin-top:6px;font-weight:300}
 .sdebt{background:#FFE0EC;color:#7a0030}
 
-/* ═══════════════════════════════════════════
-   RESPONSIVE SYSTEM
-   xs  < 480px   (small phone)
-   sm  480-767px (phone)
-   md  768-1023px (tablet / iPad)
-   lg  1024px+   (laptop / desktop)
-═══════════════════════════════════════════ */
-
-/* ── Base: mobile-first tweaks ── */
-
-/* ── Tablet: iPad / iPad Mini / iPad Pro ── */
-
-/* ── Desktop / Laptop: sidebar layout ── */
-
-/* ── Large desktop ── */
-
-/* ── Sidebar content (desktop branding panel) ── */
-
-/* ── PIN pad scales up on larger screens ── */
-
-/* ── Library section ── */
-
-/* ── Smooth page transitions ── */
-.screen{transition:opacity .15s ease}
-.screen.on{opacity:1}
-
-/* ═══════════════════════════════════
-   RESPONSIVE — simple 2-breakpoint
-═══════════════════════════════════ */
-
-/* Small phones */
-/* ── RESPONSIVE: tablet & desktop ── */
-@media (min-width: 600px) {
+/* ── NAV BAR ── */
+.nav-bar{display:flex;align-items:center;gap:8px;padding:.6rem 0;margin-bottom:.75rem;border-bottom:1px solid #f5f5f5}
+.nav-back{background:none;border:none;cursor:pointer;font-size:13px;color:var(--gl);font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;display:flex;align-items:center;gap:4px;padding:6px 4px;transition:color .15s;-webkit-tap-highlight-color:transparent;user-select:none;min-height:44px}
+.nav-back:hover,.nav-back:active{color:#111}
+.nav-spacer{flex:1}
+/* Touch improvements */
+button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
+.role-card,.teacher-card,.lib-link,.a-card,.sopt,.cdot,.pko{user-select:none;-webkit-tap-highlight-color:rgba(251,42,123,.08)}
+.lib-link{cursor:pointer}
+.llink{min-height:44px;display:flex;align-items:center;justify-content:center;padding:4px 8px}
+.lang-btn,.ipill,.apill{min-width:44px;min-height:44px}
+.nb{min-height:52px;user-select:none;-webkit-tap-highlight-color:transparent}
+/* Spacing */
+.hd{display:flex;align-items:center;justify-content:space-between;padding:.875rem 0 .75rem}
+.home-hero{text-align:center;padding:1rem 0 1.5rem}
+/* Video cards */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Breathing widget */
+.breath-widget{padding:1.75rem 0 2.5rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
+.breath-title{font-size:10px;font-weight:600;color:#ccc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.25rem}
+.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:1.75rem;flex-wrap:wrap}
+.bpreset{border:1.5px solid var(--bd);border-radius:20px;background:#fff;padding:5px 14px;font-size:11px;font-weight:500;color:#aaa;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .2s;user-select:none;-webkit-tap-highlight-color:transparent}
+.bpreset.on{border-color:var(--pink);color:var(--pink);background:var(--pl)}
+.breath-svg-wrap{position:relative;width:200px;height:200px;margin:0 auto 1rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.breath-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.breath-phase{font-size:12px;font-weight:500;color:var(--pink);letter-spacing:.8px;text-transform:uppercase}
+.breath-count{font-size:44px;font-weight:200;color:#111;line-height:1;margin-top:2px}
+.breath-tap{font-size:24px;margin-top:4px;opacity:.4}
+.breath-guide{font-size:11px;font-weight:300;color:#ccc;min-height:16px;letter-spacing:.3px}
+/* Responsive */
+@media (min-width:600px){
   body{background:#f0f0f0}
-  .page{
-    max-width:520px;
-    background:#fafafa;
-    box-shadow:0 2px 32px rgba(0,0,0,.08);
-    min-height:100vh;
-    padding:0 2rem 4rem;
-    margin:0 auto;
-  }
+  .page{max-width:520px;background:#fafafa;box-shadow:0 2px 32px rgba(0,0,0,.08);min-height:100vh;padding:0 2rem 4rem;margin:0 auto}
   .role-grid{gap:16px}
   .role-card{padding:1.75rem 1.25rem;border-radius:22px}
   .adm-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
@@ -383,50 +381,14 @@ body{background:#fafafa;min-height:100vh}
   .nb .ns{font-size:8px}
   .pad{gap:9px}
 }
-
-@media (min-width: 1024px) {
+@media (min-width:1024px){
   .page{max-width:560px}
   .sa-stats{grid-template-columns:repeat(6,1fr)}
   .modal{max-width:440px}
 }
-
-/* ── NAV BAR ── */
-.nav-bar{display:flex;align-items:center;gap:8px;padding:.6rem 0;margin-bottom:.75rem;border-bottom:1px solid #f5f5f5}
-.nav-back{background:none;border:none;cursor:pointer;font-size:13px;color:var(--gl);font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;display:flex;align-items:center;gap:4px;padding:6px 4px;transition:color .15s;-webkit-tap-highlight-color:transparent;user-select:none;min-height:44px}
-.nav-back:hover,.nav-back:active{color:#111}
-.nav-crumb{font-size:12px;color:#ccc}
-.nav-current{font-size:13px;font-weight:500;color:#111}
-.nav-spacer{flex:1}
-.nav-action{background:none;border:1px solid var(--bd);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--gr);cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.nav-action:hover{border-color:#bbb;color:#111}
-
-/* ── GLOBAL TOUCH & CLICK IMPROVEMENTS ── */
-button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
-.role-card,.teacher-card,.lib-link,.a-card,.sopt,.cdot,.pko{user-select:none;-webkit-tap-highlight-color:rgba(251,42,123,.08)}
-.lib-link{cursor:pointer}
-.llink{min-height:44px;display:flex;align-items:center;justify-content:center;padding:4px 8px}
-.lang-btn,.ipill,.apill{min-width:44px;min-height:44px}
-.nb{min-height:52px;user-select:none;-webkit-tap-highlight-color:transparent}
-
-/* ── BREATHING TIMER ── */
-.breath-widget{padding:1.75rem 0 2rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
-.breath-title{font-size:10px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.25rem}
-.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
-.bpreset{border:1.5px solid var(--bd);border-radius:20px;background:#fff;padding:5px 14px;font-size:12px;font-weight:500;color:#888;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
-.bpreset.on{border-color:var(--pink);color:var(--pink);background:var(--pl)}
-.breath-circle-wrap{position:relative;width:160px;height:160px;margin:0 auto 1.25rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.breath-ring-outer{position:absolute;inset:0;border-radius:50%;background:var(--pl);transition:transform 0s linear}
-.breath-ring-mid{position:absolute;inset:16px;border-radius:50%;background:#ffd0e8;opacity:.6}
-.breath-ring-inner{position:absolute;inset:32px;border-radius:50%;background:var(--pink);opacity:.25}
-.breath-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.breath-phase{font-size:13px;font-weight:500;color:var(--pink);letter-spacing:.5px}
-.breath-count{font-size:28px;font-weight:600;color:#111;line-height:1.1;margin-top:2px}
-.breath-tap{font-size:10px;font-weight:300;color:var(--gl);margin-top:4px}
-.breath-guide{font-size:11px;font-weight:300;color:var(--gl);min-height:16px}
 </style>
 </head>
 <body>
-
 <div class="page">
 
 <!-- HOME -->
@@ -454,39 +416,47 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
     </div>
   </div>
 
+
     <!-- VIDEO SECTION -->
     <div class="library-section" id="lib-sec-1" style="border-top:1px solid #f0f0f0;margin-top:2rem;padding-top:1.5rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div class="lib-title" style="margin-bottom:0">🎥 <span id="vid-sec-title">Practice yoga online</span></div>
-        <a href="https://yogawithjib.github.io/library/videos.html" target="_blank"
-           style="font-size:11px;font-weight:500;color:var(--pink);text-decoration:none">
-          <span id="vid-see-all">See all →</span>
-        </a>
+        <a href="https://yogawithjib.github.io/library/videos.html" target="_blank" style="font-size:11px;font-weight:500;color:var(--pink);text-decoration:none"><span id="vid-see-all">See all →</span></a>
       </div>
-      <div id="vid-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--gl);font-size:12px" id="vid-loading">Loading videos...</div>
+      <div id="vid-grid" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <div style="color:var(--gl);font-size:12px;padding:1rem 0" id="vid-loading">Loading...</div>
       </div>
     </div>
 
     <!-- BREATHING TIMER -->
     <div class="breath-widget" id="breath-widget">
-      <div class="breath-title">🫁 Breathing guide</div>
+      <div class="breath-title">Breathing guide</div>
       <div class="breath-presets">
-        <button class="bpreset on" onclick="setBreath(this,'box')" data-k="box">Box 4-4-4-4</button>
-        <button class="bpreset" onclick="setBreath(this,'478')" data-k="478">4-7-8</button>
-        <button class="bpreset" onclick="setBreath(this,'ujjayi')" data-k="ujjayi">Ujjayi 4-8</button>
+        <button class="bpreset on" onclick="setBreath(this,'box')">Box 4-4-4-4</button>
+        <button class="bpreset" onclick="setBreath(this,'478')">4-7-8</button>
+        <button class="bpreset" onclick="setBreath(this,'ujjayi')">Ujjayi 4-8</button>
       </div>
-      <div class="breath-circle-wrap" id="breath-circle" onclick="toggleBreath()">
-        <div class="breath-ring-outer" id="breath-outer"></div>
-        <div class="breath-ring-mid" id="breath-mid"></div>
-        <div class="breath-ring-inner"></div>
+      <div class="breath-svg-wrap" id="breath-circle" onclick="toggleBreath()">
+        <svg width="200" height="200" viewBox="0 0 200 200" id="breath-svg">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#f0f0f0" stroke-width="3"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#fb2a7b" stroke-width="3"
+            stroke-linecap="round" stroke-dasharray="503" stroke-dashoffset="503"
+            transform="rotate(-90 100 100)" id="breath-arc" style="transition:stroke-dashoffset 1s linear,stroke .5s"/>
+          <circle cx="100" cy="100" r="60" id="breath-blob" fill="url(#bgrad)" style="transition:r 0s linear"/>
+          <defs>
+            <radialGradient id="bgrad" cx="40%" cy="35%">
+              <stop offset="0%" stop-color="#ffd0e8"/>
+              <stop offset="100%" stop-color="#fb2a7b" stop-opacity=".35"/>
+            </radialGradient>
+          </defs>
+        </svg>
         <div class="breath-center">
-          <div class="breath-phase" id="breath-phase">Tap to start</div>
+          <div class="breath-phase" id="breath-phase"></div>
           <div class="breath-count" id="breath-count"></div>
           <div class="breath-tap" id="breath-tap">🫁</div>
         </div>
       </div>
-      <div class="breath-guide" id="breath-guide">Breathe with the circle</div>
+      <div class="breath-guide" id="breath-guide">tap to begin</div>
     </div>
 
 </div>
@@ -511,6 +481,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
   </div>
 </div>
 
+
 <!-- TEACHER USERNAME LOGIN -->
 <div id="teacher-login-screen" class="screen">
   <div class="nav-bar" style="width:100%">
@@ -528,37 +499,6 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
   </div>
   <div class="llinks" style="margin-top:1rem">
     <button class="llink" onclick="goHome()">← Back</button>
-  </div>
-</div>
-
-<!-- STUDENT PIN SCREEN -->
-<div id="student-pin-screen" class="screen" style="display:none;flex-direction:column;align-items:center;padding:1rem 0">
-  <div style="background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px;margin:0 auto 1.5rem">
-    <div style="font-size:36px;text-align:center;margin-bottom:8px" id="stu-pin-avatar">🌸</div>
-    <div style="font-size:15px;font-weight:600;color:#111;margin-bottom:4px;text-align:center" id="stu-pin-hd">Set your PIN</div>
-    <div style="font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem;line-height:1.5" id="stu-pin-sub">Choose a 4-digit PIN to keep your info private</div>
-    <div class="dots" id="stu-pin-dots" style="justify-content:center">
-      <div class="dot" id="sp-d0"></div><div class="dot" id="sp-d1"></div>
-      <div class="dot" id="sp-d2"></div><div class="dot" id="sp-d3"></div>
-    </div>
-    <div class="pad">
-      <button class="nb" onclick="spnp('1')">1<span class="ns"></span></button>
-      <button class="nb" onclick="spnp('2')">2<span class="ns">ABC</span></button>
-      <button class="nb" onclick="spnp('3')">3<span class="ns">DEF</span></button>
-      <button class="nb" onclick="spnp('4')">4<span class="ns">GHI</span></button>
-      <button class="nb" onclick="spnp('5')">5<span class="ns">JKL</span></button>
-      <button class="nb" onclick="spnp('6')">6<span class="ns">MNO</span></button>
-      <button class="nb" onclick="spnp('7')">7<span class="ns">PQRS</span></button>
-      <button class="nb" onclick="spnp('8')">8<span class="ns">TUV</span></button>
-      <button class="nb" onclick="spnp('9')">9<span class="ns">WXYZ</span></button>
-      <button class="nb z" onclick="spnp('0')">0</button>
-      <button class="nb del" onclick="spnd()">&#9003;</button>
-    </div>
-    <div class="lerr" id="stu-pin-err"></div>
-    <div style="font-size:11px;color:var(--gl);text-align:center;margin-top:10px" id="stu-pin-forgot"></div>
-  </div>
-  <div class="llinks" style="margin-top:1rem">
-    <button class="llink" onclick="goHome()">&#8592; Back</button>
   </div>
 </div>
 
@@ -660,8 +600,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn-sv">TH</button>
   </div>
   <div id="student-card-area"></div>
-  <button onclick="openStudentChangePin()" style="width:100%;padding:9px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--gr);font-size:13px;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-bottom:6px;max-width:320px;display:block;margin-left:auto;margin-right:auto" id="change-pin-btn">&#128274; Change PIN</button>
-<button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
+  <button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
 </div>
 
 <!-- ADMIN VIEW -->
@@ -680,6 +619,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
     </div>
   </div>
   <div id="ac"></div>
+
 
     <!-- LIBRARY SECTION -->
     <div class="library-section" id="lib-sec-2">
@@ -718,23 +658,29 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
           <span id="disc-lbl">Legal disclaimer / ข้อจำกัดความรับผิดชอบ</span>
         </button>
         <div class="disc-body" id="disc-body">
-          <div id="disc-en">
-            <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
-            <p style="margin-bottom:8px">This application is a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">1. Data &amp; Privacy</strong><br>This app stores only usernames and class counts. No full names, ID numbers, or phone numbers should be entered.</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>Always verify bank details directly with your teacher before transferring. Yoga with Jib accepts no liability for incorrect payments.</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>Records are maintained in good faith. Discrepancies should be resolved between teacher and student.</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>This app is provided "as is" without warranty.</p>
-            <p style="color:#bbb;font-size:10px;margin-top:8px">Last updated: April 2026</p>
+          <div id="disc-en"><p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — Class Tracker App</strong></p>
+          <p style="margin-bottom:8px">This application ("Tally by Yoga with Jib") is provided as a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">1. Data & Privacy</strong><br>
+          This app stores only nicknames (usernames) and class counts. No full names, ID numbers, phone numbers, payment card details, or sensitive personal data should be entered. The app developer accepts no responsibility for any sensitive information entered by users in violation of these guidelines. Data is stored locally on your device and is not transmitted to any third party except via Google Apps Script if configured by your teacher.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">2. Payments</strong><br>
+          This app displays teacher bank account information for the sole purpose of facilitating class package payments. Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts, fraudulent accounts, or any financial disputes arising from transfers made through or inspired by this app.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">3. Class Records</strong><br>
+          Class deduction records are maintained in good faith. In the event of any discrepancy between the app record and actual classes attended, the student and teacher should resolve the matter directly. Yoga with Jib is not liable for data loss, technical errors, or record inaccuracies.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">4. Service Availability</strong><br>
+          This app is provided "as is" without warranty of any kind. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability of this service.</p>
+          <p style="margin-bottom:6px"><strong style="color:#555">5. Third-Party Services</strong><br>
+          This app may integrate with LINE Notify, Google Apps Script, and GitHub Pages. Use of these services is subject to their respective terms of service. Yoga with Jib is not responsible for their availability or data handling practices.</p>
+          <p style="margin-bottom:8px"><strong style="color:#555">ภาษาไทย (สรุป)</strong><br>
+          แอปนี้จัดทำขึ้นเพื่อความสะดวกในการติดตามคลาสโยคะเท่านั้น กรุณาอย่าใส่ข้อมูลส่วนตัวที่ละเอียดอ่อน เช่น ชื่อจริง เบอร์โทร หรือข้อมูลบัตรธนาคาร ผู้พัฒนาไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดจากการโอนเงินผิดบัญชี การสูญหายของข้อมูล หรือข้อพิพาทระหว่างครูและนักเรียน กรุณายืนยันข้อมูลธนาคารกับครูโดยตรงก่อนโอนเงินทุกครั้ง</p>
+          <p style="color:#bbb;font-size:10px">Last updated: April 2026 · <a href="/cdn-cgi/l/email-protection#523b3c343d122b3d3533253b263a383b307c313d3f">Contact</a></p>
           </div>
           <div id="disc-th" style="display:none">
             <p style="margin-bottom:8px"><strong style="color:#555">Yoga with Jib — แอปติดตามคลาสโยคะ</strong></p>
-            <p style="margin-bottom:8px">แอปพลิเคชันนี้ ("Tally by Yoga with Jib") จัดทำขึ้นเพื่อเป็นเครื่องมือช่วยติดตามแพ็คเกจคลาสโยคะที่ชำระเงินล่วงหน้า การใช้แอปนี้ถือว่าคุณรับทราบและยอมรับข้อกำหนดต่อไปนี้</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">1. ข้อมูลและความเป็นส่วนตัว</strong><br>แอปนี้จัดเก็บเฉพาะชื่อเล่น (username) และจำนวนคลาสเท่านั้น ห้ามใส่ชื่อจริง เลขบัตรประชาชน หมายเลขโทรศัพท์ หรือข้อมูลส่วนตัวที่ละเอียดอ่อน ผู้พัฒนาไม่รับผิดชอบต่อข้อมูลที่ผู้ใช้กรอกเข้ามาโดยขัดต่อแนวทางนี้</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">2. การชำระเงิน</strong><br>กรุณายืนยันข้อมูลบัญชีกับครูโดยตรงก่อนโอนเงินทุกครั้ง Yoga with Jib ไม่รับผิดชอบต่อการโอนเงินผิดบัญชีหรือข้อพิพาททางการเงินใดๆ ที่เกิดจากการใช้แอปนี้</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">3. บันทึกคลาส</strong><br>การบันทึกดำเนินการด้วยความสุจริต หากมีความคลาดเคลื่อนใดๆ ให้ครูและนักเรียนตกลงกันโดยตรง Yoga with Jib ไม่รับผิดชอบต่อการสูญหายของข้อมูลหรือความไม่ถูกต้อง</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">4. ความพร้อมใช้งาน</strong><br>แอปนี้ให้บริการ "ตามสภาพที่เป็น" โดยไม่มีการรับประกัน Yoga with Jib ไม่รับประกันความเสถียรหรือความต่อเนื่องของบริการ</p>
-            <p style="margin-bottom:6px"><strong style="color:#555">5. บริการของบุคคลที่สาม</strong><br>แอปนี้เชื่อมต่อกับ Google Apps Script, Firebase และ GitHub Pages ซึ่งอยู่ภายใต้ข้อกำหนดของแต่ละผู้ให้บริการ Yoga with Jib ไม่รับผิดชอบต่อความพร้อมใช้งานหรือการจัดการข้อมูลของบริการเหล่านั้น</p>
+            <p style="margin-bottom:8px">แอปนี้เป็นเครื่องมือสำหรับติดตามแพ็คเกจคลาสโยคะที่ชำระล่วงหน้า การใช้แอปนี้ถือว่ายอมรับข้อกำหนดต่อไปนี้</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">1. ข้อมูลและความเป็นส่วนตัว</strong><br>แอปนี้จัดเก็บเฉพาะ username และจำนวนคลาสเท่านั้น ห้ามใส่ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">2. การชำระเงิน</strong><br>กรุณายืนยันข้อมูลบัญชีกับครูก่อนโอนเงินทุกครั้ง</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">3. บันทึกคลาส</strong><br>หากมีความคลาดเคลื่อนให้ครูและนักเรียนตกลงกันโดยตรง</p>
+            <p style="margin-bottom:6px"><strong style="color:#555">4. ความพร้อมใช้งาน</strong><br>แอปนี้ให้บริการตามสภาพที่เป็นโดยไม่มีการรับประกัน</p>
             <p style="color:#bbb;font-size:10px;margin-top:8px">อัปเดตล่าสุด: เมษายน 2569</p>
           </div>
         </div>
@@ -747,7 +693,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 
 <!-- ═══════════════════════════════════════ -->
 <!-- SUPER ADMIN LOGIN -->
-<div id="sa-login-screen" class="sa-screen" style="display:none;flex-direction:column;align-items:center;padding:1rem 0">
+<div id="sa-login-screen" class="sa-screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
   <div style="margin-bottom:1.5rem;text-align:center">
     <div class="logo" style="font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink)">Yoga with Jib</div>
     <div style="font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:4px">SUPER ADMIN</div>
@@ -803,240 +749,6 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
         <a href="#" onclick="showGasInstructions();return false;">How to set up →</a>
       </div>
     </div>
-
-    <!-- QUICK LINKS -->
-    <div style="margin-bottom:1.5rem">
-      <div class="sa-section-title">Quick links</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
-        <a href="https://console.firebase.google.com/project/tally-679b9/firestore" target="_blank"
-           style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
-           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-          <div style="font-size:18px;margin-bottom:4px">🔥</div>
-          <div style="font-size:13px;font-weight:500;color:#e65100">Firebase</div>
-          <div style="font-size:11px;font-weight:300;color:#bf360c">Firestore database</div>
-        </a>
-        <a href="https://script.google.com" target="_blank"
-           style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
-           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-          <div style="font-size:18px;margin-bottom:4px">📊</div>
-          <div style="font-size:13px;font-weight:500;color:#1b5e20">Google Script</div>
-          <div style="font-size:11px;font-weight:300;color:#2e7d32">Notifications &amp; export</div>
-        </a>
-        <a href="https://github.com/yogawithjib/tally" target="_blank"
-           style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
-           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-          <div style="font-size:18px;margin-bottom:4px">💻</div>
-          <div style="font-size:13px;font-weight:500;color:#4a148c">GitHub</div>
-          <div style="font-size:11px;font-weight:300;color:#6a1b9a">App source code</div>
-        </a>
-        <a href="https://console.cloud.google.com/apis/credentials?project=tally-679b9" target="_blank"
-           style="background:#e3f2fd;border:1px solid #90caf9;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
-           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-          <div style="font-size:18px;margin-bottom:4px">🔑</div>
-          <div style="font-size:13px;font-weight:500;color:#0d47a1">API Key</div>
-          <div style="font-size:11px;font-weight:300;color:#1565c0">Google Cloud console</div>
-        </a>
-      </div>
-    </div>
-
-    <!-- SETUP GUIDE -->
-    <div style="margin-bottom:1.5rem">
-      <div class="sa-section-title">🚀 First-time setup</div>
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:1rem 1.25rem;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:500;color:#0369a1;margin-bottom:10px">Complete these steps once to get the app ready</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-
-          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
-            <button onclick="toggleGuide('s1')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;font-weight:500;color:#111">① Change the admin password</span>
-              <span id="s1-arr" style="color:var(--gl)">›</span>
-            </button>
-            <div id="s1" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-              The default password is <code style="background:#f5f5f5;padding:1px 6px;border-radius:3px">1242</code> — change it immediately.<br>
-              Tap <strong>← Back</strong> to return to the login screen → tap <strong>Change admin password</strong>.<br>
-              Use at least 8 characters with a mix of letters and numbers.
-            </div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
-            <button onclick="toggleGuide('s2')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;font-weight:500;color:#111">② Create a teacher account</span>
-              <span id="s2-arr" style="color:var(--gl)">›</span>
-            </button>
-            <div id="s2" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-              From the home screen → tap <strong>I'm a teacher</strong> → tap <strong>+ I'm a new teacher</strong>.<br>
-              Fill in display name, choose a username (cannot be changed later), pick an avatar, set a 4-digit PIN.<br>
-              District / Province / Country fields are optional but useful for multiple teachers.
-            </div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
-            <button onclick="toggleGuide('s3')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;font-weight:500;color:#111">③ Add bank &amp; contact details</span>
-              <span id="s3-arr" style="color:var(--gl)">›</span>
-            </button>
-            <div id="s3" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-              Log in as the teacher → tap <strong>🏦</strong> in the top bar → re-enter PIN → fill in bank name, account name, account number → Save.<br>
-              Tap <strong>📱</strong> to add phone, LINE ID, and email for payment notifications.<br>
-              <em>Students see bank details when they tap "Top up". Email is used for payment notifications via GAS.</em>
-            </div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
-            <button onclick="toggleGuide('s4')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;font-weight:500;color:#111">④ Add students</span>
-              <span id="s4-arr" style="color:var(--gl)">›</span>
-            </button>
-            <div id="s4" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-              Log in as the teacher → tap <strong>＋</strong> → enter a unique username (nickname only, no full names), choose symbol and color, set package size (10 / 15 / 20 classes), optionally set the price per package → Save.<br>
-              Students log in by entering their username on the student screen. They set their own PIN on first login.
-            </div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
-            <button onclick="toggleGuide('s5')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:13px;font-weight:500;color:#111">⑤ Set up Google Apps Script (optional)</span>
-              <span id="s5-arr" style="color:var(--gl)">›</span>
-            </button>
-            <div id="s5" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-              GAS enables two features: <strong>email notifications</strong> when students submit payment, and <strong>Google Sheets export</strong> of all class data.<br>
-              1. Open a Google Sheet → Extensions → Apps Script<br>
-              2. Tap <strong>"How to set up →"</strong> in the Google Sheets export box above → copy the code → paste it into Apps Script → Save<br>
-              3. Deploy → New deployment → Web app → set access to <strong>Anyone</strong> → Deploy → copy the URL<br>
-              4. Paste the URL in the <strong>Google Sheets export</strong> box above → Export ↗ to test<br>
-              <em>Without GAS, the app still works — students just can't send payment notifications automatically.</em>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- MAINTENANCE GUIDE -->
-    <div style="margin-bottom:1.5rem">
-      <div class="sa-section-title">🔧 Maintenance guide</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g1')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🔄 Update the app</span>
-            <span id="g1-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g1" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            1. Ask Claude to make changes → download new <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">index.html</code><br>
-            2. Go to <strong>github.com/yogawithjib/tally</strong><br>
-            3. Click on <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">index.html</code> → Edit (pencil icon) → drag and drop your new file → Commit changes<br>
-            4. Wait ~1 minute → live at <strong>yogawithjib.github.io/tally</strong><br>
-            <em>All student and teacher data lives in Firebase — updating the app never deletes data.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g2')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🔥 Firebase rules renewal</span>
-            <span id="g2-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g2" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            Rules expire <strong>January 2027</strong> — renew by December 2026.<br>
-            1. Firebase console → Firestore Database → Rules tab<br>
-            2. Find the date <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2027-01-01</code> → change to <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2028-01-01</code><br>
-            3. Click Publish<br>
-            <em>If rules expire, the app goes read-only — students can still view but teachers can't save changes.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g3')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🔑 Reset teacher PIN</span>
-            <span id="g3-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g3" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            Teachers cannot reset their own PIN remotely.<br>
-            1. Scroll down to the Teachers section below → tap 🗑 next to the teacher<br>
-            2. Confirm deletion (this removes the account but <strong>not the student data</strong>)<br>
-            3. Teacher creates a new account using the same username<br>
-            4. All their students are automatically re-linked<br>
-            <em>The teacher will need to re-enter their bank details after re-creating their account.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g4')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🔒 Reset student PIN</span>
-            <span id="g4-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g4" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            The teacher handles this — not you.<br>
-            Teacher logs in → taps the 📋 history button next to the student → taps <strong>🔒 Reset PIN</strong><br>
-            The student will be prompted to set a new PIN on their next login.<br>
-            <em>Students can also change their own PIN by tapping 🔒 Change PIN on their student card.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g5')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">📊 Update GAS / fix notifications</span>
-            <span id="g5-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g5" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            If notifications stop working or you want to update the script:<br>
-            1. Go to <strong>script.google.com</strong> → open the Yoga with Jib project<br>
-            2. Tap <strong>"How to set up →"</strong> above → copy the latest code<br>
-            3. Replace all code in Apps Script → Save → Deploy → Manage deployments → Edit → New version → Deploy<br>
-            4. Copy the new URL → paste it in the Google Sheets export box above → save<br>
-            <em>The teacher also needs their email set in 📱 Contact info for notifications to reach them.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g6')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🗑 Delete a teacher</span>
-            <span id="g6-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g6" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            ⚠️ This permanently deletes the teacher account <strong>and all their students' data</strong>.<br>
-            1. Export to Google Sheets first if you need a record<br>
-            2. Scroll down to Teachers → tap 🗑 next to the teacher name → confirm<br>
-            <em>This cannot be undone. Student PINs and history are gone permanently.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g7')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">🔐 Renew the Firebase API key</span>
-            <span id="g7-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g7" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            The Firebase API key is currently restricted to <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">yogawithjib.github.io/*</code> — this is correct and secure.<br>
-            If the app stops syncing to Firebase:<br>
-            1. Go to Google Cloud console → API Key → check restrictions<br>
-            2. Make sure <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">yogawithjib.github.io/*</code> is in the allowed referrers<br>
-            3. If you change the GitHub Pages URL, update this restriction to match<br>
-            <em>The app works offline using localStorage even if Firebase is unreachable.</em>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-          <button onclick="toggleGuide('g8')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:500;color:#111">💾 Back up all data</span>
-            <span id="g8-arr" style="color:var(--gl)">›</span>
-          </button>
-          <div id="g8" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
-            Data is stored in Firebase Firestore (cloud) and backed by localStorage on each device.<br>
-            For a manual backup:<br>
-            1. Paste your GAS URL in the box above → tap <strong>Export ↗</strong><br>
-            2. This writes all teachers and students to your Google Sheet<br>
-            3. You can also view raw data at Firebase console → Firestore → teachers collection<br>
-            <em>Recommended: export to Sheets once a month as a safety net.</em>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- PRICES OVERVIEW -->
-    <div class="sa-section-title">Prices by teacher</div>
-    <div id="sa-prices-list" style="margin-bottom:1.5rem"></div>
 
     <!-- TEACHER LIST -->
     <div class="sa-section-title">Teachers</div>
@@ -1138,6 +850,9 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
   </div>
 </div>
 
+
+
+
 <!-- TEACHER CONTACT MODAL (for admin to edit) -->
 <div class="mbg" id="contact-m" style="display:none">
   <div class="modal">
@@ -1213,10 +928,6 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
     <div id="stu-bank-section">
       <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" data-i18n="bankTitle">🏦 รายละเอียดบัญชี</div>
       <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
-        <div id="stu-price-row" style="display:none;background:#fff0f6;border-radius:8px;padding:8px 10px;margin-bottom:8px;border:1px solid #ffd0e8">
-          <div style="font-size:10px;font-weight:500;color:var(--pink);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">💰 Amount to transfer</div>
-          <div id="stu-price-val" style="font-size:18px;font-weight:600;color:var(--pink)"></div>
-        </div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
         <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
         <div class="pay-bank-row">
@@ -1263,33 +974,6 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
       </div>
     </div>
     <button class="pay-close-btn" onclick="cm('student-topup-m');resetNotify()" style="margin-top:8px" id="stu-topup-close">ปิด</button>
-  </div>
-</div>
-
-<!-- STUDENT CHANGE PIN MODAL -->
-<div class="mbg" id="stu-change-pin-m" style="display:none">
-  <div class="modal" style="max-width:300px">
-    <div class="mhd" id="scp-title" style="text-align:center">Change PIN</div>
-    <div style="font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem" id="scp-sub">Enter your current PIN first</div>
-    <div class="dots" id="scp-dots" style="justify-content:center">
-      <div class="dot" id="scp-d0"></div><div class="dot" id="scp-d1"></div>
-      <div class="dot" id="scp-d2"></div><div class="dot" id="scp-d3"></div>
-    </div>
-    <div class="pad">
-      <button class="nb" onclick="scpnp('1')">1<span class="ns"></span></button>
-      <button class="nb" onclick="scpnp('2')">2<span class="ns">ABC</span></button>
-      <button class="nb" onclick="scpnp('3')">3<span class="ns">DEF</span></button>
-      <button class="nb" onclick="scpnp('4')">4<span class="ns">GHI</span></button>
-      <button class="nb" onclick="scpnp('5')">5<span class="ns">JKL</span></button>
-      <button class="nb" onclick="scpnp('6')">6<span class="ns">MNO</span></button>
-      <button class="nb" onclick="scpnp('7')">7<span class="ns">PQRS</span></button>
-      <button class="nb" onclick="scpnp('8')">8<span class="ns">TUV</span></button>
-      <button class="nb" onclick="scpnp('9')">9<span class="ns">WXYZ</span></button>
-      <button class="nb z" onclick="scpnp('0')">0</button>
-      <button class="nb del" onclick="scpnd()">&#9003;</button>
-    </div>
-    <div class="lerr" id="scp-err"></div>
-    <div class="macts"><button class="bc" onclick="cm('stu-change-pin-m')">Cancel</button></div>
   </div>
 </div>
 
@@ -1398,10 +1082,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
   <div class="modal wide">
     <div class="h-header"><div class="h-sym" id="h-sym"></div><div><div class="h-name" id="h-name"></div><div class="h-meta" id="h-meta"></div></div></div>
     <div class="h-list" id="h-list"></div>
-    <div class="macts">
-      <button class="bc" onclick="resetStudentPin(currentHistStudent);cm('hist-m')" style="font-size:12px">&#128274; Reset PIN</button>
-      <button class="bs" onclick="cm('hist-m')">Close</button>
-    </div>
+    <div class="macts"><button class="bs" onclick="cm('hist-m')">Close</button></div>
   </div>
 </div>
 
@@ -1441,6 +1122,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
+
 
 /* ═══════════════════════════════════════════
    FIREBASE CONFIG + INIT
@@ -1573,6 +1255,7 @@ function showSyncStatus(msg,ok=true){
   document.body.appendChild(el);
   setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),1000);},2000);
 }
+
 
 /* ═══════════════════════════════════════════
    SECURITY LAYER
@@ -1786,7 +1469,7 @@ function saveStudents(tid,arr){
   fsSaveStudents(tid,arr).then(()=>showSyncStatus('✓ Synced'));
 }
 function getBank(tid){
-  try{const b=JSON.parse(localStorage.getItem('yj_b_'+tid)||'{}');return{bank:b.bank||'',name:b.name||'',num:b.num||'',enc:!!b.enc};}catch(e){return{bank:'',name:'',num:'',enc:false};}}
+  try{const b=JSON.parse(localStorage.getItem('yj_b_'+tid)||'{}');return{bank:b.bank||'',name:b.name||'',num:b.num||''};}catch(e){return{bank:'',name:'',num:''};}}
 function saveBank2(tid,b){
   localStorage.setItem('yj_b_'+tid,JSON.stringify(b));
   fsSaveBank(tid,b);
@@ -1828,19 +1511,24 @@ function applyLang(){
   const ct=document.querySelector('#stu-contact-box .font-size-11px');
   // contact title
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(L[k])el.textContent=L[k];});
-  // Disclaimer label + language switch
+  // Disclaimer language
   const discLbl=document.getElementById('disc-lbl');
   if(discLbl)discLbl.textContent=lang==='th'?'ข้อจำกัดความรับผิดชอบ':'Legal disclaimer';
-  const dEn=document.getElementById('disc-en');
-  const dTh=document.getElementById('disc-th');
+  const dEn=document.getElementById('disc-en');const dTh=document.getElementById('disc-th');
   if(dEn)dEn.style.display=lang==='th'?'none':'block';
   if(dTh)dTh.style.display=lang==='th'?'block':'none';
+  // Video section labels
+  const vt=document.getElementById('vid-sec-title');
+  if(vt)vt.textContent=lang==='th'?'ฝึกโยคะออนไลน์':'Practice yoga online';
+  const vs=document.getElementById('vid-see-all');
+  if(vs)vs.textContent=lang==='th'?'ดูทั้งหมด →':'See all →';
   // Nav back labels
   document.querySelectorAll('.nav-back').forEach(function(b){
-    if(b.textContent.trim().includes('Home')||b.textContent.trim().includes('หน้าหลัก'))
+    if(b.innerHTML.includes('8592')||b.textContent.includes('Home')||b.textContent.includes('หน้าหลัก'))
       b.innerHTML='&#8592; '+(lang==='th'?'หน้าหลัก':'Home');
   });
 }
+
 
 function maskName(name){
   if(!name||name.length===0)return'***';
@@ -1848,22 +1536,7 @@ function maskName(name){
 }
 
 /* ── SCREENS ── */
-function go(id){
-  const FLEX_SCREENS=['student-login-screen','teacher-login-screen','login-screen',
-    'signup-screen','student-pin-screen','sa-login-screen'];
-  document.querySelectorAll('.screen').forEach(function(s){
-    s.classList.remove('on');
-    s.style.display='none';
-  });
-  document.querySelectorAll('.sa-screen').forEach(function(s){
-    s.style.display='none';s.classList.remove('on');
-  });
-  var el=document.getElementById(id);
-  if(!el){console.error('Screen not found:',id);return;}
-  el.classList.add('on');
-  el.style.display=FLEX_SCREENS.indexOf(id)>=0?'flex':'block';
-  window.scrollTo(0,0);
-}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
 function goHome(){
   currentTeacherId=null;currentStudentData=null;pi='';endSession();
   go('home-screen');
@@ -1914,8 +1587,8 @@ async function findStudent(){
   }
   document.getElementById('find-err').textContent='';
   currentStudentData={student:found, teacher:foundTeacher};
-  if(found.pin){goToStudentPin(found,'verify');}
-  else{goToStudentPin(found,'set');}
+  renderStudentView(found, foundTeacher);
+  go('student-view-screen');
 }
 
 /* ── STUDENT VIEW ── */
@@ -1955,9 +1628,10 @@ function renderStudentView(s, tc){
       <div class="sc-teacher" style="color:${c.tx}">with ${tc?tc.name:''}</div>
       ${rem<0?`<div class='debt-banner'><div class='debt-amount'>−${Math.abs(rem)}</div><div class='debt-lbl'>${lang==='th'?'คลาสที่ค้างชำระ':'classes owed'}</div><div class='debt-note'>${lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance'}</div></div>`:`<div class='sc-ring-wrap'>${bigRing(rem,s.t,c)}<div class='sc-ring-inner'><div class='sc-rem' style='color:${c.tx}'>${rem}</div><div class='sc-lbl' style='color:${c.tx}'>${t('left')}</div></div></div>`}
       <div class="sc-status ${scl}">${stx}</div>
-      ${rem<0
-        ?`<button onclick='openStuTopup()' style='width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน':'Pay now'}</button>`
-        :`<button class="topup-student-btn" onclick="openStuTopup()">💳 ${lang==='th'?'ต่อแพ็คเกจ':'Top up'}</button>`}
+      ${rem<=0?`<button onclick='openStuTopup()' style='width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน / Pay now':'Pay now'}</button>`:''}
+      <button class="topup-student-btn" onclick="openStuTopup()">
+        💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}
+      </button>
       <div class="hist-section">
         <div class="hist-sec-title" style="color:${c.tx}">${t('histTitle')}</div>
         ${histHtml}
@@ -2004,6 +1678,7 @@ function copyAcct(){
 }
 function fallbackCopy(txt){const e=document.createElement('textarea');e.value=txt;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);}
 
+
 /* ── TEACHER USERNAME LOGIN ── */
 function findTeacher(){
   const raw=document.getElementById('teacher-username-input').value.trim().toLowerCase();
@@ -2018,7 +1693,7 @@ function findTeacher(){
   }
   document.getElementById('t-find-err').textContent='';
   currentTeacherId=tc.id;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${esc(tc.name)}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${maskName(tc.name)}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -2033,7 +1708,7 @@ function renderTeacherList(){
     const cnt=getStudents(tc.id).length;
     return`<div class="teacher-card" onclick="selectTeacher('${tc.id}')">
       <div class="teacher-avatar">${tc.emoji||'🧘‍♀️'}</div>
-      <div class="teacher-info"><div class="teacher-name">${esc(tc.name)}</div><div class="teacher-count">${lang==='th'?'แตะเพื่อเข้าสู่ระบบ':'Tap to log in'}</div></div>
+      <div class="teacher-info"><div class="teacher-name">${maskName(tc.name)}</div><div class="teacher-count">${lang==='th'?'แตะเพื่อเข้าสู่ระบบ':'Tap to log in'}</div></div>
       <div class="teacher-arrow">›</div>
     </div>`;
   }).join('');
@@ -2042,7 +1717,7 @@ function renderTeacherList(){
 function selectTeacher(id){
   currentTeacherId=id;
   const tc=getTeachers().find(x=>x.id===id);if(!tc)return;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${esc(tc.name)}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${maskName(tc.name)}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -2135,29 +1810,7 @@ function renderA(){
   const S=getStudents(currentTeacherId);
   const el=document.getElementById('ac');
   if(!S.length){el.innerHTML=`<div class="empty"><div class="ei">🧘‍♀️</div><p>${t('addToBegin')}</p></div>`;return;}
-  const tUsed=S.reduce((a,s)=>a+s.u,0);
-  const tTotal=S.reduce((a,s)=>a+s.t,0);
-  const tRem=tTotal-tUsed;
-  const tDebt=S.filter(s=>s.t-s.u<0).reduce((a,s)=>a+Math.abs(s.t-s.u),0);
-  const statsBar=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;padding:0 .25rem">
-    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
-      <div style="font-size:22px;font-weight:600;color:var(--pink)">${S.length}</div>
-      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'นักเรียน':'Students'}</div>
-    </div>
-    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
-      <div style="font-size:22px;font-weight:600;color:#111">${tTotal}</div>
-      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'ทั้งหมด':'Sold'}</div>
-    </div>
-    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
-      <div style="font-size:22px;font-weight:600;color:#111">${tUsed}</div>
-      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${lang==='th'?'ใช้แล้ว':'Used'}</div>
-    </div>
-    <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.75rem .5rem;text-align:center">
-      <div style="font-size:22px;font-weight:600;color:${tDebt>0?'var(--pink)':'#2dbd60'}">${tDebt>0?'-'+tDebt:tRem}</div>
-      <div style="font-size:9px;font-weight:300;color:var(--gl);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">${tDebt>0?(lang==='th'?'ค้าง':'Debt'):(lang==='th'?'เหลือ':'Left')}</div>
-    </div>
-  </div>`;
-  el.innerHTML=statsBar+`<div class="adm-grid">${S.map(s=>{
+  el.innerHTML=`<div class="adm-grid">${S.map(s=>{
     const rem=s.t-s.u,c=s.c||COL[0];
     return`<div class="a-card" style="background:${c.bg}">
       <button class="x-btn" onclick="del('${s.id}')">×</button>
@@ -2198,7 +1851,6 @@ function del(id){
   saveStudents(currentTeacherId,S.filter(x=>x.id!==id));renderA();
 }
 function openHist(id){
-  currentHistStudent=id;
   const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
   document.getElementById('h-sym').textContent=s.sym;
   document.getElementById('h-name').textContent=esc(s.n);
@@ -2265,21 +1917,22 @@ function openBank(){
 }
 function openBankActual(){
   const bk=getBank(currentTeacherId);
-  const dec=(v)=>bk.enc?decryptBank(v,currentTeacherId):v;
-  document.getElementById('b-bank').value=dec(bk.bank);
-  document.getElementById('b-name').value=dec(bk.name);
-  document.getElementById('b-num').value=dec(bk.num);
+  document.getElementById('b-bank').value=decryptBank(bk.bank,currentTeacherId);
+  document.getElementById('b-name').value=decryptBank(bk.name,currentTeacherId);
+  document.getElementById('b-num').value=decryptBank(bk.num,currentTeacherId);
   document.getElementById('bank-m').style.display='flex';
 }
 function saveBank(){
   const rawBank=document.getElementById('b-bank').value.trim();
   const rawName=document.getElementById('b-name').value.trim();
   const rawNum=document.getElementById('b-num').value.trim();
-  // Save encrypted version to localStorage (protects data on teacher's device)
-  const bkEnc={bank:encryptBank(rawBank,currentTeacherId),name:encryptBank(rawName,currentTeacherId),num:encryptBank(rawNum,currentTeacherId),enc:true};
-  localStorage.setItem('yj_b_'+currentTeacherId,JSON.stringify(bkEnc));
-  // Save plain text to Firebase so students can read it
-  fsSaveBank(currentTeacherId,{bank:rawBank,name:rawName,num:rawNum,enc:false});
+  const bk={
+    bank:encryptBank(rawBank,currentTeacherId),
+    name:encryptBank(rawName,currentTeacherId),
+    num:encryptBank(rawNum,currentTeacherId),
+    enc:true
+  };
+  saveBank2(currentTeacherId,bk);
   cm('bank-m');toast(t('bankSaved'));
 }
 
@@ -2335,6 +1988,8 @@ document.getElementById('student-name-input').addEventListener('keydown',e=>{if(
 document.getElementById('su-name').addEventListener('keydown',e=>{if(e.key==='Enter')createTeacher();});
 document.getElementById('teacher-username-input').addEventListener('keydown',e=>{if(e.key==='Enter')findTeacher();});
 
+
+
 /* ═══════════════════════════════════════════
    SUPER ADMIN
 ═══════════════════════════════════════════ */
@@ -2377,6 +2032,7 @@ function saBack(){
 }
 
 function saDots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('on',i<n);});}
+
 
 async function chkSaPin(){
   const lockKey='superadmin';
@@ -2460,38 +2116,12 @@ function renderSaDashboard(){
     S.forEach(s=>{totalUsed+=s.u;totalRemaining+=(s.t-s.u);totalClasses+=s.t;});
   });
 
-  // compute debt separately
-  let totalDebt=0;
-  teachers.forEach(tc=>{getStudents(tc.id).forEach(s=>{if(s.t-s.u<0)totalDebt+=Math.abs(s.t-s.u);});});
   document.getElementById('sa-stats').innerHTML=`
     <div class="sa-stat-card"><div class="sa-stat-val">${teachers.length}</div><div class="sa-stat-lbl">Teachers</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalStudents}</div><div class="sa-stat-lbl">Students</div></div>
-    <div class="sa-stat-card"><div class="sa-stat-val">${totalClasses}</div><div class="sa-stat-lbl">Total classes sold</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalUsed}</div><div class="sa-stat-lbl">Classes used</div></div>
-    <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes remaining</div></div>
-    <div class="sa-stat-card"><div class="sa-stat-val" style="color:${totalDebt>0?'var(--pink)':'inherit'}">${totalDebt}</div><div class="sa-stat-lbl">Classes in debt</div></div>`;
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes left</div></div>`;
 
-  // Prices overview
-  const pricesList=document.getElementById('sa-prices-list');
-  if(pricesList){
-    let ph='';
-    teachers.forEach(function(tc){
-      const S=getStudents(tc.id);
-      const withPrice=S.filter(function(s){return s.price&&s.price>0;});
-      if(withPrice.length){
-        ph+='<div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.875rem 1rem;margin-bottom:8px">';
-        ph+='<div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px">'+tc.emoji+' '+tc.name+'</div>';
-        withPrice.forEach(function(s){
-          ph+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:12px">';
-          ph+='<span style="color:#555">'+s.sym+' '+s.n+'</span>';
-          ph+='<span style="font-weight:600;color:var(--pink)">฿'+s.price.toLocaleString()+' / pkg</span>';
-          ph+='</div>';
-        });
-        ph+='</div>';
-      }
-    });
-    pricesList.innerHTML=ph||'<div style="font-size:12px;color:var(--gl);padding:8px 0">No prices set yet</div>';
-  }
   const list=document.getElementById('sa-teacher-list');
   if(!teachers.length){list.innerHTML='<div class="empty"><p>No teachers yet</p></div>';return;}
   list.innerHTML=teachers.map(tc=>{
@@ -2678,6 +2308,10 @@ loadSaPin();
 migrateBankData();
 shuffleLibrary();
 
+
+
+
+
 /* ── NOTIFICATIONS ── */
 let notifyPkgVal=10;
 
@@ -2766,157 +2400,6 @@ async function sendNotification(){
   }
 }
 
-/* ── STUDENT PIN ── */
-let sppi='', spMode='set', sppFirst='';
-
-function spnp(n){
-  if(sppi.length>=4)return;
-  sppi+=n;dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
-  if(sppi.length===4)setTimeout(handleStudentPin,120);
-}
-function spnd(){
-  sppi=sppi.slice(0,-1);
-  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],sppi.length);
-  document.getElementById('stu-pin-err').textContent='';
-}
-
-async function handleStudentPin(){
-  if(!currentStudentData)return;
-  const {student:s,teacher:tc}=currentStudentData;
-  if(spMode==='set'){
-    sppFirst=sppi;sppi='';spMode='confirm';
-    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ยืนยัน PIN':'Confirm your PIN';
-    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN อีกครั้ง':'Enter your PIN again to confirm';
-    dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);return;
-  }
-  if(spMode==='confirm'){
-    if(sppi!==sppFirst){
-      document.getElementById('stu-pin-err').textContent=lang==='th'?'PIN ไม่ตรงกัน':"PINs don't match";
-      document.getElementById('stu-pin-dots').classList.add('shake');
-      setTimeout(function(){
-        document.getElementById('stu-pin-dots').classList.remove('shake');
-        sppi='';sppFirst='';spMode='set';
-        document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
-        document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลัก':'Choose a 4-digit PIN to keep your info private';
-        dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
-        document.getElementById('stu-pin-err').textContent='';
-      },700);return;
-    }
-    hashPin(sppi).then(function(hashed){
-      const students=getStudents(tc.id);
-      const st=students.find(function(x){return x.id===s.id;});
-      if(st){st.pin=hashed;saveStudents(tc.id,students);}
-      currentStudentData.student.pin=hashed;
-      toast(lang==='th'?'ตั้ง PIN เรียบร้อย':'PIN set!');
-      showStudentView();
-    });return;
-  }
-  if(spMode==='verify'){
-    const lockKey='student_'+s.id;
-    if(isLockedOut(lockKey)){showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);return;}
-    const ok=await verifyPin(sppi,s.pin);
-    if(ok){resetPinAttempts(lockKey);showStudentView();}
-    else{
-      const attempts=incPinAttempts(lockKey);
-      const rem=MAX_ATTEMPTS-attempts;
-      if(attempts>=MAX_ATTEMPTS){lockout(lockKey);showLockoutMsg('stu-pin-err','stu-pin-dots',lockKey);}
-      else{document.getElementById('stu-pin-err').textContent=(lang==='th'?'PIN ไม่ถูกต้อง':'Wrong PIN')+(rem<=2?' ('+rem+' left)':'');}
-      document.getElementById('stu-pin-dots').classList.add('shake');
-      setTimeout(function(){document.getElementById('stu-pin-dots').classList.remove('shake');sppi='';dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);},600);
-    }
-  }
-}
-
-function showStudentView(){
-  if(!currentStudentData)return;
-  sppi='';sppFirst='';spMode='set';
-  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
-  renderStudentView(currentStudentData.student,currentStudentData.teacher);
-  go('student-view-screen');
-}
-
-function goToStudentPin(student,mode){
-  spMode=mode;sppi='';sppFirst='';
-  document.getElementById('stu-pin-avatar').textContent=student.sym||'🌸';
-  if(mode==='verify'){
-    document.getElementById('stu-pin-hd').textContent=student.n;
-    document.getElementById('stu-pin-sub').textContent=lang==='th'?'ใส่ PIN ของคุณ':'Enter your PIN to continue';
-    document.getElementById('stu-pin-forgot').textContent=lang==='th'?'ลืม PIN? ติดต่อครูเพื่อ reset':'Forgot PIN? Ask your teacher to reset it.';
-  } else {
-    document.getElementById('stu-pin-hd').textContent=lang==='th'?'ตั้ง PIN ของคุณ':'Set your PIN';
-    document.getElementById('stu-pin-sub').textContent=lang==='th'?'เลือก PIN 4 หลักเพื่อรักษาข้อมูล':'Choose a 4-digit PIN to keep your info private';
-    document.getElementById('stu-pin-forgot').textContent='';
-  }
-  dots(['sp-d0','sp-d1','sp-d2','sp-d3'],0);
-  document.getElementById('stu-pin-err').textContent='';
-  go('student-pin-screen');
-}
-
-let currentHistStudent=null;
-function resetStudentPin(sid){
-  if(!confirm(lang==='th'?'รีเซ็ต PIN ของนักเรียน?':'Reset this student PIN?'))return;
-  const S=getStudents(currentTeacherId);
-  const s=S.find(function(x){return x.id===sid;});
-  if(s){delete s.pin;saveStudents(currentTeacherId,S);toast('PIN reset');}
-}
-
-/* ── STUDENT CHANGE PIN ── */
-let scppi='',scpMode='verify',scpFirst='';
-
-function openStudentChangePin(){
-  if(!currentStudentData||!currentStudentData.student.pin){
-    toast(lang==='th'?'ไม่มี PIN ที่ตั้งไว้':'No PIN set yet');return;
-  }
-  scppi='';scpFirst='';scpMode='verify';
-  dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);
-  document.getElementById('scp-title').textContent=lang==='th'?'เปลี่ยน PIN':'Change PIN';
-  document.getElementById('scp-sub').textContent=lang==='th'?'ใส่ PIN ปัจจุบันก่อน':'Enter your current PIN first';
-  document.getElementById('scp-err').textContent='';
-  document.getElementById('stu-change-pin-m').style.display='flex';
-}
-function scpnp(n){
-  if(scppi.length>=4)return;
-  scppi+=n;dots(['scp-d0','scp-d1','scp-d2','scp-d3'],scppi.length);
-  if(scppi.length===4)setTimeout(handleSCP,120);
-}
-function scpnd(){scppi=scppi.slice(0,-1);dots(['scp-d0','scp-d1','scp-d2','scp-d3'],scppi.length);document.getElementById('scp-err').textContent='';}
-async function handleSCP(){
-  const s=currentStudentData.student,tc=currentStudentData.teacher;
-  if(scpMode==='verify'){
-    const ok=await verifyPin(scppi,s.pin);
-    if(!ok){
-      document.getElementById('scp-err').textContent=lang==='th'?'PIN ไม่ถูกต้อง':'Wrong PIN';
-      document.getElementById('scp-dots').classList.add('shake');
-      setTimeout(function(){document.getElementById('scp-dots').classList.remove('shake');scppi='';dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);document.getElementById('scp-err').textContent='';},600);
-      return;
-    }
-    scppi='';scpMode='new';
-    document.getElementById('scp-title').textContent=lang==='th'?'PIN ใหม่':'New PIN';
-    document.getElementById('scp-sub').textContent=lang==='th'?'เลือก PIN ใหม่ 4 หลัก':'Choose a new 4-digit PIN';
-    document.getElementById('scp-err').textContent='';
-    dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);return;
-  }
-  if(scpMode==='new'){scpFirst=scppi;scppi='';scpMode='confirm';
-    document.getElementById('scp-title').textContent=lang==='th'?'ยืนยัน PIN':'Confirm PIN';
-    document.getElementById('scp-sub').textContent=lang==='th'?'ใส่ PIN อีกครั้ง':'Enter PIN again';
-    dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);return;
-  }
-  if(scpMode==='confirm'){
-    if(scppi!==scpFirst){
-      document.getElementById('scp-err').textContent=lang==='th'?'PIN ไม่ตรงกัน':'PINs do not match';
-      setTimeout(function(){scppi='';scpFirst='';scpMode='new';document.getElementById('scp-title').textContent=lang==='th'?'PIN ใหม่':'New PIN';dots(['scp-d0','scp-d1','scp-d2','scp-d3'],0);document.getElementById('scp-err').textContent='';},700);return;
-    }
-    hashPin(scppi).then(function(hashed){
-      const students=getStudents(tc.id);
-      const st=students.find(function(x){return x.id===s.id;});
-      if(st){st.pin=hashed;saveStudents(tc.id,students);}
-      currentStudentData.student.pin=hashed;
-      cm('stu-change-pin-m');
-      toast(lang==='th'?'เปลี่ยน PIN เรียบร้อย':'PIN changed!');
-    });
-  }
-}
-
 /* ── CONTACT INFO ── */
 function getContact(tid){
   try{const c=JSON.parse(localStorage.getItem('yj_c_'+tid)||'{}');
@@ -2949,7 +2432,7 @@ function saveContact(){
 /* ── STUDENT TOPUP MODAL ── */
 let _stuFullNum='';
 
-function openStuTopup(){
+async function openStuTopup(){
   if(!currentStudentData)return;
   const {student:s, teacher:tc}=currentStudentData;
   const bk=getBank(tc.id);
@@ -2977,11 +2460,13 @@ function openStuTopup(){
   if(hasPhone)document.getElementById('stu-phone-val').textContent=ct.phone;
   if(hasLine)document.getElementById('stu-line-val').textContent=ct.line;
 
-  // bank info — plain text from Firebase, encrypted only in teacher's localStorage
-  const dec2=(v)=>bk.enc?decryptBank(v,tc.id):v;
-  const dBank=dec2(bk.bank)||'';
-  const dName=dec2(bk.name)||'';
-  const dNum=dec2(bk.num)||'';
+  // Bank: fetch plain text from Firebase (never decrypt on student side)
+  let dBank='',dName='',dNum='';
+  try{
+    const fb=await fsGetBank(tc.id);
+    if(fb&&fb.bank){dBank=fb.bank;dName=fb.name||'';dNum=fb.num||'';}
+    else{const bk=getBank(tc.id);if(!bk.enc){dBank=bk.bank||'';dName=bk.name||'';dNum=bk.num||'';}}
+  }catch(e){const bk=getBank(tc.id);if(!bk.enc){dBank=bk.bank||'';dName=bk.name||'';dNum=bk.num||'';}}
   _stuFullNum=dNum;
 
   document.getElementById('stu-lbl-bank').textContent=t('lblBank');
@@ -2990,17 +2475,15 @@ function openStuTopup(){
   document.getElementById('stu-pm-bank').textContent=dBank||notSet;
   document.getElementById('stu-pm-name').textContent=dName||notSet;
   document.getElementById('stu-masked-num').textContent=dNum?maskAcct(dNum):notSet;
-  // Show price
+
+  // Price row
   const priceRow=document.getElementById('stu-price-row');
   const priceEl=document.getElementById('stu-price-val');
-  if(s.price&&s.price>0&&priceRow&&priceEl){
+  if(priceRow&&priceEl&&s.price&&s.price>0){
     priceRow.style.display='block';
     priceEl.textContent='฿'+s.price.toLocaleString()+' / package ('+s.t+' classes)';
-    document.getElementById('notify-amount').value=s.price;
-  } else if(priceRow){
-    priceRow.style.display='none';
-    document.getElementById('notify-amount').value='';
-  }
+    const na=document.getElementById('notify-amount');if(na)na.value=s.price;
+  }else if(priceRow){priceRow.style.display='none';}
 
   const revealBtn=document.getElementById('stu-reveal-btn');
   revealBtn.textContent=lang==='th'?'แสดงเลขเต็ม / Tap to reveal':'Tap to reveal full number';
@@ -3202,6 +2685,7 @@ function toggleDisc(){
   arrow.textContent=body.classList.contains('open')?'\u25be':'\u25b8';
 }
 
+
 function shuffleLibrary(){
   ['lib-sec-1','lib-sec-2'].forEach(function(id){
     var sec=document.getElementById(id);
@@ -3235,258 +2719,10 @@ function updateLibLang(){
   });
 }
 
-/* ── VIDEO SECTION ── */
-const VID_GAS='https://script.google.com/macros/s/AKfycbwWvPWlOE49u8tCUzflc-djPAG579QPlJNaU8WIej6TpVGAo_KrZdAdlvOV2ewvynAPXA/exec';
-
-function parseCSV(text){
-  const lines=text.trim().split('\n');
-  if(lines.length<2)return[];
-  const parseRow=function(line){
-    const fields=[];let cur='';let inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
-      else if(ch===','&&!inQ){fields.push(cur.trim());cur='';}
-      else cur+=ch;
-    }
-    fields.push(cur.trim());
-    return fields;
-  };
-  const headers=parseRow(lines[0]);
-  return lines.slice(1).filter(function(l){return l.trim();}).map(function(line){
-    const vals=parseRow(line);
-    const obj={};
-    headers.forEach(function(h,i){obj[h]=(vals[i]||'').replace(/^"|"$/g,'');});
-    return obj;
-  });
-}
-
-function getYtId(url){
-  if(!url)return'';
-  const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
-  return m?m[1]:'';
-}
-
-function resolveThumb(thumbField,url){
-  // 1. Use Thumbnail field if it's already a direct image URL
-  if(thumbField){
-    // Google Drive: convert share URL to direct embed
-    const driveM=thumbField.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
-    if(driveM)return'https://lh3.googleusercontent.com/d/'+driveM[1];
-    // Already a direct image URL
-    if(thumbField.startsWith('http'))return thumbField;
-  }
-  // 2. Extract YouTube ID from video URL
-  const ytId=getYtId(url);
-  if(ytId)return'https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg';
-  return'';
-}
-
-async function loadHomeVideos(){
-  const grid=document.getElementById('vid-grid');
-  if(!grid)return;
-  // Show skeletons while loading
-  grid.innerHTML=['','','',''].map(function(){
-    return '<div style="border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;background:#fff">'
-      +'<div style="width:100%;padding-top:56.25%;background:linear-gradient(90deg,#eee 25%,#e4e4e4 50%,#eee 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>'
-      +'<div style="padding:8px 10px"><div style="height:8px;width:40%;background:#eee;border-radius:4px;margin-bottom:6px"></div>'
-      +'<div style="height:11px;background:#eee;border-radius:4px;margin-bottom:4px"></div>'
-      +'<div style="height:9px;width:30%;background:#eee;border-radius:4px"></div></div></div>';
-  }).join('');
-
-  try{
-    const res=await fetch(VID_GAS,{mode:'cors'});
-    if(!res.ok)throw new Error('fetch failed');
-    const text=await res.text();
-    const rows=parseCSV(text);
-    if(!rows.length)throw new Error('empty');
-    renderHomeVideos(grid,rows);
-  }catch(e){
-    showVideoLink(document.getElementById('vid-grid'));
-  }
-}
-
-function renderHomeVideos(grid,rows){
-  const AK='ใครดูได้บ้าง (สมาชิกระดับไหน / ฟรี)';
-  const DK='duration (mins)';
-  const categories=['ฟรี','ผีเสื้อ','แมลงปอ'];
-
-  // Pick one random video per category
-  const picks=categories.map(function(cat){
-    const pool=rows.filter(function(v){
-      const acc=v[AK]||'';
-      return acc===cat||acc.indexOf(cat)>=0;
-    });
-    if(!pool.length)return null;
-    return pool[Math.floor(Math.random()*pool.length)];
-  }).filter(Boolean);
-
-  if(!picks.length){showVideoLink(grid);return;}
-
-  // Horizontal scroll shelf — one card per category
-  grid.style.cssText='display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none';
-
-  const catColors={'ฟรี':'#f0f0f0','ผีเสื้อ':'#fb2a7b','แมลงปอ':'#111'};
-
-  grid.innerHTML=picks.map(function(v){
-    const url=v.url||v.URL||'';
-    const thumb=resolveThumb(v.Thumbnail||v.thumbnail||'',url);
-    const title=v.title||v['Full title']||'Yoga with Jib';
-    const dur=v[DK]||v.duration||'';
-    const access=v[AK]||'';
-    const link=url||'https://yogawithjib.github.io/library/videos.html';
-    const badgeColor=catColors[access]||'#eee';
-    const badgeText=access==='ฟรี'?'#333':'#fff';
-    const thumbHtml='<div style="position:relative;width:100%;padding-top:56.25%;background:#f0f0f0;overflow:hidden;border-radius:10px 10px 0 0">'
-      +(thumb?'<img src="'+thumb+'" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display=\'none\'">':'')
-      +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">'
-      +'<div style="width:32px;height:32px;background:rgba(251,42,123,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      +'<div style="width:0;height:0;border-style:solid;border-width:5px 0 5px 10px;border-color:transparent transparent transparent #fff;margin-left:2px"></div>'
-      +'</div></div></div>';
-    const infoHtml='<div style="padding:7px 9px 9px;background:#fff">'
-      +'<span style="display:inline-block;background:'+badgeColor+';color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;margin-bottom:4px">'+access+'</span><br>'
-      +'<span style="font-size:11px;font-weight:500;color:#111;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+title+'</span>'
-      +(dur?'<div style="font-size:10px;color:#bbb;margin-top:3px">'+dur+' min</div>':'')
-      +'</div>';
-    return '<a href="'+link+'" target="_blank" style="display:block;border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;text-decoration:none;background:#fff;flex:0 0 calc(33.33% - 7px);min-width:140px;max-width:200px">'
-      +thumbHtml+infoHtml+'</a>';
-  }).join('');
-
-  const t=document.getElementById('vid-sec-title');
-  if(t)t.textContent=lang==='th'?'ฝึกโยคะออนไลน์':'Practice yoga online';
-  const s=document.getElementById('vid-see-all');
-  if(s)s.textContent=lang==='th'?'ดูทั้งหมด →':'See all →';
-}
-function showVideoLink(grid){
-  if(!grid)return;
-  grid.innerHTML='<a href="https://yogawithjib.github.io/library/videos.html" target="_blank"'
-    +' style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;background:#fff;border:1px solid var(--bd);border-radius:14px;text-decoration:none">'
-    +'<div>'
-    +'<div style="font-size:14px;font-weight:500;color:#111">🎥 '+(lang==='th'?'ดูวิดีโอโยคะทั้งหมด':'Watch all yoga videos')+'</div>'
-    +'<div style="font-size:11px;color:var(--gl);margin-top:2px">yogawithjib.github.io</div>'
-    +'</div>'
-    +'<span style="color:var(--pink);font-size:18px">→</span></a>';
-}
-
-/* ── BREATHING TIMER ── */
-const BREATH_PATTERNS={
-  box:{phases:['Inhale','Hold','Exhale','Hold'],times:[4,4,4,4],label:'Box breathing — calming & balancing'},
-  '478':{phases:['Inhale','Hold','Exhale'],times:[4,7,8],label:'4-7-8 — helps you sleep & relax'},
-  ujjayi:{phases:['Inhale','Exhale'],times:[4,8],label:'Ujjayi — energising & focused'}
-};
-const BREATH_TH={
-  box:{phases:['หายใจเข้า','กลั้น','หายใจออก','กลั้น'],label:'Box breathing — ผ่อนคลายและสมดุล'},
-  '478':{phases:['หายใจเข้า','กลั้น','หายใจออก'],label:'4-7-8 — ช่วยให้หลับและผ่อนคลาย'},
-  ujjayi:{phases:['หายใจเข้า','หายใจออก'],label:'Ujjayi — กระตุ้นพลังงาน'}
-};
-
-let bKey='box', bRunning=false, bTimer=null, bPhase=0, bCount=0;
-
-function setBreath(el,key){
-  document.querySelectorAll('.bpreset').forEach(function(b){b.classList.remove('on');});
-  el.classList.add('on');
-  bKey=key;
-  if(bRunning)stopBreath();
-  resetBreathUI();
-}
-
-function toggleBreath(){
-  if(bRunning)stopBreath();
-  else startBreath();
-}
-
-function startBreath(){
-  bRunning=true;bPhase=0;
-  document.getElementById('breath-tap').style.display='none';
-  runBreathPhase();
-}
-
-function stopBreath(){
-  bRunning=false;
-  clearTimeout(bTimer);
-  resetBreathUI();
-}
-
-function resetBreathUI(){
-  bCount=0;bPhase=0;
-  document.getElementById('breath-phase').textContent=lang==='th'?'แตะเพื่อเริ่ม':'Tap to start';
-  document.getElementById('breath-count').textContent='';
-  document.getElementById('breath-tap').style.display='block';
-  document.getElementById('breath-tap').textContent='🫁';
-  setBreathScale(1,0);
-  const p=BREATH_PATTERNS[bKey];
-  const g=lang==='th'?BREATH_TH[bKey].label:p.label;
-  document.getElementById('breath-guide').textContent=g;
-}
-
-function runBreathPhase(){
-  if(!bRunning)return;
-  const p=BREATH_PATTERNS[bKey];
-  const phases=lang==='th'?BREATH_TH[bKey].phases:p.phases;
-  const dur=p.times[bPhase];
-  const phaseName=phases[bPhase];
-  const isIn=phaseName.includes('Inhale')||phaseName.includes('เข้า');
-  const isOut=phaseName.includes('Exhale')||phaseName.includes('ออก');
-
-  document.getElementById('breath-phase').textContent=phaseName;
-  // Animate circle
-  const targetScale=isIn?1.22:isOut?0.88:1;
-  const transDur=isIn||isOut?dur:0.3;
-  setBreathScale(targetScale,transDur);
-
-  bCount=dur;
-  document.getElementById('breath-count').textContent=bCount;
-  countBreath(dur,function(){
-    if(!bRunning)return;
-    bPhase=(bPhase+1)%p.phases.length;
-    runBreathPhase();
-  });
-}
-
-function countBreath(sec,done){
-  if(sec<=0){done();return;}
-  document.getElementById('breath-count').textContent=sec;
-  bTimer=setTimeout(function(){countBreath(sec-1,done);},1000);
-}
-
-function setBreathScale(scale,dur){
-  const el=document.getElementById('breath-outer');
-  if(!el)return;
-  el.style.transition=dur>0?'transform '+dur+'s ease-in-out':'none';
-  el.style.transform='scale('+scale+')';
-  const mid=document.getElementById('breath-mid');
-  if(mid){mid.style.transition=el.style.transition;mid.style.transform='scale('+(scale*.95)+')';}
-}
-
-/* ── YOGA SUTRA TAGLINE ── */
-const YOGA_SUTRAS = [
-  {su:'1.2', en:'"Yoga is the stilling of the fluctuations of the mind."'},
-  {su:'1.3', en:'"Then the seer rests in their own true nature."'},
-  {su:'1.14', en:'"Practice becomes firmly established when it is done consistently, for a long time, with love."'},
-  {su:'1.33', en:'"Clarity of mind comes through cultivating friendliness, compassion, joy, and equanimity."'},
-  {su:'2.1', en:'"Yoga in action is self-discipline, self-study, and surrender to the greater whole."'},
-  {su:'2.46', en:'"Posture should be steady and comfortable."'},
-  {su:'2.47', en:'"Effort relaxes into effortlessness, and the infinite reveals itself."'},
-  {su:'2.48', en:'"Then one is undisturbed by the pairs of opposites."'},
-  {su:'3.4', en:'"When concentration, meditation, and samadhi are practised together, that is samyama."'},
-  {su:'1.12', en:'"These fluctuations are mastered through practice and non-attachment."'},
-  {su:'1.20', en:'"For others, clarity comes through faith, energy, memory, and deep insight."'},
-  {su:'2.29', en:'"The eight limbs of yoga are the foundation of the path."'},
-  {su:'1.36', en:'"Or by focusing on the inner light, which is beyond sorrow."'},
-  {su:'2.16', en:'"Future suffering is to be avoided."'},
-  {su:'2.42', en:'"From contentment, unsurpassed happiness is attained."'},
-];
-function setRandomSutra(){
-  const el=document.getElementById('ds-tagline-el');
-  if(!el)return;
-  const s=YOGA_SUTRAS[Math.floor(Math.random()*YOGA_SUTRAS.length)];
-  el.innerHTML=s.en+'<br><span style="font-size:11px;color:#ccc;letter-spacing:.5px;margin-top:6px;display:block">— Yoga Sutra '+s.su+'</span>';
-}
-setRandomSutra();
-
 /* ── INIT ── */
 try{lang=localStorage.getItem('yj_lang')||'en';}catch(e){}
 loadHomeVideos();
+setRandomSutra();
 applyLang();
 loadSaPin();
 migrateBankData();
@@ -3514,6 +2750,217 @@ loadFirebase().then(()=>{
   }
 }).catch(()=>showSyncStatus('Offline mode',false));
 }).catch(()=>{console.warn('Firebase failed to load');});
+
+
+/* ── VIDEO SECTION ── */
+const VID_GAS='https://script.google.com/macros/s/AKfycbwWvPWlOE49u8tCUzflc-djPAG579QPlJNaU8WIej6TpVGAo_KrZdAdlvOV2ewvynAPXA/exec';
+
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  if(lines.length<2)return[];
+  const parseRow=function(line){
+    const fields=[];let cur='';let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){fields.push(cur.trim());cur='';}
+      else cur+=ch;
+    }
+    fields.push(cur.trim());return fields;
+  };
+  const headers=parseRow(lines[0]);
+  return lines.slice(1).filter(function(l){return l.trim();}).map(function(line){
+    const vals=parseRow(line);const obj={};
+    headers.forEach(function(h,i){obj[h]=(vals[i]||'').replace(/^"|"$/g,'');});
+    return obj;
+  });
+}
+
+function getYtId(url){
+  if(!url)return'';
+  const m=url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m?m[1]:'';
+}
+
+function resolveThumb(thumbField,url){
+  if(thumbField){
+    const driveM=thumbField.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+    if(driveM)return'https://lh3.googleusercontent.com/d/'+driveM[1];
+    if(thumbField.startsWith('http'))return thumbField;
+  }
+  const ytId=getYtId(url);
+  if(ytId)return'https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg';
+  return'';
+}
+
+async function loadHomeVideos(){
+  const grid=document.getElementById('vid-grid');
+  if(!grid)return;
+  grid.innerHTML=['','',''].map(function(){
+    return '<div style="flex:0 0 calc(33.33% - 7px);min-width:140px;border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;background:#fff">'
+      +'<div style="width:100%;padding-top:56.25%;background:linear-gradient(90deg,#eee 25%,#e4e4e4 50%,#eee 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>'
+      +'<div style="padding:8px 10px"><div style="height:8px;width:50%;background:#eee;border-radius:4px;margin-bottom:6px"></div>'
+      +'<div style="height:11px;background:#eee;border-radius:4px"></div></div></div>';
+  }).join('');
+  try{
+    const res=await fetch(VID_GAS,{mode:'cors'});
+    if(!res.ok)throw new Error('fetch failed');
+    const text=await res.text();
+    const rows=parseCSV(text);
+    if(!rows.length)throw new Error('empty');
+    renderHomeVideos(grid,rows);
+  }catch(e){showVideoLink(document.getElementById('vid-grid'));}
+}
+
+function renderHomeVideos(grid,rows){
+  const AK='ใครดูได้บ้าง (สมาชิกระดับไหน / ฟรี)';
+  const DK='duration (mins)';
+  const categories=['ฟรี','ผีเสื้อ','แมลงปอ'];
+  const picks=categories.map(function(cat){
+    const pool=rows.filter(function(v){const acc=v[AK]||'';return acc===cat||acc.indexOf(cat)>=0;});
+    return pool.length?pool[Math.floor(Math.random()*pool.length)]:null;
+  }).filter(Boolean);
+  if(!picks.length){showVideoLink(grid);return;}
+  const catColors={'ฟรี':'#f0f0f0','ผีเสื้อ':'#fb2a7b','แมลงปอ':'#111'};
+  const catText={'ฟรี':'#333','ผีเสื้อ':'#fff','แมลงปอ':'#fff'};
+  grid.innerHTML=picks.map(function(v){
+    const url=v.url||v.URL||'';
+    const thumb=resolveThumb(v.Thumbnail||v.thumbnail||'',url);
+    const title=v.title||v['Full title']||'Yoga with Jib';
+    const dur=v[DK]||v.duration||'';
+    const access=v[AK]||'';
+    const link=url||'https://yogawithjib.github.io/library/videos.html';
+    const bg=catColors[access]||'#eee';
+    const tx=catText[access]||'#333';
+    const thumbHtml='<div style="position:relative;width:100%;padding-top:56.25%;background:#f0f0f0;overflow:hidden;border-radius:10px 10px 0 0">'
+      +(thumb?'<img src="'+thumb+'" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display=\'none\'">':'')
+      +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">'
+      +'<div style="width:32px;height:32px;background:rgba(251,42,123,.85);border-radius:50%;display:flex;align-items:center;justify-content:center">'
+      +'<div style="width:0;height:0;border-style:solid;border-width:5px 0 5px 10px;border-color:transparent transparent transparent #fff;margin-left:2px"></div>'
+      +'</div></div></div>';
+    const infoHtml='<div style="padding:7px 9px 9px;background:#fff">'
+      +(access?'<span style="display:inline-block;background:'+bg+';color:'+tx+';font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;margin-bottom:4px">'+access+'</span><br>':'')
+      +'<span style="font-size:11px;font-weight:500;color:#111;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+title+'</span>'
+      +(dur?'<div style="font-size:10px;color:#bbb;margin-top:3px">'+dur+' min</div>':'')
+      +'</div>';
+    return '<a href="'+link+'" target="_blank" style="display:block;flex:0 0 calc(33.33% - 7px);min-width:140px;border-radius:10px;overflow:hidden;border:1px solid #e8e8e8;text-decoration:none;background:#fff">'
+      +thumbHtml+infoHtml+'</a>';
+  }).join('');
+  const t=document.getElementById('vid-sec-title');
+  if(t)t.textContent=lang==='th'?'ฝึกโยคะออนไลน์':'Practice yoga online';
+  const s=document.getElementById('vid-see-all');
+  if(s)s.textContent=lang==='th'?'ดูทั้งหมด →':'See all →';
+}
+
+function showVideoLink(grid){
+  if(!grid)return;
+  grid.style.display='block';
+  grid.innerHTML='<a href="https://yogawithjib.github.io/library/videos.html" target="_blank"'
+    +' style="display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;background:#fff;border:1px solid var(--bd);border-radius:14px;text-decoration:none">'
+    +'<div><div style="font-size:14px;font-weight:500;color:#111">🎥 '+(lang==='th'?'ดูวิดีโอโยคะทั้งหมด':'Watch all yoga videos')+'</div>'
+    +'<div style="font-size:11px;color:var(--gl);margin-top:2px">yogawithjib.github.io</div></div>'
+    +'<span style="color:var(--pink);font-size:18px">→</span></a>';
+}
+
+/* ── YOGA SUTRAS TAGLINE ── */
+const YOGA_SUTRAS=[
+  {su:'1.2',en:'"Yoga is the stilling of the fluctuations of the mind."'},
+  {su:'1.3',en:'"Then the seer rests in their own true nature."'},
+  {su:'1.14',en:'"Practice becomes firmly established when done consistently, for a long time, with love."'},
+  {su:'1.33',en:'"Clarity comes through friendliness, compassion, joy, and equanimity."'},
+  {su:'2.46',en:'"Posture should be steady and comfortable."'},
+  {su:'2.47',en:'"Effort relaxes into effortlessness, and the infinite reveals itself."'},
+  {su:'2.48',en:'"Then one is undisturbed by the pairs of opposites."'},
+  {su:'1.12',en:'"These fluctuations are mastered through practice and non-attachment."'},
+  {su:'2.16',en:'"Future suffering is to be avoided."'},
+  {su:'2.42',en:'"From contentment, unsurpassed happiness is attained."'},
+];
+function setRandomSutra(){
+  const el=document.getElementById('ds-tagline-el');if(!el)return;
+  const s=YOGA_SUTRAS[Math.floor(Math.random()*YOGA_SUTRAS.length)];
+  el.innerHTML=s.en+'<br><span style="font-size:11px;color:#ccc;letter-spacing:.5px;margin-top:6px;display:block">— Yoga Sutra '+s.su+'</span>';
+}
+
+/* ── BREATHING TIMER ── */
+const BREATH_PATTERNS={
+  box:{phases:['Inhale','Hold','Exhale','Hold'],times:[4,4,4,4],label:'Box — calm & balance'},
+  '478':{phases:['Inhale','Hold','Exhale'],times:[4,7,8],label:'4-7-8 — relax & sleep'},
+  ujjayi:{phases:['Inhale','Exhale'],times:[4,8],label:'Ujjayi — energise & focus'}
+};
+const BREATH_TH={
+  box:{phases:['หายใจเข้า','กลั้น','หายใจออก','กลั้น'],label:'Box — สงบและสมดุล'},
+  '478':{phases:['หายใจเข้า','กลั้น','หายใจออก'],label:'4-7-8 — ผ่อนคลายและหลับ'},
+  ujjayi:{phases:['หายใจเข้า','หายใจออก'],label:'Ujjayi — พลังงานและสมาธิ'}
+};
+const CIRC=2*Math.PI*80;
+let bKey='box',bRunning=false,bTimer=null,bPhase=0;
+
+function setBreath(el,key){
+  document.querySelectorAll('.bpreset').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');bKey=key;
+  if(bRunning)stopBreath();else resetBreathUI();
+}
+function toggleBreath(){bRunning?stopBreath():startBreath();}
+function startBreath(){
+  bRunning=true;bPhase=0;
+  document.getElementById('breath-tap').style.display='none';
+  document.getElementById('breath-guide').textContent='';
+  runBreathPhase();
+}
+function stopBreath(){
+  bRunning=false;clearTimeout(bTimer);resetBreathUI();
+}
+function resetBreathUI(){
+  document.getElementById('breath-phase').textContent='';
+  document.getElementById('breath-count').textContent='';
+  document.getElementById('breath-tap').style.display='block';
+  document.getElementById('breath-guide').textContent='tap to begin';
+  setArc(0,0);setBlobR(60,0);
+  const arc=document.getElementById('breath-arc');
+  if(arc){arc.style.stroke='#fb2a7b';}
+}
+function runBreathPhase(){
+  if(!bRunning)return;
+  const p=BREATH_PATTERNS[bKey];
+  const phases=lang==='th'?BREATH_TH[bKey].phases:p.phases;
+  const dur=p.times[bPhase];
+  const name=phases[bPhase];
+  const isIn=name.includes('Inhale')||name.includes('เข้า');
+  const isHold=name.includes('Hold')||name.includes('กลั้น');
+  document.getElementById('breath-phase').textContent=name;
+  // Arc: reset then fill over duration
+  setArc(0,0);
+  setTimeout(function(){setArc(CIRC,dur);},30);
+  // Blob size & arc colour by phase
+  const arc=document.getElementById('breath-arc');
+  if(arc)arc.style.stroke=isIn?'#fb2a7b':isHold?'#f5a623':'#8b5cf6';
+  const targetR=isIn?78:isHold?78:44;
+  setBlobR(targetR,isHold?0.3:dur);
+  // Countdown
+  let cnt=dur;
+  document.getElementById('breath-count').textContent=cnt;
+  function tick(){
+    cnt--;
+    if(cnt<=0){
+      if(!bRunning)return;
+      bPhase=(bPhase+1)%p.phases.length;
+      runBreathPhase();return;
+    }
+    document.getElementById('breath-count').textContent=cnt;
+    bTimer=setTimeout(tick,1000);
+  }
+  bTimer=setTimeout(tick,1000);
+}
+function setArc(offset,dur){
+  const arc=document.getElementById('breath-arc');if(!arc)return;
+  arc.style.transition=dur>0?'stroke-dashoffset '+dur+'s linear':'none';
+  arc.style.strokeDashoffset=CIRC-offset;
+}
+function setBlobR(r,dur){
+  const blob=document.getElementById('breath-blob');if(!blob)return;
+  blob.style.transition=dur>0?'r '+dur+'s ease-in-out':'none';
+  blob.setAttribute('r',r);
+}
 </script>
 </body>
 </html>
