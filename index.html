@@ -585,6 +585,18 @@ body{background:#fafafa;min-height:100vh}
       <input id="su-name" type="text" placeholder="e.g. Jib, Noon, Best" maxlength="40"/>
     </div>
     <div class="auth-field">
+      <label id="su-district-lbl">District / อำเภอ</label>
+      <input id="su-district" type="text" placeholder="e.g. Muang / เมือง" maxlength="60"/>
+    </div>
+    <div class="auth-field">
+      <label id="su-province-lbl">Province / จังหวัด</label>
+      <input id="su-province" type="text" placeholder="e.g. Nonthaburi / นนทบุรี" maxlength="60"/>
+    </div>
+    <div class="auth-field">
+      <label id="su-country-lbl">Country / ประเทศ</label>
+      <input id="su-country" type="text" placeholder="e.g. Thailand / ไทย" maxlength="60"/>
+    </div>
+    <div class="auth-field">
       <label id="su-user-lbl">Username (for login)</label>
       <input id="su-username" type="text" placeholder="e.g. jib_yoga, noon123" maxlength="40" autocorrect="off" autocapitalize="none"/>
       <div style="font-size:11px;color:var(--gl);font-weight:300;margin-top:4px">Lowercase letters and numbers only. Cannot be changed.</div>
@@ -729,8 +741,7 @@ body{background:#fafafa;min-height:100vh}
 
 
     <!-- LIBRARY IN ADMIN -->
-    <div class="library-section" id="lib-sec-admin" style="margin-top:1.5rem">
-      <div class="lib-title">&#10024; Resources</div>
+    
       <a class="lib-link" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank">
         <div class="lib-dot"></div>
         <span class="lib-en">Beginner's guide</span><span class="lib-th">คู่มือผู้ฝึกใหม่</span>
@@ -820,6 +831,129 @@ body{background:#fafafa;min-height:100vh}
         <a href="#" onclick="showGasInstructions();return false;">How to set up →</a>
       </div>
     </div>
+
+
+    <!-- ADMIN LINKS & GUIDE -->
+    <div style="margin-bottom:1.5rem">
+      <div class="sa-section-title">Quick links</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
+        <a href="https://console.firebase.google.com/project/tally-679b9/firestore" target="_blank"
+           style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:.875rem;text-decoration:none;display:block;transition:opacity .15s"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">🔥</div>
+          <div style="font-size:13px;font-weight:500;color:#e65100">Firebase</div>
+          <div style="font-size:11px;font-weight:300;color:#bf360c">Firestore database</div>
+        </a>
+        <a href="https://script.google.com" target="_blank"
+           style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px;padding:.875rem;text-decoration:none;display:block;transition:opacity .15s"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">📊</div>
+          <div style="font-size:13px;font-weight:500;color:#1b5e20">Google Script</div>
+          <div style="font-size:11px;font-weight:300;color:#2e7d32">Notifications & export</div>
+        </a>
+        <a href="https://github.com/yogawithjib/tally" target="_blank"
+           style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:12px;padding:.875rem;text-decoration:none;display:block;transition:opacity .15s"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">💻</div>
+          <div style="font-size:13px;font-weight:500;color:#4a148c">GitHub</div>
+          <div style="font-size:11px;font-weight:300;color:#6a1b9a">App source code</div>
+        </a>
+        <a href="https://console.cloud.google.com/apis/credentials?project=tally-679b9" target="_blank"
+           style="background:#e3f2fd;border:1px solid #90caf9;border-radius:12px;padding:.875rem;text-decoration:none;display:block;transition:opacity .15s"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">🔑</div>
+          <div style="font-size:13px;font-weight:500;color:#0d47a1">API Key</div>
+          <div style="font-size:11px;font-weight:300;color:#1565c0">Google Cloud console</div>
+        </a>
+      </div>
+
+      <!-- MAINTENANCE GUIDE -->
+      <div class="sa-section-title">Maintenance guide</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem">
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g1')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔄 Update the app</span>
+            <span id="g1-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g1" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            1. Ask Claude to make changes → download new index.html<br>
+            2. Go to <strong>github.com/yogawithjib/tally</strong><br>
+            3. Upload files → Commit changes<br>
+            4. Wait ~1 min → live at yogawithjib.github.io/tally
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g2')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔥 Firebase rules renewal</span>
+            <span id="g2-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g2" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            Rules expire <strong>January 2027</strong> — renew by December 2026<br>
+            1. Firebase console → Firestore → Rules<br>
+            2. Change <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2027</code> to <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2028</code><br>
+            3. Click Publish
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g3')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔑 Reset teacher PIN</span>
+            <span id="g3-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g3" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            Teachers cannot reset their own PIN remotely.<br>
+            1. Delete the teacher account here in super admin<br>
+            2. Teacher creates a new account with same username<br>
+            3. All student data is preserved under the teacher ID
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g4')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔒 Reset student PIN</span>
+            <span id="g4-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g4" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            Teacher does this — not you.<br>
+            Teacher logs in → taps student's 📋 history → tap <strong>Reset PIN</strong><br>
+            Student sets a new PIN next time they log in.
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g5')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">📊 Update GAS script</span>
+            <span id="g5-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g5" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            1. Click "How to set up →" below to copy latest code<br>
+            2. Go to script.google.com → open project<br>
+            3. Replace all code → Save<br>
+            4. Deploy → Manage deployments → Edit → New version → Deploy<br>
+            5. Copy URL → paste in GAS URL field above
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g6')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🗑 Delete a teacher</span>
+            <span id="g6-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g6" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.8">
+            ⚠️ This deletes all their student data too.<br>
+            Scroll down to Teachers → tap 🗑 next to the teacher name.<br>
+            Cannot be undone — export to Google Sheets first if needed.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PRICES OVERVIEW -->
+    <div class="sa-section-title" id="sa-prices-title">Prices by teacher</div>
+    <div id="sa-prices-list" style="margin-bottom:1.5rem"></div>
 
     <!-- TEACHER LIST -->
     <div class="sa-section-title">Teachers</div>
@@ -1500,7 +1634,7 @@ const TR={
     suSub:'new teacher',suHd:'Create your account',suSub2:'Takes 30 seconds',
     privTitle:'🔒 Disclaimer',
     privText:'This app is free and built with good intentions but cannot take responsibility for any data you choose to enter. We recommend avoiding sensitive personal information and using the app at your own responsibility.',
-    suNameLbl:'Your teacher name',suEmoLbl:'Pick your avatar',suPinLbl:'Set a 4-digit PIN',
+    suNameLbl:'Display name',suDistrictLbl:'District',suProvinceLbl:'Province',suCountryLbl:'Country',suEmoLbl:'Pick your avatar',suPinLbl:'Set a 4-digit PIN',
     suCreateBtn:'Create account',loginSub:'Enter your PIN',
     wMain:'Hi {name}! 🙏',active:'Active',low:'Running low',out:'All used',left:'left',
     noHist:'No class history yet',histTitle:'Class history',
@@ -1533,7 +1667,7 @@ const TR={
     suSub:'ครูใหม่',suHd:'สร้างบัญชีของคุณ',suSub2:'ใช้เวลาแค่ 30 วินาที',
     privTitle:'🔒 ข้อจำกัดความรับผิดชอบ',
     privText:'ระบบนี้ฟรี ทำด้วยความตั้งใจ แต่ไม่สามารถรับผิดชอบต่อข้อมูลที่คุณเลือกใส่เข้ามาได้ แนะนำให้หลีกเลี่ยงการใส่ข้อมูลที่มีความละเอียดอ่อนและรับผิดชอบการใช้งานด้วยตัวเอง',
-    suNameLbl:'ชื่อครู',suEmoLbl:'เลือกอวตาร',suPinLbl:'ตั้ง PIN 4 หลัก',
+    suNameLbl:'ชื่อครู',suDistrictLbl:'อำเภอ',suProvinceLbl:'จังหวัด',suCountryLbl:'ประเทศ',suEmoLbl:'เลือกอวตาร',suPinLbl:'ตั้ง PIN 4 หลัก',
     suCreateBtn:'สร้างบัญชี',loginSub:'ใส่ PIN ของคุณ',
     wMain:'สวัสดี {name}! 🙏',active:'Active',low:'เหลือน้อย',out:'หมดแล้ว',left:'เหลือ',
     noHist:'ยังไม่มีประวัติคลาส',histTitle:'ประวัติคลาส',
@@ -1597,7 +1731,7 @@ function applyLang(){
   set('new-teacher-btn','newTeacher');
   set('su-sub','suSub');set('su-hd','suHd');set('su-sub2','suSub2');
   set('priv-title','privTitle');set('priv-text','privText');
-  set('su-name-lbl','suNameLbl');set('su-emo-lbl','suEmoLbl');set('su-pin-lbl','suPinLbl');
+  set('su-name-lbl','suNameLbl');set('su-district-lbl','suDistrictLbl');set('su-province-lbl','suProvinceLbl');set('su-country-lbl','suCountryLbl');set('su-emo-lbl','suEmoLbl');set('su-pin-lbl','suPinLbl');
   set('su-create-btn','suCreateBtn');set('login-sub-lbl','loginSub');
   set('logout-student-btn','logoutBtn');
   set('mhd-add','mhdAdd');set('lbl-name-f','lblNameF');set('add-priv-txt','addPrivTxt');
@@ -1853,7 +1987,10 @@ function createTeacher(){
   if(teachers.find(t=>(t.username||t.name.toLowerCase())===usernameRaw)){document.getElementById('su-err').textContent='Username already taken. Choose another.';return;}
   const id='t_'+Date.now();
   hashPin(supi).then(h=>{
-    teachers.push({id,name,username:usernameRaw,emoji:suEmoSel,pin:h});
+    const district=document.getElementById('su-district').value.trim();
+      const province=document.getElementById('su-province').value.trim();
+      const country=document.getElementById('su-country').value.trim()||'Thailand';
+      teachers.push({id,name,username:usernameRaw,emoji:suEmoSel,pin:h,district,province,country});
     saveTeachers(teachers);
     currentTeacherId=id;
     const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=suEmoSel;
@@ -2232,6 +2369,28 @@ function renderSaDashboard(){
     <div class="sa-stat-card"><div class="sa-stat-val">${totalStudents}</div><div class="sa-stat-lbl">Students</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalUsed}</div><div class="sa-stat-lbl">Classes used</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes left</div></div>`;
+
+  // Prices overview
+  const pricesList=document.getElementById('sa-prices-list');
+  if(pricesList){
+    let pricesHtml='';
+    teachers.forEach(function(tc){
+      const S=getStudents(tc.id);
+      const withPrice=S.filter(function(s){return s.price&&s.price>0;});
+      if(withPrice.length){
+        pricesHtml+='<div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.875rem 1rem;margin-bottom:8px">';
+        pricesHtml+='<div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px">'+tc.emoji+' '+tc.name+'</div>';
+        withPrice.forEach(function(s){
+          pricesHtml+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:12px">';
+          pricesHtml+='<span style="color:#555">'+s.sym+' '+s.n+'</span>';
+          pricesHtml+='<span style="font-weight:600;color:var(--pink)">฿'+s.price.toLocaleString()+' / pkg</span>';
+          pricesHtml+='</div>';
+        });
+        pricesHtml+='</div>';
+      }
+    });
+    pricesList.innerHTML=pricesHtml||'<div style="font-size:12px;color:var(--gl);padding:8px 0">No prices set yet</div>';
+  }
 
   const list=document.getElementById('sa-teacher-list');
   if(!teachers.length){list.innerHTML='<div class="empty"><p>No teachers yet</p></div>';return;}
@@ -3021,7 +3180,7 @@ function toggleDisc(){
 
 
 function shuffleLibrary(){
-  ['lib-sec-1','lib-sec-2','lib-sec-admin','lib-sec-student'].forEach(function(id){
+  ['lib-sec-1','lib-sec-2','lib-sec-student'].forEach(function(id){
     var sec=document.getElementById(id);
     if(!sec)return;
     var links=Array.from(sec.querySelectorAll('.lib-link'));
@@ -3051,6 +3210,16 @@ function updateLibLang(){
       if(arr){link.insertBefore(en,arr);link.insertBefore(th,arr);}
     }
   });
+}
+
+
+function toggleGuide(id){
+  const el=document.getElementById(id);
+  const arr=document.getElementById(id+'-arr');
+  if(!el)return;
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arr)arr.textContent=open?'›':'˅';
 }
 
 /* ── INIT ── */
