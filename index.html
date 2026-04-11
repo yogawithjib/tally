@@ -796,7 +796,7 @@ body{background:#fafafa;min-height:100vh}
       <input id="c-phone" type="tel" placeholder="e.g. 08x-xxx-xxxx"/>
     </div>
     <div class="field">
-      <label>LINE ID (display)</label>
+      <label>LINE ID</label>
       <input id="c-line" type="text" placeholder="e.g. @yogawithjib"/>
     </div>
     <div class="field">
@@ -887,7 +887,7 @@ body{background:#fafafa;min-height:100vh}
         </div>
         <div>
           <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-msg-lbl">บันทึกเพิ่มเติม (ไม่ใส่ก็ได้)</label>
-          <input id="notify-note" type="text" placeholder="โอนผ่านธนาคารกสิกรไทย" maxlength="100" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+          <input id="notify-note" type="text" placeholder="e.g. transferred on June 12" maxlength="100" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
         </div>
         <button id="notify-send-btn" onclick="sendNotification()" style="width:100%;padding:12px;border-radius:12px;border:none;background:#111;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px">
           <span>📲</span><span id="notify-btn-lbl">แจ้งครู</span>
@@ -1332,7 +1332,7 @@ const TR={
     notifyTitle:'Transferred? Notify your teacher 📲',
     notifyAmt:'Amount transferred',
     notifyNote:'Note (optional)',
-    notifyPh:'e.g. via K-Bank',
+    notifyPh:'e.g. transferred on June 12',
     notifyBtn:'Notify teacher',
     contactTitle:'📞 Contact your teacher first',
     bankTitle:'🏦 Transfer details',
@@ -1362,7 +1362,7 @@ const TR={
     logoutBtn:'← กลับ',payMsg:'คลาสของคุณหมดแล้วค่ะ 🧘‍♀️\nกรุณาต่อแพ็คเกจเพื่อจองคลาสต่อไป\nโอนเงินมาที่บัญชีด้านล่าง แล้วแจ้งครูได้เลยนะคะ',
     lblBank:'ธนาคาร',lblAcctName:'ชื่อบัญชี',lblAcctNum:'เลขบัญชี',
     copyBtn:'คัดลอกเลขบัญชี',copiedBtn:'คัดลอกแล้ว ✓',
-    notifyTitle:'โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲',notifyAmt:'จำนวนที่โอน',notifyNote:'บันทึกเพิ่มเติม (ไม่ใส่ก็ได้)',notifyPh:'โอนผ่านธนาคารกสิกรไทย',notifyBtn:'แจ้งครู',contactTitle:'📞 ถามครูให้แน่ใจ',bankTitle:'🏦 รายละเอียดบัญชี',stuVerify:'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้ง',
+    notifyTitle:'โอนแล้วหรอ แจ้งครูได้ทางนี้ 📲',notifyAmt:'จำนวนที่โอน',notifyNote:'บันทึกเพิ่มเติม (ไม่ใส่ก็ได้)',notifyPh:'e.g. โอนวันที่ 12 มิถุนายน',notifyBtn:'แจ้งครู',contactTitle:'📞 ถามครูให้แน่ใจ',bankTitle:'🏦 รายละเอียดบัญชี',stuVerify:'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้ง',
     mhdAdd:'เพิ่มนักเรียน',addPrivTxt:'ใส่ username ง่ายๆ ห้ามใช้ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว',
     lblNameF:'Username',clsLbl:'คลาส',pinWrong:'PIN ไม่ถูกต้อง',
     bankSaved:'บันทึกข้อมูลธนาคารแล้ว 🏦',noStudents:'ยังไม่มีนักเรียน',
