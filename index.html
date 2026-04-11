@@ -905,6 +905,241 @@ body{background:#fafafa;min-height:100vh}
       </div>
     </div>
 
+
+    <!-- QUICK LINKS -->
+    <div style="margin-bottom:1.5rem">
+      <div class="sa-section-title">Quick links</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
+        <a href="https://console.firebase.google.com/project/tally-679b9/firestore" target="_blank"
+           style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">🔥</div>
+          <div style="font-size:13px;font-weight:500;color:#e65100">Firebase</div>
+          <div style="font-size:11px;font-weight:300;color:#bf360c">Firestore database</div>
+        </a>
+        <a href="https://script.google.com" target="_blank"
+           style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">📊</div>
+          <div style="font-size:13px;font-weight:500;color:#1b5e20">Google Script</div>
+          <div style="font-size:11px;font-weight:300;color:#2e7d32">Notifications &amp; export</div>
+        </a>
+        <a href="https://github.com/yogawithjib/tally" target="_blank"
+           style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">💻</div>
+          <div style="font-size:13px;font-weight:500;color:#4a148c">GitHub</div>
+          <div style="font-size:11px;font-weight:300;color:#6a1b9a">App source code</div>
+        </a>
+        <a href="https://console.cloud.google.com/apis/credentials?project=tally-679b9" target="_blank"
+           style="background:#e3f2fd;border:1px solid #90caf9;border-radius:12px;padding:.875rem;text-decoration:none;display:block"
+           onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:18px;margin-bottom:4px">🔑</div>
+          <div style="font-size:13px;font-weight:500;color:#0d47a1">API Key</div>
+          <div style="font-size:11px;font-weight:300;color:#1565c0">Google Cloud console</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SETUP GUIDE -->
+    <div style="margin-bottom:1.5rem">
+      <div class="sa-section-title">🚀 First-time setup</div>
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:1rem 1.25rem;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:500;color:#0369a1;margin-bottom:10px">Complete these steps once to get the app ready</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+
+          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
+            <button onclick="toggleGuide('s1')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#111">① Change the admin password</span>
+              <span id="s1-arr" style="color:var(--gl)">›</span>
+            </button>
+            <div id="s1" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+              The default password is <code style="background:#f5f5f5;padding:1px 6px;border-radius:3px">1242</code> — change it immediately.<br>
+              Tap <strong>← Back</strong> to return to the login screen → tap <strong>Change admin password</strong>.<br>
+              Use at least 8 characters with a mix of letters and numbers.
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
+            <button onclick="toggleGuide('s2')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#111">② Create a teacher account</span>
+              <span id="s2-arr" style="color:var(--gl)">›</span>
+            </button>
+            <div id="s2" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+              From the home screen → tap <strong>I'm a teacher</strong> → tap <strong>+ I'm a new teacher</strong>.<br>
+              Fill in display name, choose a username (cannot be changed later), pick an avatar, set a 4-digit PIN.<br>
+              District / Province / Country fields are optional but useful for multiple teachers.
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
+            <button onclick="toggleGuide('s3')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#111">③ Add bank &amp; contact details</span>
+              <span id="s3-arr" style="color:var(--gl)">›</span>
+            </button>
+            <div id="s3" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+              Log in as the teacher → tap <strong>🏦</strong> in the top bar → re-enter PIN → fill in bank name, account name, account number → Save.<br>
+              Tap <strong>📱</strong> to add phone, LINE ID, and email for payment notifications.<br>
+              <em>Students see bank details when they tap "Top up". Email is used for payment notifications via GAS.</em>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
+            <button onclick="toggleGuide('s4')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#111">④ Add students</span>
+              <span id="s4-arr" style="color:var(--gl)">›</span>
+            </button>
+            <div id="s4" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+              Log in as the teacher → tap <strong>＋</strong> → enter a unique username (nickname only, no full names), choose symbol and color, set package size (10 / 15 / 20 classes), optionally set the price per package → Save.<br>
+              Students log in by entering their username on the student screen. They set their own PIN on first login.
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e0f2fe;border-radius:10px;overflow:hidden">
+            <button onclick="toggleGuide('s5')" style="width:100%;padding:.75rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:500;color:#111">⑤ Set up Google Apps Script (optional)</span>
+              <span id="s5-arr" style="color:var(--gl)">›</span>
+            </button>
+            <div id="s5" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+              GAS enables two features: <strong>email notifications</strong> when students submit payment, and <strong>Google Sheets export</strong> of all class data.<br>
+              1. Open a Google Sheet → Extensions → Apps Script<br>
+              2. Tap <strong>"How to set up →"</strong> in the Google Sheets export box above → copy the code → paste it into Apps Script → Save<br>
+              3. Deploy → New deployment → Web app → set access to <strong>Anyone</strong> → Deploy → copy the URL<br>
+              4. Paste the URL in the <strong>Google Sheets export</strong> box above → Export ↗ to test<br>
+              <em>Without GAS, the app still works — students just can't send payment notifications automatically.</em>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MAINTENANCE GUIDE -->
+    <div style="margin-bottom:1.5rem">
+      <div class="sa-section-title">🔧 Maintenance guide</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g1')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔄 Update the app</span>
+            <span id="g1-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g1" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            1. Ask Claude to make changes → download new <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">index.html</code><br>
+            2. Go to <strong>github.com/yogawithjib/tally</strong><br>
+            3. Click on <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">index.html</code> → Edit (pencil icon) → drag and drop your new file → Commit changes<br>
+            4. Wait ~1 minute → live at <strong>yogawithjib.github.io/tally</strong><br>
+            <em>All student and teacher data lives in Firebase — updating the app never deletes data.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g2')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔥 Firebase rules renewal</span>
+            <span id="g2-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g2" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            Rules expire <strong>January 2027</strong> — renew by December 2026.<br>
+            1. Firebase console → Firestore Database → Rules tab<br>
+            2. Find the date <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2027-01-01</code> → change to <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">2028-01-01</code><br>
+            3. Click Publish<br>
+            <em>If rules expire, the app goes read-only — students can still view but teachers can't save changes.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g3')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔑 Reset teacher PIN</span>
+            <span id="g3-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g3" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            Teachers cannot reset their own PIN remotely.<br>
+            1. Scroll down to the Teachers section below → tap 🗑 next to the teacher<br>
+            2. Confirm deletion (this removes the account but <strong>not the student data</strong>)<br>
+            3. Teacher creates a new account using the same username<br>
+            4. All their students are automatically re-linked<br>
+            <em>The teacher will need to re-enter their bank details after re-creating their account.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g4')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔒 Reset student PIN</span>
+            <span id="g4-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g4" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            The teacher handles this — not you.<br>
+            Teacher logs in → taps the 📋 history button next to the student → taps <strong>🔒 Reset PIN</strong><br>
+            The student will be prompted to set a new PIN on their next login.<br>
+            <em>Students can also change their own PIN by tapping 🔒 Change PIN on their student card.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g5')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">📊 Update GAS / fix notifications</span>
+            <span id="g5-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g5" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            If notifications stop working or you want to update the script:<br>
+            1. Go to <strong>script.google.com</strong> → open the Yoga with Jib project<br>
+            2. Tap <strong>"How to set up →"</strong> above → copy the latest code<br>
+            3. Replace all code in Apps Script → Save → Deploy → Manage deployments → Edit → New version → Deploy<br>
+            4. Copy the new URL → paste it in the Google Sheets export box above → save<br>
+            <em>The teacher also needs their email set in 📱 Contact info for notifications to reach them.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g6')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🗑 Delete a teacher</span>
+            <span id="g6-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g6" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            ⚠️ This permanently deletes the teacher account <strong>and all their students' data</strong>.<br>
+            1. Export to Google Sheets first if you need a record<br>
+            2. Scroll down to Teachers → tap 🗑 next to the teacher name → confirm<br>
+            <em>This cannot be undone. Student PINs and history are gone permanently.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g7')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">🔐 Renew the Firebase API key</span>
+            <span id="g7-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g7" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            The Firebase API key is currently restricted to <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">yogawithjib.github.io/*</code> — this is correct and secure.<br>
+            If the app stops syncing to Firebase:<br>
+            1. Go to Google Cloud console → API Key → check restrictions<br>
+            2. Make sure <code style="background:#f5f5f5;padding:1px 4px;border-radius:3px">yogawithjib.github.io/*</code> is in the allowed referrers<br>
+            3. If you change the GitHub Pages URL, update this restriction to match<br>
+            <em>The app works offline using localStorage even if Firebase is unreachable.</em>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+          <button onclick="toggleGuide('g8')" style="width:100%;padding:.875rem 1rem;background:none;border:none;text-align:left;cursor:pointer;font-family:inherit;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:500;color:#111">💾 Back up all data</span>
+            <span id="g8-arr" style="color:var(--gl)">›</span>
+          </button>
+          <div id="g8" style="display:none;padding:0 1rem 1rem;font-size:12px;font-weight:300;color:#555;line-height:1.9">
+            Data is stored in Firebase Firestore (cloud) and backed by localStorage on each device.<br>
+            For a manual backup:<br>
+            1. Paste your GAS URL in the box above → tap <strong>Export ↗</strong><br>
+            2. This writes all teachers and students to your Google Sheet<br>
+            3. You can also view raw data at Firebase console → Firestore → teachers collection<br>
+            <em>Recommended: export to Sheets once a month as a safety net.</em>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PRICES OVERVIEW -->
+    <div class="sa-section-title">Prices by teacher</div>
+    <div id="sa-prices-list" style="margin-bottom:1.5rem"></div>
+
     <!-- TEACHER LIST -->
     <div class="sa-section-title">Teachers</div>
     <div id="sa-teacher-list"></div>
@@ -2338,6 +2573,27 @@ function renderSaDashboard(){
     <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes remaining</div></div>
     <div class="sa-stat-card"><div class="sa-stat-val" style="color:${totalDebt>0?'var(--pink)':'inherit'}">${totalDebt}</div><div class="sa-stat-lbl">Classes in debt</div></div>`;
 
+  // Prices overview
+  const pricesList=document.getElementById('sa-prices-list');
+  if(pricesList){
+    let ph='';
+    teachers.forEach(function(tc){
+      const S=getStudents(tc.id);
+      const withPrice=S.filter(function(s){return s.price&&s.price>0;});
+      if(withPrice.length){
+        ph+='<div style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:.875rem 1rem;margin-bottom:8px">';
+        ph+='<div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px">'+tc.emoji+' '+tc.name+'</div>';
+        withPrice.forEach(function(s){
+          ph+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:12px">';
+          ph+='<span style="color:#555">'+s.sym+' '+s.n+'</span>';
+          ph+='<span style="font-weight:600;color:var(--pink)">฿'+s.price.toLocaleString()+' / pkg</span>';
+          ph+='</div>';
+        });
+        ph+='</div>';
+      }
+    });
+    pricesList.innerHTML=ph||'<div style="font-size:12px;color:var(--gl);padding:8px 0">No prices set yet</div>';
+  }
   const list=document.getElementById('sa-teacher-list');
   if(!teachers.length){list.innerHTML='<div class="empty"><p>No teachers yet</p></div>';return;}
   list.innerHTML=teachers.map(tc=>{
