@@ -436,13 +436,13 @@ th:{
   approved:'อนุมัติแล้ว ✓',
   rejected:'ปฏิเสธ',
   signupAlreadyExists:'มีใบสมัครจากอีเมลนี้แล้ว',
-  whoAreYou:'สวัสดี! คุณเป็นใคร?',
+  whoAreYou:'สวัสดีค่า นี่ใครน้า',
   chooseRole:'เลือกบทบาทเพื่อเข้าสู่ระบบ',
   imStudent:'ฉันเป็นนักเรียน',
   imTeacher:'ฉันเป็นครู',
   studentSub:'ดูคลาสของฉัน',
   teacherSub:'จัดการนักเรียน',
-  orSignup:'ครูใหม่?',
+  orSignup:'ครูใหม่หรอ',
 }};
 
 const SUTRAS=[
@@ -751,6 +751,14 @@ function thumbUrl(v){
   return v;
 }
 
+function ytThumb(url){
+  if(!url)return'';
+  let id='';
+  const m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  if(m)id=m[1];
+  return id?`https://img.youtube.com/vi/${id}/hqdefault.jpg`:'';
+}
+
 // ═══════════════════════════════════════════════════════════
 // RENDER ENGINE
 // ═══════════════════════════════════════════════════════════
@@ -886,7 +894,7 @@ async function screenHome(s){
   // Teacher sign-up link
   const suLink=el('div');
   suLink.style.cssText='text-align:center;padding:0 16px 24px;font-size:13px;color:var(--grey)';
-  suLink.innerHTML=`${t('orSignup')} <button style="background:none;border:none;color:var(--pink);font-size:13px;font-weight:600;cursor:pointer;padding:0" id="signup-link">🧘 ${t('teacherSignup')}</button>`;
+  suLink.innerHTML=`${t('orSignup')} <button style="background:none;border:none;color:var(--pink);font-size:13px;font-weight:600;cursor:pointer;padding:0" id="signup-link">🧘 ${lang==='th'?'สมัครสมาชิกตรงนี้':t('teacherSignup')}</button>`;
   s.appendChild(suLink);
   $('signup-link').onclick=()=>render(screenTeacherSignup);
 
@@ -996,10 +1004,14 @@ async function loadVideos(container){
     const title=v['Full title']||v['title']||v['Title']||'';
     const dur=v['duration (mins)']||v['duration']||'';
     const url=v['url']||v['URL']||'';
-    
-    card.innerHTML=thumb
-      ?`<img class="video-thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-      :'';
+    const ytFallback=ytThumb(url);
+    const imgSrc=thumb||ytFallback;
+
+    card.innerHTML=imgSrc
+      ?`<img class="video-thumb" src="${imgSrc}" alt="" loading="lazy"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'${ytFallback&&imgSrc!==ytFallback?`;if(!this.dataset.tried){this.dataset.tried=1;this.style.display='';this.src='${ytFallback}'}`:''}">
+         <div class="video-thumb-ph" style="display:none">🧘</div>`
+      :`<div class="video-thumb-ph">🧘</div>`;
     if(!thumb)card.innerHTML=`<div class="video-thumb-ph">🧘</div>`;
     else card.innerHTML+=`<div class="video-thumb-ph" style="display:none">🧘</div>`;
     
