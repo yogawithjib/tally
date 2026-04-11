@@ -3,559 +3,1998 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Yoga with Jib — Class Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Yoga with Jib</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-@font-face {
-  font-family: 'FabfeltScript';
-  src: url('FabfeltScript-Bold.otf') format('opentype'),
-       url('fabfeltscript-bold.ttf') format('truetype');
-  font-weight: bold;
-}
-</style>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans',sans-serif}
+@font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
 body{background:#fafafa;min-height:100vh}
-.container{max-width:700px;margin:0 auto;padding:0 1.25rem 3rem}
-:root{--pink:#fb2a7b;--pink-light:#fff0f6;--pink-mid:#ffd0e8;--border:#ebebeb;--gray:#888;--gray-lt:#bbb}
+.page{max-width:680px;margin:0 auto;padding:0 1.25rem 3rem}
+:root{--pink:#fb2a7b;--pl:#fff0f6;--pm:#ffd0e8;--bd:#ebebeb;--gr:#888;--gl:#bbb}
+.screen{display:none}.screen.on{display:block}
+#login-screen.on,#signup-screen.on,#student-login-screen.on{display:flex}
 
-/* SHARED HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem;margin-bottom:.25rem}
-.brand-main{font-size:36px;font-weight:bold;color:var(--pink);letter-spacing:-0.5px;line-height:1;font-family:'FabfeltScript',cursive}
-.brand-sub{font-size:10px;font-weight:300;color:var(--gray-lt);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+/* HEADER */
+.hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
+.logo{font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink);line-height:1;user-select:none}
+.sub{font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.lang-btn{background:#fff;border:1.5px solid var(--bd);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#111;transition:all .15s;letter-spacing:1px}
+.lang-btn:hover{border-color:var(--pink);color:var(--pink)}
 
-/* STUDENT VIEW */
-.student-screen{display:block}
-.student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
-.s-card{border-radius:20px;padding:1.1rem 1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
-.s-sym{font-size:34px;line-height:1}
-.s-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.s-ring{display:flex;justify-content:center}
-.s-ring svg{overflow:visible}
-.ring-bg{fill:none;stroke:rgba(0,0,0,0.1);stroke-width:6}
-.ring-fill{fill:none;stroke-width:6;stroke-linecap:round}
-.ring-txt{font-size:15px;font-weight:600;text-anchor:middle;dominant-baseline:central;font-family:'IBM Plex Sans',sans-serif}
-.ring-lbl{font-size:9px;font-weight:300;text-anchor:middle;dominant-baseline:central;opacity:0.55;font-family:'IBM Plex Sans',sans-serif}
-.s-status{font-size:11px;font-weight:400;padding:3px 10px;border-radius:20px;margin-top:2px}
-.status-ok{background:rgba(0,0,0,0.07);color:rgba(0,0,0,0.45)}
-.status-low{background:#FFF3D6;color:#7a4800}
-.status-out{background:#FFE0EC;color:#7a0030}
-.admin-hint{text-align:center;padding:2rem 0 .5rem;font-size:11px;color:#ddd;cursor:pointer;user-select:none}
+/* HOME */
+.home-hero{text-align:center;padding:1.5rem 0 2rem}
+.home-hero-icon{font-size:28px;margin-bottom:12px}
+.home-hero-title{font-size:17px;font-weight:500;color:#111;margin-bottom:6px}
+.home-hero-sub{font-size:13px;font-weight:300;color:var(--gl);line-height:1.6}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.role-card{background:#fff;border:1.5px solid var(--bd);border-radius:20px;padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all .2s}
+.role-card:hover{border-color:var(--pink);background:var(--pl);transform:translateY(-2px)}
+.role-icon{font-size:36px;margin-bottom:10px}
+.role-title{font-size:15px;font-weight:500;color:#111;margin-bottom:4px}
+.role-sub{font-size:12px;font-weight:300;color:var(--gl)}
 
-/* EMPTY */
-.empty-state{text-align:center;padding:3rem 1rem;color:var(--gray-lt)}
-.empty-icon{font-size:48px;margin-bottom:10px}
-.empty-txt{font-size:13px;font-weight:300}
+/* STUDENT LOGIN */
+#student-login-screen{flex-direction:column;align-items:center;padding:1.5rem 0}
+.slogin-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:320px}
+.slogin-hd{font-size:16px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
+.slogin-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem;line-height:1.5}
+.name-input-wrap{position:relative;margin-bottom:8px}
+.name-input{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px 16px;font-size:15px;color:#111;background:#fff;outline:none;transition:border-color .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.name-input:focus{border-color:var(--pink)}
+.name-input::placeholder{color:var(--gl);font-weight:300}
+.find-btn{width:100%;padding:12px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s;margin-top:4px}
+.find-btn:hover{opacity:.88}
+.find-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
+.find-hint{font-size:11px;font-weight:300;color:var(--gl);text-align:center;margin-top:8px;line-height:1.5}
 
-/* LOGIN */
-.login-screen{display:none;flex-direction:column;align-items:center;padding:1.5rem 0}
-.login-box{background:#fff;border:1px solid var(--border);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
-.login-label{font-size:11px;font-weight:500;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:block;text-align:center}
-.pin-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.25rem}
-.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);background:#fff;transition:all 0.15s}
-.pin-dot.filled{background:var(--pink);border-color:var(--pink)}
-.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.num-btn{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 4px;font-size:17px;font-weight:400;cursor:pointer;transition:all 0.12s;color:#111;display:flex;flex-direction:column;align-items:center;gap:1px}
-.num-btn:hover{background:var(--pink-light);border-color:var(--pink-mid)}
-.num-btn:active{transform:scale(0.95)}
-.num-btn .sub{font-size:7px;font-weight:300;color:var(--gray-lt);letter-spacing:1px}
-.num-btn.del{font-size:15px;color:var(--gray)}
-.num-btn.zero{grid-column:2}
-.login-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
-.back-btn{margin-top:1rem;background:none;border:none;font-size:12px;color:var(--gray-lt);cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif}
-.back-btn:hover{color:var(--pink)}
-.change-pin-btn{margin-top:.75rem;background:none;border:none;font-size:11px;color:var(--gray-lt);cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans',sans-serif}
-.change-pin-btn:hover{color:var(--pink)}
-.shake{animation:shake 0.35s ease}
+/* TEACHER LIST */
+.teacher-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
+.teacher-card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:1rem 1.25rem;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s}
+.teacher-card:hover{border-color:var(--pink);background:var(--pl)}
+.teacher-avatar{width:44px;height:44px;border-radius:50%;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:2px solid var(--pm)}
+.teacher-info{flex:1}.teacher-name{font-size:15px;font-weight:500;color:#111}
+.teacher-count{font-size:12px;font-weight:300;color:var(--gl);margin-top:2px}
+.teacher-arrow{font-size:18px;color:var(--gl)}
+.new-teacher-btn{width:100%;padding:12px;border-radius:12px;border:1.5px dashed var(--bd);background:#fff;font-size:14px;font-weight:400;color:var(--gr);cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.new-teacher-btn:hover{border-color:var(--pink);color:var(--pink);background:var(--pl)}
+
+/* PRIVACY BOX */
+.privacy-box{background:#f7f7f7;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;border-left:3px solid var(--pink)}
+.privacy-title{font-size:12px;font-weight:600;color:var(--pink);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.privacy-text{font-size:12px;font-weight:300;color:#555;line-height:1.7}
+
+/* AUTH BOX */
+#login-screen,#signup-screen{flex-direction:column;align-items:center;padding:1.5rem 0}
+.auth-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
+.auth-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:.25rem;text-align:center}
+.auth-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem}
+.auth-field{margin-bottom:12px}
+.auth-field label{display:block;font-size:10px;font-weight:500;color:var(--gr);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.auth-field input{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;transition:border-color .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.auth-field input:focus{border-color:var(--pink)}
+.auth-emoji-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.emo-opt{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.emo-opt:hover{border-color:var(--pm);background:var(--pl)}.emo-opt.on{border-color:var(--pink);background:var(--pl)}
+
+/* PIN */
+.dots{display:flex;gap:10px;justify-content:center;margin-bottom:1.25rem}
+.dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bd);background:#fff;transition:all .15s}
+.dot.on{background:var(--pink);border-color:var(--pink)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.nb{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px 4px;font-size:17px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .12s;color:#111}
+.nb:hover{background:var(--pl);border-color:var(--pm)}.nb:active{transform:scale(.95)}
+.nb .ns{font-size:7px;font-weight:300;color:var(--gl);letter-spacing:1px}
+.nb.del{font-size:15px;color:var(--gr)}.nb.z{grid-column:2}
+.lerr{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
+.llinks{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:1rem}
+.llink{background:none;border:none;font-size:11px;color:var(--gl);cursor:pointer;text-decoration:underline;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.llink:hover{color:var(--pink)}
+.shake{animation:shake .35s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.bs-full{width:100%;padding:11px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-top:4px}
+.bs-full:hover{opacity:.88}
 
-/* ADMIN VIEW */
-.admin-screen{display:none}
-.top-actions{display:flex;gap:8px;align-items:center}
-.icon-pill{background:#fff;color:var(--gray);border:1px solid var(--border);border-radius:50px;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.icon-pill:hover{border-color:#bbb;color:#111}
-.add-pill{background:var(--pink);color:#fff;border:none;border-radius:50px;width:34px;height:34px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.15s}
-.add-pill:hover{opacity:0.85}
-.admin-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
-.a-card{border-radius:20px;padding:1.1rem 1rem 1rem;position:relative;transition:transform 0.15s}
+/* STUDENT PERSONAL VIEW */
+#student-view-screen .sv-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
+.student-card-big{border-radius:24px;padding:2rem 1.5rem;text-align:center;max-width:320px;margin:0 auto 1.5rem}
+.sc-sym{font-size:52px;margin-bottom:12px}
+.sc-name{font-size:20px;font-weight:600;margin-bottom:6px}
+.sc-teacher{font-size:12px;font-weight:300;opacity:.6;margin-bottom:20px}
+.sc-ring-wrap{display:flex;justify-content:center;margin-bottom:16px;position:relative;width:140px;height:140px;margin-left:auto;margin-right:auto}
+.sc-ring-wrap svg{overflow:visible}
+.sc-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sc-rem{font-size:42px;font-weight:600;line-height:1}
+.sc-lbl{font-size:13px;font-weight:300;opacity:.6;margin-top:4px}
+.sc-status{font-size:12px;padding:5px 14px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.hist-section{background:rgba(0,0,0,.05);border-radius:14px;padding:1rem;margin-top:4px;text-align:left}
+.hist-sec-title{font-size:11px;font-weight:500;opacity:.5;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.hist-item-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.hist-item-row:last-child{border-bottom:none}
+.hi-num{font-size:10px;font-weight:600;opacity:.4;min-width:18px}
+.hi-date{font-size:12px;font-weight:400;opacity:.8}
+.no-hist-txt{font-size:12px;opacity:.4;text-align:center;padding:4px 0}
+.logout-btn{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--gr);font-size:13px;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;margin-top:4px;max-width:320px;display:block;margin-left:auto;margin-right:auto}
+
+/* PAYMENT */
+.pay-modal-sym{font-size:48px;text-align:center;margin-bottom:8px}
+.pay-modal-title{font-size:17px;font-weight:600;text-align:center;color:#111;margin-bottom:8px}
+.pay-modal-msg{font-size:13px;line-height:1.8;color:#555;text-align:center;margin-bottom:16px;white-space:pre-line}
+.pay-bank-box{background:#f7f7f7;border-radius:14px;padding:1rem 1.25rem;margin-bottom:12px}
+.pay-bank-row{margin-bottom:8px}.pay-bank-row:last-child{margin-bottom:0}
+.pay-bank-label{font-size:10px;font-weight:500;color:var(--gl);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.pay-bank-val{font-size:15px;font-weight:600;color:#111}
+.pay-copy-btn{width:100%;padding:12px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.pay-copy-btn:hover{opacity:.88}.pay-copy-btn.copied{background:#2dbd60}
+.pay-close-btn{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:#fff;color:var(--gr);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+
+/* ADMIN */
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+.a-card{border-radius:20px;padding:1.1rem 1rem 1rem;position:relative;transition:transform .15s}
 .a-card:hover{transform:translateY(-2px)}
-.del-btn{position:absolute;top:9px;right:9px;background:rgba(0,0,0,0.11);border:none;cursor:pointer;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(0,0,0,0.4);transition:background 0.15s}
-.del-btn:hover{background:rgba(0,0,0,0.22)}
-.a-sym{font-size:32px;display:block;margin-bottom:8px;line-height:1}
-.a-name{font-size:13px;font-weight:500;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.a-ring{display:flex;justify-content:center;margin-bottom:10px}
-.a-btns{display:flex;gap:6px;justify-content:center}
-.a-btn{border:none;border-radius:10px;cursor:pointer;font-size:17px;font-weight:300;width:38px;height:34px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.55)}
-.a-btn:hover{background:rgba(0,0,0,0.17)}
-.a-btn:active{transform:scale(0.94)}
-.a-btn:disabled{opacity:0.3;cursor:not-allowed}
+.a-sym{font-size:30px;display:block;margin-bottom:6px}
+.a-name{font-size:13px;font-weight:500;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.a-counts{display:flex;gap:5px;justify-content:center;margin-bottom:8px}
+.a-stat{flex:1;background:rgba(0,0,0,.07);border-radius:8px;padding:5px 4px;text-align:center}
+.a-val{font-size:15px;font-weight:600}.a-lbl{font-size:8px;font-weight:300;opacity:.5}
+.a-btns{display:flex;gap:5px;justify-content:center}
+.a-btn{border:none;border-radius:10px;cursor:pointer;font-size:16px;width:34px;height:32px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:rgba(0,0,0,.1);color:rgba(0,0,0,.55)}
+.a-btn:hover{background:rgba(0,0,0,.17)}.a-btn:active{transform:scale(.94)}
+.a-btn:disabled{opacity:.3;cursor:not-allowed}.a-btn.sm{font-size:12px}
+.x-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.1);border:none;cursor:pointer;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(0,0,0,.4)}
+.x-btn:hover{background:rgba(0,0,0,.2)}
+.top-acts{display:flex;gap:7px}
+.sv-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
+.teacher-badge{display:flex;align-items:center;gap:8px}
+.t-ava{width:32px;height:32px;border-radius:50%;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:16px;border:1.5px solid var(--pm)}
+.t-nm{font-size:13px;font-weight:500;color:#111}.t-sub{font-size:10px;font-weight:300;color:var(--gl)}
+.ipill{background:#fff;color:var(--gr);border:1px solid var(--bd);border-radius:50px;width:34px;height:34px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ipill:hover{border-color:#bbb;color:#111}
+.apill{background:var(--pink);color:#fff;border:none;border-radius:50px;width:34px;height:34px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.apill:hover{opacity:.85}
 
 /* MODALS */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;z-index:100}
-.modal{background:#fff;border-radius:20px;border:1px solid var(--border);padding:1.5rem;width:340px;max-width:92vw}
-.modal-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:1rem}
-.preview-card{border-radius:14px;padding:1rem;display:flex;align-items:center;gap:12px;margin-bottom:1rem}
-.preview-sym{font-size:26px;line-height:1}
-.pname{font-size:14px;font-weight:500}
-.ppkg{font-size:11px;font-weight:300;opacity:0.6;margin-top:2px}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+.modal{background:#fff;border-radius:20px;border:1px solid var(--bd);padding:1.5rem;width:100%;max-width:340px;max-height:90vh;overflow-y:auto}
+.modal.wide{max-width:380px}
+.mhd{font-size:15px;font-weight:600;color:#111;margin-bottom:1rem}
+.pcard{border-radius:14px;padding:1rem;display:flex;align-items:center;gap:12px;margin-bottom:1rem}
+.psym{font-size:24px}.pname{font-size:14px;font-weight:500}
+.ppkg{font-size:11px;font-weight:300;opacity:.6;margin-top:2px}
 .field{margin-bottom:12px}
-.field label{display:block;font-size:10px;font-weight:500;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
-.field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;transition:border-color 0.15s;font-family:'IBM Plex Sans',sans-serif}
+.field label{display:block;font-size:10px;font-weight:500;color:var(--gr);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.field input{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;transition:border-color .15s;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
 .field input:focus{border-color:var(--pink)}
-.sym-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
-.sym-opt{width:100%;aspect-ratio:1;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
-.sym-opt:hover{border-color:var(--pink-mid);background:var(--pink-light)}
-.sym-opt.sel{border-color:var(--pink);background:var(--pink-light)}
-.color-row{display:flex;gap:7px;flex-wrap:wrap}
-.color-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all 0.12s;flex-shrink:0}
-.color-dot.sel{border-color:#111;transform:scale(1.15)}
-.pkg-row{display:flex;gap:7px}
-.pkg-opt{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--gray);background:#fff;transition:all 0.15s}
-.pkg-opt span{display:block;font-size:10px;font-weight:300;color:var(--gray-lt);margin-top:1px}
-.pkg-opt.sel{border-color:var(--pink);background:var(--pink-light);color:var(--pink)}
-.pkg-opt.sel span{color:var(--pink)}
-.divider{height:1px;background:var(--border);margin:12px 0}
-.modal-actions{display:flex;gap:8px;margin-top:16px}
-.modal-actions button{flex:1;padding:10px;border-radius:10px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all 0.15s;font-weight:500}
-.btn-cancel{border:1px solid var(--border);background:#fff;color:var(--gray)}
-.btn-cancel:hover{border-color:#bbb}
-.btn-save{border:none;background:var(--pink);color:#fff}
-.btn-save:hover{opacity:0.88}
-.manage-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
-.manage-row:last-child{border-bottom:none}
-.manage-info{display:flex;align-items:center;gap:10px}
-.m-sym{font-size:20px}
-.m-name{font-size:14px;font-weight:500;color:#111}
-.m-sub{font-size:11px;font-weight:300;color:var(--gray-lt);margin-top:1px}
-.m-btns{display:flex;align-items:center;gap:6px}
-.m-btn{border:1px solid var(--border);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;color:#111}
-.m-btn:hover{border-color:#bbb}
-.m-btn.minus:hover{border-color:var(--pink);color:var(--pink)}
-.m-btn.plus:hover{border-color:#2dbd60;color:#2dbd60}
-.m-btn:disabled{opacity:0.28;cursor:not-allowed}
-.m-count{font-size:15px;font-weight:600;color:#111;min-width:22px;text-align:center}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:200;white-space:nowrap}
-.toast.show{opacity:1}
+.sgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.sopt{width:100%;aspect-ratio:1;border-radius:8px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.sopt:hover{border-color:var(--pm);background:var(--pl)}.sopt.on{border-color:var(--pink);background:var(--pl)}
+.crow{display:flex;gap:7px;flex-wrap:wrap}
+.cdot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .12s;flex-shrink:0}
+.cdot.on{border-color:#111;transform:scale(1.15)}
+.pkrow{display:flex;gap:7px}
+.pko{flex:1;border:1.5px solid var(--bd);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--gr);background:#fff;transition:all .15s}
+.pko span{display:block;font-size:10px;font-weight:300;color:var(--gl);margin-top:1px}
+.pko.on{border-color:var(--pink);background:var(--pl);color:var(--pink)}
+.pko.on span{color:var(--pink)}
+.div{height:1px;background:var(--bd);margin:12px 0}
+.macts{display:flex;gap:8px;margin-top:16px}
+.macts button{flex:1;padding:10px;border-radius:10px;font-size:13px;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s}
+.bc{border:1px solid var(--bd);background:#fff;color:var(--gr)}.bc:hover{border-color:#bbb}
+.bs{border:none;background:var(--pink);color:#fff}.bs:hover{opacity:.88}
+.mrow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)}
+.mrow:last-child{border-bottom:none}
+.minfo{display:flex;align-items:center;gap:10px}
+.msym2{font-size:18px}.mname2{font-size:13px;font-weight:500;color:#111}
+.msub2{font-size:11px;font-weight:300;color:var(--gl);margin-top:1px}
+.mbtns{display:flex;align-items:center;gap:6px}
+.mbtn{border:1px solid var(--bd);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#111;transition:all .12s}
+.mbtn:hover{border-color:#bbb}.mbtn.mi:hover{border-color:var(--pink);color:var(--pink)}
+.mbtn.mp:hover{border-color:#2dbd60;color:#2dbd60}.mbtn:disabled{opacity:.28;cursor:not-allowed}
+.mct{font-size:14px;font-weight:600;color:#111;min-width:20px;text-align:center}
+.h-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.h-sym{font-size:26px}.h-name{font-size:15px;font-weight:600;color:#111}
+.h-meta{font-size:12px;font-weight:300;color:var(--gl);margin-top:2px}
+.h-list{max-height:300px;overflow-y:auto}
+.h-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.h-item:last-child{border-bottom:none}
+.h-num{width:24px;height:24px;border-radius:50%;background:var(--pl);color:var(--pink);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.h-date{font-size:13px;font-weight:400;color:#111}.h-time{font-size:11px;font-weight:300;color:var(--gl);margin-top:1px}
+.h-undo{background:none;border:1px solid var(--bd);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--gr);cursor:pointer;transition:all .12s;white-space:nowrap}
+.h-undo:hover{border-color:var(--pink);color:var(--pink)}
+.h-empty{text-align:center;padding:1.5rem;color:var(--gl);font-size:13px}
+.date-student-info{display:flex;align-items:center;gap:10px;background:var(--pl);border-radius:12px;padding:.75rem 1rem;margin-bottom:1rem}
+.date-sym{font-size:22px}.date-name{font-size:14px;font-weight:500;color:#111}
+.date-rem{font-size:12px;font-weight:300;color:var(--gr);margin-top:2px}
+.date-input-wrap input[type="date"]{width:100%;border:1px solid var(--bd);border-radius:8px;padding:10px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;cursor:pointer}
+.date-input-wrap input[type="date"]:focus{border-color:var(--pink)}
+.date-note{font-size:11px;color:var(--gl);font-weight:300;margin-top:4px}
+.bank-settings-row{display:flex;flex-direction:column;gap:10px}
+.setting-field{display:flex;flex-direction:column;gap:5px}
+.setting-field label{font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px}
+.setting-field input{border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.setting-field input:focus{border-color:var(--pink)}
+.empty{text-align:center;padding:3rem 1rem;color:var(--gl)}
+.empty .ei{font-size:48px;margin-bottom:10px}.empty p{font-size:13px;font-weight:300}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.on{opacity:1}
+.sok{background:rgba(0,0,0,.07);color:rgba(0,0,0,.45)}
+.slow{background:#FFF3D6;color:#7a4800}
+.sout{background:#FFE0EC;color:#7a0030}
+
+/* SUPER ADMIN */
+.sa-screen{display:none}.sa-screen.on{display:block}
+#sa-login-screen.on{display:flex}
+.sa-login-box{background:#111;border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
+.sa-login-hd{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;text-align:center}
+.sa-login-sub{font-size:12px;font-weight:300;color:#666;text-align:center;margin-bottom:1.25rem}
+.sa-dot{width:13px;height:13px;border-radius:50%;border:2px solid #333;background:#111;transition:all .15s}
+.sa-dot.on{background:var(--pink);border-color:var(--pink)}
+.sa-nb{background:#222;border:1px solid #333;border-radius:12px;padding:12px 4px;font-size:17px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .12s;color:#fff}
+.sa-nb:hover{background:#333}.sa-nb:active{transform:scale(.95)}
+.sa-nb .ns{font-size:7px;font-weight:300;color:#555;letter-spacing:1px}
+.sa-nb.del{font-size:15px;color:#666}.sa-nb.z{grid-column:2}
+.sa-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
+.sa-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem;border-bottom:1px solid #f0f0f0;margin-bottom:1.25rem}
+.sa-title{font-size:20px;font-weight:600;color:#111}
+.sa-badge{background:#111;color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:1px}
+.sa-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}
+.sa-stat-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:1rem;text-align:center}
+.sa-stat-val{font-size:28px;font-weight:600;color:var(--pink)}
+.sa-stat-lbl{font-size:11px;font-weight:300;color:var(--gl);margin-top:2px}
+.sa-section-title{font-size:12px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.sa-teacher-row{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:1rem 1.25rem;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.sa-teacher-row:hover{border-color:var(--pink);background:var(--pl)}
+.sa-tr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sa-tr-info{display:flex;align-items:center;gap:10px}
+.sa-tr-ava{width:36px;height:36px;border-radius:50%;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--pm)}
+.sa-tr-name{font-size:14px;font-weight:500;color:#111}
+.sa-tr-cnt{font-size:11px;font-weight:300;color:var(--gl);margin-top:1px}
+.sa-tr-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;padding:2px 6px;transition:color .15s}
+.sa-tr-del:hover{color:var(--pink)}
+.sa-tr-bars{display:flex;gap:8px}
+.sa-bar-item{flex:1;background:#f5f5f5;border-radius:8px;padding:6px 8px;text-align:center}
+.sa-bar-val{font-size:14px;font-weight:600;color:#111}
+.sa-bar-lbl{font-size:9px;font-weight:300;color:var(--gl)}
+.sa-students-section{background:#f9f9f9;border-radius:10px;padding:.75rem;margin-top:8px;display:none}
+.sa-students-section.open{display:block}
+.sa-student-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:12px}
+.sa-student-row:last-child{border-bottom:none}
+.sa-s-name{display:flex;align-items:center;gap:6px;color:#111}
+.sa-s-rem{font-weight:600;color:var(--pink)}
+.gas-box{background:#f0fff4;border:1px solid #86efac;border-radius:14px;padding:1.25rem;margin-bottom:1.5rem}
+.gas-title{font-size:13px;font-weight:600;color:#166534;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.gas-url-wrap{display:flex;gap:8px;margin-bottom:8px}
+.gas-url-input{flex:1;border:1px solid #86efac;border-radius:8px;padding:8px 10px;font-size:12px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
+.gas-url-input:focus{border-color:var(--pink)}
+.gas-sync-btn{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s}
+.gas-sync-btn:hover{opacity:.88}
+.gas-sync-btn:disabled{opacity:.5;cursor:not-allowed}
+.gas-note{font-size:11px;color:#166534;font-weight:300;line-height:1.5}
+.gas-note a{color:#15803d;font-weight:500}
+.sa-actions{display:flex;gap:8px;margin-bottom:1.5rem}
+.sa-action-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s;border:1px solid var(--bd);background:#fff;color:#111}
+.sa-action-btn:hover{border-color:#bbb}
+.sa-action-btn.danger{border-color:#fca5a5;color:#dc2626}
+.sa-action-btn.danger:hover{background:#fef2f2}
+
+
+.masked-num{font-size:15px;font-weight:600;color:#111;letter-spacing:1px}
+.reveal-btn{background:none;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--gr);cursor:pointer;margin-top:4px;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .12s;display:block;width:100%}
+.reveal-btn:hover{border-color:var(--pink);color:var(--pink)}
+.secure-badge{display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:500;color:#166534;margin-bottom:.75rem}
+
+
+.topup-student-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--pink);background:#fff;color:var(--pink);font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.topup-student-btn:hover{background:var(--pink);color:#fff}
+
 </style>
 </head>
 <body>
-<div class="container">
+<div class="page">
 
-<!-- STUDENT VIEW -->
-<div class="student-screen" id="student-screen">
-  <div class="header">
-    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">class tracker</div></div>
+<!-- HOME -->
+<div id="home-screen" class="screen on">
+  <div class="hd">
+    <div><div class="logo" onclick="homeLogoTap()" style="cursor:pointer;user-select:none">Yoga with Jib</div><div class="sub" id="h-sub">class tracker</div></div>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-home">TH</button>
   </div>
-  <div id="student-cards"></div>
-  <div class="admin-hint" id="admin-hint" onclick="showLogin()">⚙</div>
+  <div class="home-hero">
+    <div class="home-hero-icon">✨</div>
+    <div class="home-hero-title" id="h-title">Welcome! Who are you?</div>
+    <div class="home-hero-sub" id="h-sub2">Choose your role to continue</div>
+  </div>
+  <div class="role-grid">
+    <div class="role-card" onclick="go('student-login-screen')">
+      <div class="role-icon">🤸🏻</div>
+      <div class="role-title" id="role-student">I'm a student</div>
+      <div class="role-sub" id="role-student-sub">Check my classes</div>
+    </div>
+    <div class="role-card" onclick="showTeacherList()">
+      <div class="role-icon">🧘🏻‍♀️</div>
+      <div class="role-title" id="role-teacher">I'm a teacher</div>
+      <div class="role-sub" id="role-teacher-sub">Manage students</div>
+    </div>
+  </div>
 </div>
 
-<!-- LOGIN -->
-<div class="login-screen" id="login-screen">
-  <div class="header" style="width:100%">
-    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">admin</div></div>
+<!-- STUDENT LOGIN -->
+<div id="student-login-screen" class="screen">
+  <div class="hd" style="width:100%">
+    <div><div class="logo">Yoga with Jib</div><div class="sub" id="sl-sub">student</div></div>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-sl">TH</button>
   </div>
-  <div class="login-box">
-    <span class="login-label" id="pin-label">Enter PIN</span>
-    <div class="pin-row" id="pin-row">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="numpad">
-      <button class="num-btn" onclick="numPress('1')">1<span class="sub"></span></button>
-      <button class="num-btn" onclick="numPress('2')">2<span class="sub">ABC</span></button>
-      <button class="num-btn" onclick="numPress('3')">3<span class="sub">DEF</span></button>
-      <button class="num-btn" onclick="numPress('4')">4<span class="sub">GHI</span></button>
-      <button class="num-btn" onclick="numPress('5')">5<span class="sub">JKL</span></button>
-      <button class="num-btn" onclick="numPress('6')">6<span class="sub">MNO</span></button>
-      <button class="num-btn" onclick="numPress('7')">7<span class="sub">PQRS</span></button>
-      <button class="num-btn" onclick="numPress('8')">8<span class="sub">TUV</span></button>
-      <button class="num-btn" onclick="numPress('9')">9<span class="sub">WXYZ</span></button>
-      <button class="num-btn zero" onclick="numPress('0')">0</button>
-      <button class="num-btn del" onclick="numDel()">⌫</button>
-    </div>
-    <div class="login-err" id="login-err"></div>
+  <div class="slogin-box">
+    <div class="slogin-hd" id="sl-hd">What's your name?</div>
+    <div class="slogin-sub" id="sl-sub2">Type the nickname your teacher gave you</div>
+    <input class="name-input" id="student-name-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button class="find-btn" id="find-btn" onclick="findStudent()">Find my classes →</button>
+    <div class="find-err" id="find-err"></div>
+    <div class="find-hint" id="find-hint">Your nickname is set by your teacher.<br>Type it exactly as they added you.</div>
   </div>
-  <button class="back-btn" onclick="showStudent()">← Back to student view</button>
-  <button class="change-pin-btn" onclick="startChangePin()">Change PIN</button>
+  <div class="llinks">
+    <button class="llink" onclick="goHome()">← Back</button>
+  </div>
+</div>
+
+<!-- TEACHER SELECT -->
+<div id="teacher-select-screen" class="screen">
+  <div class="hd">
+    <div><div class="logo">Yoga with Jib</div><div class="sub" id="ts-sub">teacher login</div></div>
+  </div>
+  <div style="margin-bottom:1rem">
+    <p style="font-size:14px;font-weight:500;color:#111;margin-bottom:4px" id="ts-title">Select your name</p>
+    <p style="font-size:12px;font-weight:300;color:var(--gl)" id="ts-sub2">Then enter your PIN</p>
+  </div>
+  <div class="teacher-list" id="teacher-list"></div>
+  <button class="new-teacher-btn" id="new-teacher-btn" onclick="go('signup-screen');buildEmoRow()">+ I'm a new teacher</button>
+  <div class="llinks" style="margin-top:1rem"><button class="llink" onclick="goHome()">← Back</button></div>
+</div>
+
+<!-- TEACHER PIN LOGIN -->
+<div id="login-screen" class="screen">
+  <div class="hd" style="width:100%">
+    <div><div class="logo">Yoga with Jib</div><div class="sub">admin</div></div>
+  </div>
+  <div class="auth-box">
+    <div class="auth-hd" id="login-teacher-name"></div>
+    <div class="auth-sub" id="login-sub-lbl">Enter your PIN</div>
+    <div class="dots" id="dots">
+      <div class="dot" id="d0"></div><div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+    </div>
+    <div class="pad">
+      <button class="nb" onclick="np('1')">1<span class="ns"></span></button>
+      <button class="nb" onclick="np('2')">2<span class="ns">ABC</span></button>
+      <button class="nb" onclick="np('3')">3<span class="ns">DEF</span></button>
+      <button class="nb" onclick="np('4')">4<span class="ns">GHI</span></button>
+      <button class="nb" onclick="np('5')">5<span class="ns">JKL</span></button>
+      <button class="nb" onclick="np('6')">6<span class="ns">MNO</span></button>
+      <button class="nb" onclick="np('7')">7<span class="ns">PQRS</span></button>
+      <button class="nb" onclick="np('8')">8<span class="ns">TUV</span></button>
+      <button class="nb" onclick="np('9')">9<span class="ns">WXYZ</span></button>
+      <button class="nb z" onclick="np('0')">0</button>
+      <button class="nb del" onclick="nd()">⌫</button>
+    </div>
+    <div class="lerr" id="lerr"></div>
+  </div>
+  <div class="llinks">
+    <button class="llink" onclick="go('teacher-select-screen');renderTeacherList()">← Back</button>
+    <button class="llink" onclick="startCp()">Change PIN</button>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div id="signup-screen" class="screen">
+  <div class="hd" style="width:100%">
+    <div><div class="logo">Yoga with Jib</div><div class="sub" id="su-sub">new teacher</div></div>
+  </div>
+  <div class="auth-box" style="max-width:320px">
+    <div class="auth-hd" id="su-hd">Create your account</div>
+    <div class="auth-sub" id="su-sub2">Takes 30 seconds</div>
+    <div class="privacy-box">
+      <div class="privacy-title" id="priv-title">🔒 Privacy notice</div>
+      <div class="privacy-text" id="priv-text">Please use nicknames only. Do not enter students' full names, phone numbers, ID numbers, or any sensitive personal information.</div>
+    </div>
+    <div class="auth-field">
+      <label id="su-name-lbl">Your teacher name</label>
+      <input id="su-name" type="text" placeholder="e.g. Jib, Noon, Best"/>
+    </div>
+    <div class="auth-field">
+      <label id="su-emo-lbl">Pick your avatar</label>
+      <div class="auth-emoji-row" id="su-emoji-row"></div>
+    </div>
+    <div class="auth-field" style="margin-top:8px">
+      <label id="su-pin-lbl">Set a 4-digit PIN</label>
+      <div class="dots" id="su-dots" style="justify-content:flex-start;margin-bottom:.75rem">
+        <div class="dot" id="su-d0"></div><div class="dot" id="su-d1"></div>
+        <div class="dot" id="su-d2"></div><div class="dot" id="su-d3"></div>
+      </div>
+      <div class="pad">
+        <button class="nb" onclick="sunp('1')">1</button><button class="nb" onclick="sunp('2')">2</button><button class="nb" onclick="sunp('3')">3</button>
+        <button class="nb" onclick="sunp('4')">4</button><button class="nb" onclick="sunp('5')">5</button><button class="nb" onclick="sunp('6')">6</button>
+        <button class="nb" onclick="sunp('7')">7</button><button class="nb" onclick="sunp('8')">8</button><button class="nb" onclick="sunp('9')">9</button>
+        <button class="nb z" onclick="sunp('0')">0</button><button class="nb del" onclick="sund()">⌫</button>
+      </div>
+      <div class="lerr" id="su-err"></div>
+    </div>
+    <button class="bs-full" id="su-create-btn" onclick="createTeacher()">Create account</button>
+  </div>
+  <div class="llinks"><button class="llink" onclick="go('teacher-select-screen');renderTeacherList()">← Back</button></div>
+</div>
+
+<!-- STUDENT PERSONAL VIEW -->
+<div id="student-view-screen" class="screen">
+  <div class="sv-hd">
+    <div><div class="logo" style="font-size:26px">Yoga with Jib</div></div>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-sv">TH</button>
+  </div>
+  <div id="student-card-area"></div>
+  <button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
 </div>
 
 <!-- ADMIN VIEW -->
-<div class="admin-screen" id="admin-screen">
-  <div class="header">
-    <div><div class="brand-main">Yoga with Jib</div><div class="brand-sub">admin</div></div>
-    <div class="top-actions">
-      <button class="icon-pill" onclick="manageOpen()" title="Fix classes">✎</button>
-      <button class="icon-pill" onclick="showStudent()" title="Student view">👁</button>
-      <button class="add-pill" onclick="openAdd()" title="Add student">+</button>
+<div id="av" class="screen">
+  <div class="sv-hd">
+    <div class="teacher-badge">
+      <div class="t-ava" id="av-ava"></div>
+      <div><div class="t-nm" id="av-nm"></div><div class="t-sub">admin</div></div>
+    </div>
+    <div class="top-acts">
+      <button class="ipill" onclick="openContact()" title="Contact info">📱</button>
+      <button class="ipill" onclick="openBank()">🏦</button>
+      <button class="ipill" onclick="openFix()">✎</button>
+      <button class="ipill" onclick="goHome()">⇄</button>
+      <button class="apill" onclick="openAdd()">+</button>
     </div>
   </div>
-  <div id="admin-cards"></div>
+  <div id="ac"></div>
 </div>
 
-</div><!-- /container -->
+</div><!-- /page -->
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SUPER ADMIN LOGIN -->
+<div id="sa-login-screen" class="sa-screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
+  <div style="margin-bottom:1.5rem;text-align:center">
+    <div class="logo" style="font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink)">Yoga with Jib</div>
+    <div style="font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:4px">SUPER ADMIN</div>
+  </div>
+  <div class="sa-login-box">
+    <div class="sa-login-hd">Admin access</div>
+    <div class="sa-login-sub">Triple-tap logo to exit</div>
+    <div class="dots" id="sa-dots" style="justify-content:center">
+      <div class="sa-dot" id="sa-d0"></div><div class="sa-dot" id="sa-d1"></div>
+      <div class="sa-dot" id="sa-d2"></div><div class="sa-dot" id="sa-d3"></div>
+    </div>
+    <div class="pad">
+      <button class="sa-nb" onclick="sanp('1')">1<span class="ns"></span></button>
+      <button class="sa-nb" onclick="sanp('2')">2<span class="ns">ABC</span></button>
+      <button class="sa-nb" onclick="sanp('3')">3<span class="ns">DEF</span></button>
+      <button class="sa-nb" onclick="sanp('4')">4<span class="ns">GHI</span></button>
+      <button class="sa-nb" onclick="sanp('5')">5<span class="ns">JKL</span></button>
+      <button class="sa-nb" onclick="sanp('6')">6<span class="ns">MNO</span></button>
+      <button class="sa-nb" onclick="sanp('7')">7<span class="ns">PQRS</span></button>
+      <button class="sa-nb" onclick="sanp('8')">8<span class="ns">TUV</span></button>
+      <button class="sa-nb" onclick="sanp('9')">9<span class="ns">WXYZ</span></button>
+      <button class="sa-nb z" onclick="sanp('0')">0</button>
+      <button class="sa-nb del" onclick="sand()">⌫</button>
+    </div>
+    <div class="sa-err" id="sa-err"></div>
+  </div>
+  <div class="llinks" style="margin-top:1rem">
+    <button class="llink" onclick="saBack()">← Back</button>
+    <button class="llink" onclick="startSaCp()">Change admin PIN</button>
+  </div>
+</div>
+
+<!-- SUPER ADMIN DASHBOARD -->
+<div id="sa-dashboard-screen" class="sa-screen" style="display:none;padding-bottom:3rem">
+  <div style="max-width:680px;margin:0 auto;padding:0 1.25rem">
+    <div class="sa-hd">
+      <div>
+        <div class="sa-title">System Dashboard</div>
+        <div style="font-size:12px;font-weight:300;color:var(--gl);margin-top:2px">All teachers &amp; students</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="sa-badge">ADMIN</span>
+        <button class="ipill" onclick="saBack()" style="background:#fff;color:var(--gr);border:1px solid var(--bd);border-radius:50px;width:34px;height:34px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="sa-stats" id="sa-stats"></div>
+
+    <!-- GAS INTEGRATION -->
+    <div class="gas-box">
+      <div class="gas-title">📊 Google Sheets export</div>
+      <div class="gas-url-wrap">
+        <input class="gas-url-input" id="gas-url" type="url" placeholder="Paste your Google Apps Script URL here"/>
+        <button class="gas-sync-btn" id="gas-sync-btn" onclick="syncToGAS()">Export ↗</button>
+      </div>
+      <div class="gas-note">
+        Deploy a Google Apps Script web app to receive data. 
+        <a href="#" onclick="showGasInstructions();return false;">How to set up →</a>
+      </div>
+    </div>
+
+    <!-- TEACHER LIST -->
+    <div class="sa-section-title">Teachers</div>
+    <div id="sa-teacher-list"></div>
+  </div>
+</div>
+
+<!-- GAS INSTRUCTIONS MODAL -->
+<div class="mbg" id="gas-m" style="display:none">
+  <div class="modal wide" style="max-height:85vh;overflow-y:auto">
+    <div class="mhd">📊 Google Sheets setup</div>
+    <div style="font-size:13px;line-height:1.8;color:#555;margin-bottom:1rem">
+      <strong>Step 1:</strong> Open Google Sheets → Extensions → Apps Script<br>
+      <strong>Step 2:</strong> Paste this code:<br>
+    </div>
+    <div style="background:#111;border-radius:10px;padding:1rem;margin-bottom:1rem;overflow-x:auto">
+      <pre style="font-size:11px;color:#86efac;font-family:monospace;white-space:pre-wrap;line-height:1.6" id="gas-code-block"></pre>
+    </div>
+    <div style="font-size:13px;line-height:1.8;color:#555;margin-bottom:1rem">
+      <strong>Step 3:</strong> Click Deploy → New deployment → Web app<br>
+      <strong>Step 4:</strong> Set "Who has access" to <strong>Anyone</strong><br>
+      <strong>Step 5:</strong> Copy the web app URL → paste into the dashboard
+    </div>
+    <div class="macts"><button class="bs" onclick="copyGasCode()">Copy code</button><button class="bc" onclick="cm('gas-m')">Close</button></div>
+  </div>
+</div>
+
+<!-- SA CHANGE PIN MODAL -->
+<div class="mbg" id="sa-cp-m" style="display:none">
+  <div class="modal" style="background:#111">
+    <div class="mhd" id="sa-cpt" style="color:#fff">New admin PIN</div>
+    <div style="text-align:center;margin-bottom:1rem">
+      <div class="dots" id="sa-cp-dots" style="justify-content:center">
+        <div class="sa-dot" id="sa-cp0"></div><div class="sa-dot" id="sa-cp1"></div>
+        <div class="sa-dot" id="sa-cp2"></div><div class="sa-dot" id="sa-cp3"></div>
+      </div>
+    </div>
+    <div class="pad">
+      <button class="sa-nb" onclick="sacpp('1')">1</button><button class="sa-nb" onclick="sacpp('2')">2</button><button class="sa-nb" onclick="sacpp('3')">3</button>
+      <button class="sa-nb" onclick="sacpp('4')">4</button><button class="sa-nb" onclick="sacpp('5')">5</button><button class="sa-nb" onclick="sacpp('6')">6</button>
+      <button class="sa-nb" onclick="sacpp('7')">7</button><button class="sa-nb" onclick="sacpp('8')">8</button><button class="sa-nb" onclick="sacpp('9')">9</button>
+      <button class="sa-nb z" onclick="sacpp('0')">0</button><button class="sa-nb del" onclick="sacpd()">⌫</button>
+    </div>
+    <div class="sa-err" id="sa-cperr"></div>
+    <div class="macts"><button class="bc" onclick="cm('sa-cp-m')" style="color:#ccc;background:#222;border-color:#333">Cancel</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- ADD MODAL -->
-<div class="modal-bg" id="modal" style="display:none">
+<!-- PAYMENT MODAL -->
+<div class="mbg" id="pay-m" style="display:none">
   <div class="modal">
-    <div class="modal-hd">New student</div>
-    <div class="preview-card" id="prev-card" style="background:#FFE0EC">
-      <div class="preview-sym" id="prev-sym">🌸</div>
-      <div><div class="pname" id="prev-name">Name</div><div class="ppkg" id="prev-pkg">20 classes</div></div>
+    <div class="pay-modal-sym">🙏</div>
+    <div class="pay-modal-title" id="pay-sname"></div>
+    <div class="pay-modal-msg" id="pay-msg"></div>
+    <div class="pay-bank-box">
+      <div class="pay-bank-row"><div class="pay-bank-label" id="lbl-bank"></div><div class="pay-bank-val" id="pm-bank"></div></div>
+      <div class="pay-bank-row"><div class="pay-bank-label" id="lbl-acct-name"></div><div class="pay-bank-val" id="pm-name"></div></div>
+      <div class="pay-bank-row"><div class="pay-bank-label" id="lbl-acct-num"></div><div class="pay-bank-val" id="pm-num"></div></div>
     </div>
-    <div class="field"><label>Name</label><input id="inp-name" type="text" placeholder="Student name" oninput="updatePreview()"/></div>
-    <div class="field"><label>Symbol</label><div class="sym-grid" id="sym-grid"></div></div>
-    <div class="field"><label>Color</label><div class="color-row" id="color-row"></div></div>
-    <div class="divider"></div>
-    <div class="field"><label>Package</label>
-      <div class="pkg-row" id="pkg-row">
-        <div class="pkg-opt sel" data-v="20" onclick="selPkg(this)">20<span>classes</span></div>
-        <div class="pkg-opt" data-v="30" onclick="selPkg(this)">30<span>classes</span></div>
-        <div class="pkg-opt" data-v="40" onclick="selPkg(this)">40<span>classes</span></div>
+    <button class="pay-copy-btn" id="copy-btn" onclick="copyAcct()"><span>📋</span><span id="copy-lbl">Copy account number</span></button>
+    <button class="pay-close-btn" onclick="cm('pay-m')">ปิด / Close</button>
+  </div>
+</div>
+
+<!-- ADD STUDENT -->
+<div class="mbg" id="add-m" style="display:none">
+  <div class="modal">
+    <div class="mhd" id="mhd-add">New student</div>
+    <div class="privacy-box" style="margin-bottom:1rem">
+      <div class="privacy-title">🔒 Reminder</div>
+      <div class="privacy-text" id="add-priv-txt">Use nickname only. No full names or personal details.</div>
+    </div>
+    <div class="pcard" id="pc" style="background:#FFE0EC">
+      <div class="psym" id="ps">🌸</div>
+      <div><div class="pname" id="pn">Nickname</div><div class="ppkg" id="pp">10 classes</div></div>
+    </div>
+    <div class="field"><label id="lbl-name-f">Nickname</label><input id="inp" type="text" placeholder="e.g. Noon, Best, Fah" oninput="upPrev()"/></div>
+    <div class="field"><label id="lbl-sym-f">Symbol</label><div class="sgrid" id="sg"></div></div>
+    <div class="field"><label id="lbl-col-f">Color</label><div class="crow" id="cr"></div></div>
+    <div class="div"></div>
+    <div class="field"><label id="lbl-pkg-f">Package</label>
+      <div class="pkrow" id="pkr">
+        <div class="pko on" data-v="10" onclick="spk(this)">10<span id="cls-lbl1">classes</span></div>
+        <div class="pko" data-v="15" onclick="spk(this)">15<span id="cls-lbl2">classes</span></div>
+        <div class="pko" data-v="20" onclick="spk(this)">20<span id="cls-lbl3">classes</span></div>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveStudent()">Save</button>
+    <div class="macts"><button class="bc" onclick="cm('add-m')">Cancel</button><button class="bs" onclick="saveSt()">Save</button></div>
+  </div>
+</div>
+
+
+
+
+<!-- TEACHER CONTACT MODAL (for admin to edit) -->
+<div class="mbg" id="contact-m" style="display:none">
+  <div class="modal">
+    <div class="mhd">📱 Contact info</div>
+    <div style="font-size:12px;font-weight:300;color:var(--gl);margin-bottom:1rem;line-height:1.6">
+      Your students will see this when they want to top up — so they can reach you to confirm.
+    </div>
+    <div style="font-size:11px;font-weight:300;color:var(--gl);margin-bottom:12px;line-height:1.6">
+      Shown to students when they top up. Used to send you payment notifications.
+    </div>
+    <div class="field">
+      <label>Phone number</label>
+      <input id="c-phone" type="tel" placeholder="e.g. 08x-xxx-xxxx"/>
+    </div>
+    <div class="field">
+      <label>LINE ID (display)</label>
+      <input id="c-line" type="text" placeholder="e.g. @yogawithjib"/>
+    </div>
+    <div class="field">
+      <label>Email (for notifications)</label>
+      <input id="c-email" type="email" placeholder="your@email.com"/>
+    </div>
+    <div style="background:#f0fff4;border:1px solid #86efac;border-radius:10px;padding:.85rem;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:#166534;margin-bottom:5px">📲 LINE Notify token</div>
+      <input id="c-line-token" type="text" placeholder="Paste your LINE Notify token" style="width:100%;border:1px solid #86efac;border-radius:8px;padding:8px 10px;font-size:13px;color:#111;background:#fff;outline:none;font-family:inherit;margin-bottom:6px"/>
+      <div style="font-size:11px;color:#16a34a;font-weight:300;line-height:1.5">
+        Get your token from <strong>notify-bot.line.me</strong> → Log in → Generate token → 1:1 chat with LINE Notify → copy token here
+      </div>
+    </div>
+    <div class="macts">
+      <button class="bc" onclick="cm('contact-m')">Cancel</button>
+      <button class="bs" onclick="saveContact()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- TOPUP MODAL -->
-<div class="modal-bg" id="topup-modal" style="display:none">
+<!-- TOPUP INFO MODAL (for students) -->
+<div class="mbg" id="student-topup-m" style="display:none">
   <div class="modal">
-    <div class="modal-hd">Top up <span id="topup-name" style="color:var(--pink)"></span></div>
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="font-size:42px;margin-bottom:6px">🙏</div>
+      <div style="font-size:17px;font-weight:600;color:#111;margin-bottom:4px" id="stu-topup-title">Top up classes</div>
+      <div style="font-size:13px;font-weight:300;color:var(--gl);line-height:1.6" id="stu-topup-sub">Ready to continue your yoga journey?</div>
+    </div>
+
+    <!-- IMPORTANT NOTICE -->
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:4px">⚠️ Important / สำคัญ</div>
+      <div style="font-size:12px;font-weight:300;color:#78350f;line-height:1.7" id="stu-verify-msg">
+        Always check with your teacher before transferring. Bank details can change — confirm it's the right account first.
+      </div>
+    </div>
+
+    <!-- TEACHER CONTACT -->
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:1rem;margin-bottom:1rem" id="stu-contact-box">
+      <div style="font-size:11px;font-weight:600;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📞 Contact your teacher first</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px" id="stu-teacher-info">
+        <div style="width:36px;height:36px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0" id="stu-t-ava"></div>
+        <div style="font-size:14px;font-weight:500;color:#111" id="stu-t-name"></div>
+      </div>
+      <div id="stu-phone-row" style="display:none;margin-bottom:6px">
+        <div style="font-size:10px;font-weight:500;color:#0369a1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Phone</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:14px;font-weight:500;color:#111" id="stu-phone-val"></div>
+          <button onclick="copyContact('phone')" style="background:none;border:1px solid #bae6fd;border-radius:6px;padding:2px 8px;font-size:11px;color:#0369a1;cursor:pointer;font-family:inherit">Copy</button>
+        </div>
+      </div>
+      <div id="stu-line-row" style="display:none">
+        <div style="font-size:10px;font-weight:500;color:#0369a1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">LINE ID</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:14px;font-weight:500;color:#111" id="stu-line-val"></div>
+          <button onclick="copyContact('line')" style="background:none;border:1px solid #bae6fd;border-radius:6px;padding:2px 8px;font-size:11px;color:#0369a1;cursor:pointer;font-family:inherit">Copy</button>
+        </div>
+      </div>
+      <div id="stu-no-contact" style="display:none;font-size:12px;color:#64748b;font-weight:300">Contact info not set yet — ask your teacher directly.</div>
+    </div>
+
+    <!-- BANK INFO -->
+    <div id="stu-bank-section">
+      <div style="font-size:11px;font-weight:600;color:#111;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏦 Transfer details</div>
+      <div style="background:#f7f7f7;border-radius:12px;padding:1rem;margin-bottom:10px">
+        <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-bank">Bank</div><div class="pay-bank-val" id="stu-pm-bank"></div></div>
+        <div class="pay-bank-row"><div class="pay-bank-label" id="stu-lbl-name">Account name</div><div class="pay-bank-val" id="stu-pm-name"></div></div>
+        <div class="pay-bank-row">
+          <div class="pay-bank-label" id="stu-lbl-num">Account number</div>
+          <div class="masked-num" id="stu-masked-num"></div>
+          <button class="reveal-btn" id="stu-reveal-btn" onclick="revealStuAcct()"></button>
+        </div>
+      </div>
+      <button class="pay-copy-btn" id="stu-copy-btn" onclick="copyStuAcct()">
+        <span>📋</span><span id="stu-copy-lbl">Copy account number</span>
+      </button>
+    </div>
+
+    <!-- NOTIFY TEACHER SECTION -->
+    <div id="notify-section" style="margin-top:12px;border-top:1px solid var(--bd);padding-top:12px">
+      <div style="font-size:12px;font-weight:500;color:#111;margin-bottom:8px" id="notify-title">Already transferred? Let your teacher know 📲</div>
+      <div id="notify-form" style="display:flex;flex-direction:column;gap:8px">
+        <div>
+          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-amt-lbl">Amount transferred (optional)</label>
+          <input id="notify-amount" type="number" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-pkg-lbl">Package</label>
+          <div style="display:flex;gap:6px">
+            <div class="pko on" data-v="10" onclick="selNotifyPkg(this)" style="flex:1;border:1.5px solid var(--bd);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--gr);background:#fff;transition:all .15s">10</div>
+            <div class="pko" data-v="15" onclick="selNotifyPkg(this)" style="flex:1;border:1.5px solid var(--bd);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--gr);background:#fff;transition:all .15s">15</div>
+            <div class="pko" data-v="20" onclick="selNotifyPkg(this)" style="flex:1;border:1.5px solid var(--bd);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--gr);background:#fff;transition:all .15s">20</div>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:500;color:var(--gr);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px" id="notify-msg-lbl">Note (optional)</label>
+          <input id="notify-note" type="text" placeholder="e.g. Transferred via K-Bank" style="width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:14px;color:#111;background:#fff;outline:none;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif"/>
+        </div>
+        <button id="notify-send-btn" onclick="sendNotification()" style="width:100%;padding:12px;border-radius:12px;border:none;background:#111;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px">
+          <span>📲</span><span id="notify-btn-lbl">Notify teacher</span>
+        </button>
+        <div id="notify-err" style="font-size:11px;color:var(--pink);text-align:center;min-height:14px"></div>
+      </div>
+      <!-- Success state -->
+      <div id="notify-success" style="display:none;text-align:center;padding:1rem;background:#f0fdf4;border-radius:12px;border:1px solid #86efac">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:14px;font-weight:500;color:#166534" id="notify-success-msg">Teacher notified!</div>
+        <div style="font-size:12px;font-weight:300;color:#16a34a;margin-top:4px" id="notify-success-sub">They'll confirm your payment shortly</div>
+      </div>
+    </div>
+    <button class="pay-close-btn" onclick="cm('student-topup-m');resetNotify()" style="margin-top:8px" id="stu-topup-close">Close</button>
+  </div>
+</div>
+
+<!-- BANK PIN CONFIRM -->
+<div class="mbg" id="bank-pin-m" style="display:none">
+  <div class="modal" style="max-width:300px">
+    <div class="mhd" style="text-align:center">🏦 Bank details</div>
+    <div style="font-size:13px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem">Re-enter your PIN to access</div>
+    <div class="dots" id="bpin-dots" style="justify-content:center">
+      <div class="dot" id="bp-d0"></div><div class="dot" id="bp-d1"></div>
+      <div class="dot" id="bp-d2"></div><div class="dot" id="bp-d3"></div>
+    </div>
+    <div class="pad">
+      <button class="nb" onclick="bpnp('1')">1<span class="ns"></span></button>
+      <button class="nb" onclick="bpnp('2')">2<span class="ns">ABC</span></button>
+      <button class="nb" onclick="bpnp('3')">3<span class="ns">DEF</span></button>
+      <button class="nb" onclick="bpnp('4')">4<span class="ns">GHI</span></button>
+      <button class="nb" onclick="bpnp('5')">5<span class="ns">JKL</span></button>
+      <button class="nb" onclick="bpnp('6')">6<span class="ns">MNO</span></button>
+      <button class="nb" onclick="bpnp('7')">7<span class="ns">PQRS</span></button>
+      <button class="nb" onclick="bpnp('8')">8<span class="ns">TUV</span></button>
+      <button class="nb" onclick="bpnp('9')">9<span class="ns">WXYZ</span></button>
+      <button class="nb z" onclick="bpnp('0')">0</button>
+      <button class="nb del" onclick="bpnd()">⌫</button>
+    </div>
+    <div class="lerr" id="bpin-err"></div>
+    <div class="macts"><button class="bc" onclick="cm('bank-pin-m')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- EDIT STUDENT MODAL -->
+<div class="mbg" id="edit-m" style="display:none">
+  <div class="modal">
+    <div class="mhd">Edit student</div>
+    <div class="pcard" id="edit-pc" style="background:#FFE0EC">
+      <div class="psym" id="edit-ps">🌸</div>
+      <div><div class="pname" id="edit-pn">Name</div><div class="ppkg" id="edit-pp">10 classes</div></div>
+    </div>
+    <div class="field">
+      <label>Nickname</label>
+      <input id="edit-inp" type="text" oninput="upEditPrev()"/>
+    </div>
+    <div class="field"><label>Symbol</label><div class="sgrid" id="edit-sg"></div></div>
+    <div class="field"><label>Color</label><div class="crow" id="edit-cr"></div></div>
+    <div class="div"></div>
+    <div class="field"><label>Total package size</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="adjEditPkg(-5)" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--bd);background:#fff;font-size:18px;cursor:pointer">−</button>
+        <span id="edit-pkg-val" style="font-size:20px;font-weight:600;color:#111;min-width:30px;text-align:center">10</span>
+        <button onclick="adjEditPkg(5)" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--bd);background:#fff;font-size:18px;cursor:pointer">+</button>
+        <span style="font-size:12px;color:var(--gl);font-weight:300">classes total</span>
+      </div>
+    </div>
+    <div class="macts">
+      <button class="bc" onclick="cm('edit-m')">Cancel</button>
+      <button class="bs" onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATE PICKER -->
+<div class="mbg" id="date-m" style="display:none">
+  <div class="modal">
+    <div class="mhd" id="mhd-date">Deduct class</div>
+    <div class="date-student-info"><div class="date-sym" id="dt-sym"></div><div><div class="date-name" id="dt-name"></div><div class="date-rem" id="dt-rem"></div></div></div>
+    <div class="field">
+      <label id="lbl-date-f">Class date</label>
+      <div class="date-input-wrap"><input type="date" id="dt-date"/></div>
+      <div class="date-note" id="date-note">Select the actual class date</div>
+    </div>
+    <div class="macts"><button class="bc" onclick="cm('date-m')">Cancel</button><button class="bs" onclick="confirmDeduct()">Deduct</button></div>
+  </div>
+</div>
+
+<!-- TOPUP -->
+<div class="mbg" id="top-m" style="display:none">
+  <div class="modal">
+    <div class="mhd"><span id="mhd-top">Top up</span> <span id="tn" style="color:var(--pink)"></span></div>
     <div class="field" style="margin-top:4px"><label>Package</label>
-      <div class="pkg-row" id="topup-pkg-row">
-        <div class="pkg-opt sel" data-v="20" onclick="selTopupPkg(this)">20<span>classes</span></div>
-        <div class="pkg-opt" data-v="30" onclick="selTopupPkg(this)">30<span>classes</span></div>
-        <div class="pkg-opt" data-v="40" onclick="selTopupPkg(this)">40<span>classes</span></div>
+      <div class="pkrow" id="tpkr">
+        <div class="pko on" data-v="10" onclick="stpk(this)">10<span id="tcls-lbl1">classes</span></div>
+        <div class="pko" data-v="15" onclick="stpk(this)">15<span id="tcls-lbl2">classes</span></div>
+        <div class="pko" data-v="20" onclick="stpk(this)">20<span id="tcls-lbl3">classes</span></div>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeTopup()">Cancel</button>
-      <button class="btn-save" onclick="doTopup()">Add</button>
-    </div>
+    <div class="macts"><button class="bc" onclick="cm('top-m')">Cancel</button><button class="bs" onclick="doTop()">Add</button></div>
   </div>
 </div>
 
-<!-- MANAGE MODAL -->
-<div class="modal-bg" id="manage-modal" style="display:none">
-  <div class="modal">
-    <div class="modal-hd">Fix classes</div>
-    <div id="manage-list"></div>
-    <div class="modal-actions" style="margin-top:12px">
-      <button class="btn-save" onclick="closeManage()">Done</button>
-    </div>
+<!-- FIX -->
+<div class="mbg" id="fix-m" style="display:none">
+  <div class="modal"><div class="mhd">Fix classes</div><div id="fl"></div>
+    <div class="macts" style="margin-top:12px"><button class="bs" onclick="cm('fix-m')">Done</button></div>
   </div>
 </div>
 
-<!-- CHANGE PIN MODAL -->
-<div class="modal-bg" id="cp-modal" style="display:none">
+<!-- HISTORY -->
+<div class="mbg" id="hist-m" style="display:none">
+  <div class="modal wide">
+    <div class="h-header"><div class="h-sym" id="h-sym"></div><div><div class="h-name" id="h-name"></div><div class="h-meta" id="h-meta"></div></div></div>
+    <div class="h-list" id="h-list"></div>
+    <div class="macts"><button class="bs" onclick="cm('hist-m')">Close</button></div>
+  </div>
+</div>
+
+<!-- BANK -->
+<div class="mbg" id="bank-m" style="display:none">
   <div class="modal">
-    <div class="modal-hd" id="cp-title">Enter new PIN</div>
+    <div class="mhd">Bank details</div>
+    <div class="secure-badge">🔒 Encrypted &amp; PIN protected</div>
+    <div class="bank-settings-row">
+      <div class="setting-field"><label>Bank name</label><input id="b-bank" type="text" placeholder="e.g. Kasikorn, SCB"/></div>
+      <div class="setting-field"><label>Account name</label><input id="b-name" type="text"/></div>
+      <div class="setting-field"><label>Account number</label><input id="b-num" type="text" placeholder="xxx-x-xxxxx-x"/></div>
+    </div>
+    <div class="macts"><button class="bc" onclick="cm('bank-m')">Cancel</button><button class="bs" onclick="saveBank()">Save</button></div>
+  </div>
+</div>
+
+<!-- CHANGE PIN -->
+<div class="mbg" id="cp-m" style="display:none">
+  <div class="modal">
+    <div class="mhd" id="cpt">New PIN</div>
     <div style="text-align:center;margin-bottom:1rem">
-      <div class="pin-row" id="cp-row" style="justify-content:center">
-        <div class="pin-dot" id="cp-d0"></div><div class="pin-dot" id="cp-d1"></div>
-        <div class="pin-dot" id="cp-d2"></div><div class="pin-dot" id="cp-d3"></div>
+      <div class="dots" id="cp-dots" style="justify-content:center">
+        <div class="dot" id="cp0"></div><div class="dot" id="cp1"></div><div class="dot" id="cp2"></div><div class="dot" id="cp3"></div>
       </div>
     </div>
-    <div class="numpad">
-      <button class="num-btn" onclick="cpPress('1')">1</button>
-      <button class="num-btn" onclick="cpPress('2')">2</button>
-      <button class="num-btn" onclick="cpPress('3')">3</button>
-      <button class="num-btn" onclick="cpPress('4')">4</button>
-      <button class="num-btn" onclick="cpPress('5')">5</button>
-      <button class="num-btn" onclick="cpPress('6')">6</button>
-      <button class="num-btn" onclick="cpPress('7')">7</button>
-      <button class="num-btn" onclick="cpPress('8')">8</button>
-      <button class="num-btn" onclick="cpPress('9')">9</button>
-      <button class="num-btn zero" onclick="cpPress('0')">0</button>
-      <button class="num-btn del" onclick="cpDel()">⌫</button>
+    <div class="pad">
+      <button class="nb" onclick="cpp('1')">1</button><button class="nb" onclick="cpp('2')">2</button><button class="nb" onclick="cpp('3')">3</button>
+      <button class="nb" onclick="cpp('4')">4</button><button class="nb" onclick="cpp('5')">5</button><button class="nb" onclick="cpp('6')">6</button>
+      <button class="nb" onclick="cpp('7')">7</button><button class="nb" onclick="cpp('8')">8</button><button class="nb" onclick="cpp('9')">9</button>
+      <button class="nb z" onclick="cpp('0')">0</button><button class="nb del" onclick="cpd()">⌫</button>
     </div>
-    <div class="login-err" id="cp-err"></div>
-    <div class="modal-actions"><button class="btn-cancel" onclick="closeCp()">Cancel</button></div>
+    <div class="lerr" id="cperr"></div>
+    <div class="macts"><button class="bc" onclick="cm('cp-m')">Cancel</button></div>
   </div>
 </div>
 
 <script>
-const SYMBOLS=['🧘‍♀️','🌸','⭐','🌈','🦋','🌙','🔥','🌺','🐬','🦄','🌻','🍀','🦊','🐧','🎯','🌊','🐝','🍉','🎸','🦁','🐙','🌴','🎀','🐸'];
-const COLORS=[
-  {bg:'#FFE0EC',ring:'#fb2a7b',text:'#7a0030'},
-  {bg:'#DDEEFF',ring:'#3a8fd4',text:'#0a3a6a'},
-  {bg:'#E2F7E8',ring:'#2dbd60',text:'#0a5a28'},
-  {bg:'#FFF3D6',ring:'#f5a623',text:'#7a4800'},
-  {bg:'#EDE0FF',ring:'#8b5cf6',text:'#3b0099'},
-  {bg:'#FFE8D6',ring:'#f07040',text:'#7a2800'},
-  {bg:'#D6F5F5',ring:'#20b2aa',text:'#004a48'},
-  {bg:'#F0F0F0',ring:'#888888',text:'#333333'},
+const SYM=['🧘‍♀️','🌸','⭐','🌈','🦋','🌙','🔥','🌺','🐬','🦄','🌻','🍀','🦊','🐧','🎯','🌊','🐝','🍉','🎸','🦁','🐙','🌴','🎀','🐸'];
+const T_EMOJIS=['🧘‍♀️','🌺','🎯','⭐','🦋','🔥','🌙','🐬','🌸','🎸'];
+const COL=[
+  {bg:'#FFE0EC',rg:'#fb2a7b',tx:'#7a0030'},{bg:'#DDEEFF',rg:'#3a8fd4',tx:'#0a3a6a'},
+  {bg:'#E2F7E8',rg:'#2dbd60',tx:'#0a5a28'},{bg:'#FFF3D6',rg:'#f5a623',tx:'#7a4800'},
+  {bg:'#EDE0FF',rg:'#8b5cf6',tx:'#3b0099'},{bg:'#FFE8D6',rg:'#f07040',tx:'#7a2800'},
+  {bg:'#D6F5F5',rg:'#20b2aa',tx:'#004a48'},{bg:'#F0F0F0',rg:'#888',tx:'#333'},
 ];
 
-let students = [], pin = '1234', pinInput = '';
-let selPkgVal = 20, selTopupVal = 20, topupId = null;
-let selectedSym = SYMBOLS[0], selectedColor = COLORS[0];
+const TR={
+  en:{
+    sub:'class tracker',langBtn:'TH',hTitle:'Welcome! Who are you?',hSub:'Choose your role to continue',
+    roleStudent:"I'm a student",roleStudentSub:'Check my classes',
+    roleTeacher:"I'm a teacher",roleTeacherSub:'Manage students',
+    slSub:'student',slHd:"What's your name?",slSub2:'Type the nickname your teacher gave you',
+    findBtn:'Find my classes →',findHint:'Your nickname is set by your teacher.\nType it exactly as they added you.',
+    notFound:"Name not found. Check spelling or ask your teacher.",
+    tsSub:'teacher login',tsTitle:'Select your name',tsSub2:'Then enter your PIN',
+    newTeacher:"+ I'm a new teacher",
+    suSub:'new teacher',suHd:'Create your account',suSub2:'Takes 30 seconds',
+    privTitle:'🔒 Privacy notice',
+    privText:"Please use nicknames only. Do not enter students' full names, phone numbers, ID numbers, or any sensitive personal information.",
+    suNameLbl:'Your teacher name',suEmoLbl:'Pick your avatar',suPinLbl:'Set a 4-digit PIN',
+    suCreateBtn:'Create account',loginSub:'Enter your PIN',
+    wMain:'Hi {name}! 🙏',active:'Active',low:'Running low',out:'All used',left:'left',
+    noHist:'No class history yet',histTitle:'Class history',
+    logoutBtn:'← Back',payMsg:'Your classes are all used up! 🧘‍♀️\nPlease renew your package to continue.\nTransfer to the account below and let your teacher know.',
+    lblBank:'Bank',lblAcctName:'Account name',lblAcctNum:'Account number',
+    copyBtn:'Copy account number',copiedBtn:'Copied ✓',
+    mhdAdd:'New student',addPrivTxt:'Use nickname only. No full names or personal details.',
+    lblNameF:'Nickname',clsLbl:'classes',pinWrong:'Wrong PIN',
+    bankSaved:'Bank details saved 🏦',noStudents:'No students yet',
+    addToBegin:'Add a student to begin',removed:'Entry removed',
+    hUsed:'used',hLeft:'remaining',confirmRemove:'Remove this entry?',
+  },
+  th:{
+    sub:'ติดตามคลาส',langBtn:'EN',hTitle:'ยินดีต้อนรับ! คุณคือใคร?',hSub:'เลือกบทบาทของคุณเพื่อดำเนินการต่อ',
+    roleStudent:'ฉันเป็นนักเรียน',roleStudentSub:'ดูคลาสของฉัน',
+    roleTeacher:'ฉันเป็นครู',roleTeacherSub:'จัดการนักเรียน',
+    slSub:'นักเรียน',slHd:'ชื่อของคุณคืออะไร?',slSub2:'พิมพ์ชื่อเล่นที่ครูตั้งให้คุณ',
+    findBtn:'ค้นหาคลาสของฉัน →',findHint:'ชื่อเล่นของคุณถูกตั้งโดยครู\nพิมพ์ตรงๆ เหมือนที่ครูเพิ่มคุณ',
+    notFound:'ไม่พบชื่อนี้ กรุณาตรวจสอบการสะกดหรือถามครู',
+    tsSub:'ล็อกอินครู',tsTitle:'เลือกชื่อของคุณ',tsSub2:'แล้วใส่ PIN',
+    newTeacher:'+ ฉันเป็นครูใหม่',
+    suSub:'ครูใหม่',suHd:'สร้างบัญชีของคุณ',suSub2:'ใช้เวลาแค่ 30 วินาที',
+    privTitle:'🔒 ประกาศความเป็นส่วนตัว',
+    privText:'กรุณาใช้ชื่อเล่นเท่านั้น ห้ามใส่ชื่อจริง-นามสกุล หมายเลขโทรศัพท์ หรือข้อมูลส่วนตัวใดๆ',
+    suNameLbl:'ชื่อครู',suEmoLbl:'เลือกอวตาร',suPinLbl:'ตั้ง PIN 4 หลัก',
+    suCreateBtn:'สร้างบัญชี',loginSub:'ใส่ PIN ของคุณ',
+    wMain:'สวัสดี {name}! 🙏',active:'Active',low:'เหลือน้อย',out:'หมดแล้ว',left:'เหลือ',
+    noHist:'ยังไม่มีประวัติคลาส',histTitle:'ประวัติคลาส',
+    logoutBtn:'← กลับ',payMsg:'คลาสของคุณหมดแล้วค่ะ 🧘‍♀️\nกรุณาต่อแพ็คเกจเพื่อจองคลาสต่อไป\nโอนเงินมาที่บัญชีด้านล่าง แล้วแจ้งครูได้เลยนะคะ',
+    lblBank:'ธนาคาร',lblAcctName:'ชื่อบัญชี',lblAcctNum:'เลขบัญชี',
+    copyBtn:'คัดลอกเลขบัญชี',copiedBtn:'คัดลอกแล้ว ✓',
+    mhdAdd:'เพิ่มนักเรียน',addPrivTxt:'ใช้ชื่อเล่นเท่านั้น ห้ามใส่ชื่อจริงหรือข้อมูลส่วนตัว',
+    lblNameF:'ชื่อเล่น',clsLbl:'คลาส',pinWrong:'PIN ไม่ถูกต้อง',
+    bankSaved:'บันทึกข้อมูลธนาคารแล้ว 🏦',noStudents:'ยังไม่มีนักเรียน',
+    addToBegin:'เพิ่มนักเรียนเพื่อเริ่มต้น',removed:'ลบรายการแล้ว',
+    hUsed:'ใช้แล้ว',hLeft:'เหลือ',confirmRemove:'ลบรายการนี้ออก?',
+  }
+};
 
-function loadAll() {
-  try { students = JSON.parse(localStorage.getItem('yj_students') || '[]'); } catch(e) { students = []; }
-  try { pin = localStorage.getItem('yj_pin') || '1234'; } catch(e) {}
-}
-function save() {
-  localStorage.setItem('yj_students', JSON.stringify(students));
-}
-function savePin(p) {
-  localStorage.setItem('yj_pin', p);
+let lang='en', currentTeacherId=null, currentStudentData=null;
+let pi='', supi='', pkv=10, tpkv=10, tid=null, dedId=null;
+let ssym=SYM[0], scol=COL[0], suEmoSel=T_EMOJIS[0];
+let cps='new', cpf='', cpi='';
+
+function t(k){return TR[lang][k]||k;}
+
+/* ── STORAGE ── */
+function getTeachers(){try{return JSON.parse(localStorage.getItem('yj_teachers')||'[]');}catch(e){return[];}}
+function saveTeachers(arr){localStorage.setItem('yj_teachers',JSON.stringify(arr));}
+function getStudents(tid){try{return JSON.parse(localStorage.getItem('yj_s_'+tid)||'[]');}catch(e){return[];}}
+function saveStudents(tid,arr){localStorage.setItem('yj_s_'+tid,JSON.stringify(arr));}
+function getBank(tid){try{const b=JSON.parse(localStorage.getItem('yj_b_'+tid)||'{}');return{bank:b.bank||'',name:b.name||'',num:b.num||''};}catch(e){return{bank:'',name:'',num:''};}}
+function saveBank2(tid,b){localStorage.setItem('yj_b_'+tid,JSON.stringify(b));}
+
+/* ── LANG ── */
+function toggleLang(){lang=lang==='en'?'th':'en';localStorage.setItem('yj_lang',lang);applyLang();}
+function applyLang(){
+  const L=TR[lang];
+  const set=(id,k)=>{const e=document.getElementById(id);if(e&&L[k]!==undefined)e.textContent=L[k];};
+  document.querySelectorAll('.lang-btn').forEach(b=>b.textContent=L.langBtn);
+  set('h-sub','sub');set('h-title','hTitle');set('h-sub2','hSub');
+  set('role-student','roleStudent');set('role-student-sub','roleStudentSub');
+  set('role-teacher','roleTeacher');set('role-teacher-sub','roleTeacherSub');
+  set('sl-sub','slSub');set('sl-hd','slHd');set('sl-sub2','slSub2');
+  set('find-btn','findBtn');set('find-hint','findHint');
+  set('ts-sub','tsSub');set('ts-title','tsTitle');set('ts-sub2','tsSub2');
+  set('new-teacher-btn','newTeacher');
+  set('su-sub','suSub');set('su-hd','suHd');set('su-sub2','suSub2');
+  set('priv-title','privTitle');set('priv-text','privText');
+  set('su-name-lbl','suNameLbl');set('su-emo-lbl','suEmoLbl');set('su-pin-lbl','suPinLbl');
+  set('su-create-btn','suCreateBtn');set('login-sub-lbl','loginSub');
+  set('logout-student-btn','logoutBtn');
+  set('mhd-add','mhdAdd');set('lbl-name-f','lblNameF');set('add-priv-txt','addPrivTxt');
+  set('lbl-bank','lblBank');set('lbl-acct-name','lblAcctName');set('lbl-acct-num','lblAcctNum');
+  set('copy-lbl','copyBtn');
+  ['cls-lbl1','cls-lbl2','cls-lbl3','tcls-lbl1','tcls-lbl2','tcls-lbl3'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=L.clsLbl;});
+  renderTeacherList();
+  if(currentStudentData)renderStudentView(currentStudentData.student, currentStudentData.teacher);
 }
 
 /* ── SCREENS ── */
-function showStudent() {
-  document.getElementById('student-screen').style.display = 'block';
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'none';
-  pinInput = ''; updateDots(['d0','d1','d2','d3'], 0);
-  document.getElementById('login-err').textContent = '';
-  renderStudent();
-}
-function showLogin() {
-  document.getElementById('student-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('admin-screen').style.display = 'none';
-}
-function showAdmin() {
-  document.getElementById('student-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
-  renderAdmin();
-}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function goHome(){currentTeacherId=null;currentStudentData=null;pi='';go('home-screen');}
+function showTeacherList(){go('teacher-select-screen');renderTeacherList();}
 
-/* ── STUDENT RENDER ── */
-function sRing(rem, total, color) {
-  const r=30, cx=36, cy=36, circ=2*Math.PI*r;
-  const pct = Math.max(0, Math.min(1, rem/total));
-  const dash = circ*pct, gap = circ*(1-pct), offset = circ*0.25;
-  return `<svg width="72" height="72" viewBox="0 0 72 72" style="overflow:visible">
-    <circle class="ring-bg" cx="${cx}" cy="${cy}" r="${r}"/>
-    <circle class="ring-fill" cx="${cx}" cy="${cy}" r="${r}" stroke="${color.ring}"
-      stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}"
-      stroke-dashoffset="${offset.toFixed(1)}"
-      transform="rotate(-90 ${cx} ${cy})"/>
-    <text class="ring-txt" x="${cx}" y="${cy-5}" fill="${color.text}">${rem}</text>
-    <text class="ring-lbl" x="${cx}" y="${cy+9}" fill="${color.text}">classes</text>
-  </svg>`;
-}
-function renderStudent() {
-  const el = document.getElementById('student-cards');
-  if (!students.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🧘‍♀️</div><div class="empty-txt">No students yet</div></div>`;
+/* ── STUDENT LOGIN ── */
+function findStudent(){
+  const raw=document.getElementById('student-name-input').value.trim();
+  if(!raw){document.getElementById('find-err').textContent=t('notFound');return;}
+  const name=raw.toLowerCase();
+  const teachers=getTeachers();
+  let found=null, foundTeacher=null;
+  for(const tc of teachers){
+    const students=getStudents(tc.id);
+    const match=students.find(s=>s.n.toLowerCase()===name);
+    if(match){found=match;foundTeacher=tc;break;}
+  }
+  if(!found){
+    document.getElementById('find-err').textContent=t('notFound');
+    document.getElementById('student-name-input').classList.add('shake');
+    setTimeout(()=>document.getElementById('student-name-input').classList.remove('shake'),400);
     return;
   }
-  el.innerHTML = `<div class="student-grid">${students.map(s => {
-    const rem = s.total - s.used, c = s.color || COLORS[0];
-    const pct = rem / s.total;
-    const statusCls = rem===0 ? 'status-out' : pct<=0.25 ? 'status-low' : 'status-ok';
-    const statusTxt = rem===0 ? 'All used' : pct<=0.25 ? 'Running low' : 'Active';
-    return `<div class="s-card" style="background:${c.bg}">
-      <div class="s-sym">${s.symbol}</div>
-      <div class="s-name" style="color:${c.text}">${s.name}</div>
-      <div class="s-ring">${sRing(rem, s.total, c)}</div>
-      <div class="s-status ${statusCls}">${statusTxt}</div>
-    </div>`;
-  }).join('')}</div>`;
+  document.getElementById('find-err').textContent='';
+  currentStudentData={student:found, teacher:foundTeacher};
+  renderStudentView(found, foundTeacher);
+  go('student-view-screen');
 }
 
-/* ── ADMIN RENDER ── */
-function aRing(rem, total, color) {
-  const r=30, cx=36, cy=36, circ=2*Math.PI*r;
-  const pct = Math.max(0, Math.min(1, rem/total));
-  const dash = circ*pct, gap = circ*(1-pct), offset = circ*0.25;
-  return `<svg width="72" height="72" viewBox="0 0 72 72" style="overflow:visible">
-    <circle class="ring-bg" cx="${cx}" cy="${cy}" r="${r}"/>
-    <circle class="ring-fill" cx="${cx}" cy="${cy}" r="${r}" stroke="${color.ring}"
-      stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}"
-      stroke-dashoffset="${offset.toFixed(1)}"
-      transform="rotate(-90 ${cx} ${cy})"/>
-    <text class="ring-txt" x="${cx}" y="${cy-5}" fill="${color.text}">${rem}</text>
-    <text class="ring-lbl" x="${cx}" y="${cy+9}" fill="${color.text}">left</text>
+/* ── STUDENT VIEW ── */
+function bigRing(rem,tot,c){
+  const r=56,cx=70,cy=70,circ=2*Math.PI*r,p=Math.max(0,Math.min(1,rem/tot));
+  const da=circ*p,ga=circ*(1-p),off=circ*.25;
+  return`<svg width="140" height="140" viewBox="0 0 140 140" style="overflow:visible">
+    <circle fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="8" cx="${cx}" cy="${cy}" r="${r}"/>
+    <circle fill="none" stroke="${c.rg}" stroke-width="8" stroke-linecap="round" cx="${cx}" cy="${cy}" r="${r}"
+      stroke-dasharray="${da.toFixed(1)} ${ga.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>
   </svg>`;
 }
-function renderAdmin() {
-  const el = document.getElementById('admin-cards');
-  if (!students.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🧘‍♀️</div><div class="empty-txt">Add a student to begin</div></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="admin-cards">${students.map(s => {
-    const rem = s.total - s.used, c = s.color || COLORS[0];
-    return `<div class="a-card" style="background:${c.bg}">
-      <button class="del-btn" onclick="removeStudent('${s.id}')">×</button>
-      <span class="a-sym">${s.symbol}</span>
-      <div class="a-name" style="color:${c.text}">${s.name}</div>
-      <div class="a-ring">${aRing(rem, s.total, c)}</div>
-      <div class="a-btns">
-        <button class="a-btn" onclick="deduct('${s.id}')" ${rem===0?'disabled':''}>−</button>
-        <button class="a-btn" onclick="openTopup('${s.id}')">＋</button>
+function fmtDateStr(str){if(!str)return'';const d=new Date(str+'T12:00:00');return d.toLocaleDateString(lang==='th'?'th-TH':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
+function fmtTs(ts){const d=new Date(ts);return d.toLocaleDateString(lang==='th'?'th-TH':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
+function today(){return new Date().toISOString().split('T')[0];}
+
+function renderStudentView(s, tc){
+  const rem=s.t-s.u, c=s.c||COL[0];
+  const pct=rem/s.t;
+  const scl=rem===0?'sout':pct<=.25?'slow':'sok';
+  const stx=rem===0?t('out'):pct<=.25?t('low'):t('active');
+  const wMain=(t('wMain')||'Hi {name}! 🙏').replace('{name}', s.n);
+  const histHtml = s.h&&s.h.length
+    ? s.h.map((e,i)=>`<div class="hist-item-row"><span class="hi-num">${s.h.length-i}</span><span class="hi-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</span></div>`).join('')
+    : `<div class="no-hist-txt">${t('noHist')}</div>`;
+
+  const area=document.getElementById('student-card-area');
+  area.innerHTML=`
+    <div class="student-card-big" style="background:${c.bg}">
+      <div class="sc-sym">${s.sym}</div>
+      <div class="sc-name" style="color:${c.tx}">${wMain}</div>
+      <div class="sc-teacher" style="color:${c.tx}">with ${tc?tc.name:''}</div>
+      <div class="sc-ring-wrap">
+        ${bigRing(rem,s.t,c)}
+        <div class="sc-ring-inner">
+          <div class="sc-rem" style="color:${c.tx}">${rem}</div>
+          <div class="sc-lbl" style="color:${c.tx}">${t('left')}</div>
+        </div>
+      </div>
+      <div class="sc-status ${scl}">${stx}</div>
+      ${rem===0?`<button onclick="showPay()" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:12px;font-family:inherit">🙏 ${lang==='th'?'ต่อแพ็คเกจ':'Renew package'}</button>`:''}
+      <button class="topup-student-btn" onclick="openStuTopup()">
+        💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}
+      </button>
+      <div class="hist-section">
+        <div class="hist-sec-title" style="color:${c.tx}">${t('histTitle')}</div>
+        ${histHtml}
       </div>
     </div>`;
-  }).join('')}</div>`;
 }
 
-/* ── PIN LOGIN ── */
-function updateDots(ids, len) {
-  for (let i = 0; i < 4; i++) document.getElementById(ids[i]).classList.toggle('filled', i < len);
+function showPay(){
+  if(!currentStudentData)return;
+  const {student:s, teacher:tc}=currentStudentData;
+  const bk=getBank(tc.id);
+  document.getElementById('pay-sname').textContent=`${s.sym} ${s.n}`;
+  document.getElementById('pay-msg').textContent=t('payMsg');
+  document.getElementById('lbl-bank').textContent=t('lblBank');
+  document.getElementById('lbl-acct-name').textContent=t('lblAcctName');
+  document.getElementById('lbl-acct-num').textContent=t('lblAcctNum');
+  const dBank=decryptBank(bk.bank,tc.id)||'';
+  const dName=decryptBank(bk.name,tc.id)||'';
+  const dNum=decryptBank(bk.num,tc.id)||'';
+  const notSet=lang==='th'?'(ยังไม่ได้ตั้งค่า)':'(not set)';
+  document.getElementById('pm-bank').textContent=dBank||notSet;
+  document.getElementById('pm-name').textContent=dName||notSet;
+  // Masked account number with reveal
+  const masked=dNum?maskAcct(dNum):notSet;
+  document.getElementById('pm-num').innerHTML=dNum
+    ?`<div class="masked-num" id="masked-num-display">${masked}</div>
+      <button class="reveal-btn" id="reveal-num-btn" onclick="revealAcct('${dNum.replace(/'/g,"\'")}')">
+        ${lang==='th'?'แสดงเลขเต็ม / Tap to reveal':'Tap to reveal full number'}
+      </button>`
+    :`<span>${notSet}</span>`;
+  _fullAcctNum=dNum;
+  document.getElementById('copy-lbl').textContent=t('copyBtn');
+  document.getElementById('copy-btn').classList.remove('copied');
+  document.getElementById('pay-m').style.display='flex';
 }
-function numPress(n) {
-  if (pinInput.length >= 4) return;
-  pinInput += n; updateDots(['d0','d1','d2','d3'], pinInput.length);
-  if (pinInput.length === 4) setTimeout(checkPin, 120);
+
+function copyAcct(){
+  const tc=currentStudentData?currentStudentData.teacher:null;
+  const bk=tc?getBank(tc.id):{num:''};
+  const num=bk.num||'';if(!num)return;
+  const done=()=>{document.getElementById('copy-lbl').textContent=t('copiedBtn');document.getElementById('copy-btn').classList.add('copied');setTimeout(()=>{document.getElementById('copy-lbl').textContent=t('copyBtn');document.getElementById('copy-btn').classList.remove('copied');},2500);};
+  if(navigator.clipboard){navigator.clipboard.writeText(num).then(done).catch(()=>{fallbackCopy(num);done();});}
+  else{fallbackCopy(num);done();}
 }
-function numDel() {
-  pinInput = pinInput.slice(0,-1);
-  updateDots(['d0','d1','d2','d3'], pinInput.length);
-  document.getElementById('login-err').textContent = '';
+function fallbackCopy(txt){const e=document.createElement('textarea');e.value=txt;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);}
+
+/* ── TEACHER LIST ── */
+function renderTeacherList(){
+  const list=document.getElementById('teacher-list');if(!list)return;
+  const teachers=getTeachers();
+  if(!teachers.length){list.innerHTML=`<div class="empty" style="padding:1rem 0"><div class="ei">🧘‍♀️</div><p>${t('noStudents')}</p></div>`;return;}
+  list.innerHTML=teachers.map(tc=>{
+    const cnt=getStudents(tc.id).length;
+    return`<div class="teacher-card" onclick="selectTeacher('${tc.id}')">
+      <div class="teacher-avatar">${tc.emoji||'🧘‍♀️'}</div>
+      <div class="teacher-info"><div class="teacher-name">${tc.name}</div><div class="teacher-count">${cnt} student${cnt!==1&&lang==='en'?'s':''}</div></div>
+      <div class="teacher-arrow">›</div>
+    </div>`;
+  }).join('');
 }
-function checkPin() {
-  if (pinInput === pin) { showAdmin(); }
-  else {
-    document.getElementById('login-err').textContent = 'Wrong PIN — try again';
-    document.getElementById('pin-row').classList.add('shake');
-    setTimeout(() => {
-      document.getElementById('pin-row').classList.remove('shake');
-      pinInput = ''; updateDots(['d0','d1','d2','d3'], 0);
-      document.getElementById('login-err').textContent = '';
-    }, 600);
+
+function selectTeacher(id){
+  currentTeacherId=id;
+  const tc=getTeachers().find(x=>x.id===id);if(!tc)return;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||''} ${tc.name}`;
+  pi='';dots(['d0','d1','d2','d3'],0);
+  document.getElementById('lerr').textContent='';
+  go('login-screen');
+}
+
+/* ── SIGNUP ── */
+function buildEmoRow(){
+  document.getElementById('su-emoji-row').innerHTML=T_EMOJIS.map(e=>`<div class="emo-opt${e===suEmoSel?' on':''}" onclick="pickEmo(this,'${e}')">${e}</div>`).join('');
+  document.getElementById('su-name').value='';
+  document.getElementById('su-err').textContent='';
+  supi='';dots(['su-d0','su-d1','su-d2','su-d3'],0);
+}
+function pickEmo(el,e){document.querySelectorAll('.emo-opt').forEach(x=>x.classList.remove('on'));el.classList.add('on');suEmoSel=e;}
+function sunp(n){if(supi.length>=4)return;supi+=n;dots(['su-d0','su-d1','su-d2','su-d3'],supi.length);}
+function sund(){supi=supi.slice(0,-1);dots(['su-d0','su-d1','su-d2','su-d3'],supi.length);}
+function createTeacher(){
+  const name=document.getElementById('su-name').value.trim();
+  if(!name){document.getElementById('su-err').textContent='Please enter your name';return;}
+  if(supi.length<4){document.getElementById('su-err').textContent='Please set a 4-digit PIN';return;}
+  const teachers=getTeachers();
+  const id='t_'+Date.now();
+  teachers.push({id,name,emoji:suEmoSel,pin:supi});
+  saveTeachers(teachers);
+  currentTeacherId=id;
+  const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=suEmoSel;
+  const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=name;
+  toast(`Welcome ${name}! 🎉`);
+  go('av');renderA();
+}
+
+/* ── PIN ── */
+function dots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('on',i<n);});}
+function np(n){if(pi.length>=4)return;pi+=n;dots(['d0','d1','d2','d3'],pi.length);if(pi.length===4)setTimeout(chkPin,120);}
+function nd(){pi=pi.slice(0,-1);dots(['d0','d1','d2','d3'],pi.length);document.getElementById('lerr').textContent='';}
+function chkPin(){
+  const tc=getTeachers().find(x=>x.id===currentTeacherId);if(!tc)return;
+  if(pi===tc.pin){
+    const avAva=document.getElementById('av-ava');if(avAva)avAva.textContent=tc.emoji||'🧘‍♀️';
+    const avNm=document.getElementById('av-nm');if(avNm)avNm.textContent=tc.name;
+    go('av');renderA();
+  } else {
+    document.getElementById('lerr').textContent=t('pinWrong');
+    document.getElementById('dots').classList.add('shake');
+    setTimeout(()=>{document.getElementById('dots').classList.remove('shake');pi='';dots(['d0','d1','d2','d3'],0);document.getElementById('lerr').textContent='';},600);
   }
 }
 
 /* ── CHANGE PIN ── */
-let cpStep = 'new', cpFirst = '', cpInput = '';
-function startChangePin() {
-  cpStep = 'new'; cpInput = ''; cpFirst = '';
-  document.getElementById('cp-title').textContent = 'Enter new PIN';
-  document.getElementById('cp-err').textContent = '';
-  updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
-  document.getElementById('cp-modal').style.display = 'flex';
-}
-function cpPress(n) {
-  if (cpInput.length >= 4) return;
-  cpInput += n; updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], cpInput.length);
-  if (cpInput.length === 4) setTimeout(handleCp, 120);
-}
-function cpDel() { cpInput = cpInput.slice(0,-1); updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], cpInput.length); }
-function handleCp() {
-  if (cpStep === 'new') {
-    cpFirst = cpInput; cpInput = ''; cpStep = 'confirm';
-    document.getElementById('cp-title').textContent = 'Confirm new PIN';
-    document.getElementById('cp-err').textContent = '';
-    updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
-  } else {
-    if (cpInput !== cpFirst) {
-      document.getElementById('cp-err').textContent = "PINs don't match";
-      document.getElementById('cp-row').classList.add('shake');
-      setTimeout(() => {
-        document.getElementById('cp-row').classList.remove('shake');
-        cpInput = ''; cpFirst = ''; cpStep = 'new';
-        document.getElementById('cp-title').textContent = 'Enter new PIN';
-        document.getElementById('cp-err').textContent = '';
-        updateDots(['cp-d0','cp-d1','cp-d2','cp-d3'], 0);
-      }, 700);
-      return;
-    }
-    pin = cpFirst; savePin(pin); closeCp(); toast('PIN updated ✓');
+function startCp(){cps='new';cpi='';cpf='';document.getElementById('cpt').textContent='New PIN';document.getElementById('cperr').textContent='';dots(['cp0','cp1','cp2','cp3'],0);document.getElementById('cp-m').style.display='flex';}
+function cpp(n){if(cpi.length>=4)return;cpi+=n;dots(['cp0','cp1','cp2','cp3'],cpi.length);if(cpi.length===4)setTimeout(hcp,120);}
+function cpd(){cpi=cpi.slice(0,-1);dots(['cp0','cp1','cp2','cp3'],cpi.length);}
+function hcp(){
+  if(cps==='new'){cpf=cpi;cpi='';cps='confirm';document.getElementById('cpt').textContent='Confirm PIN';document.getElementById('cperr').textContent='';dots(['cp0','cp1','cp2','cp3'],0);}
+  else{
+    if(cpi!==cpf){document.getElementById('cperr').textContent="PINs don't match";document.getElementById('cp-dots').classList.add('shake');setTimeout(()=>{document.getElementById('cp-dots').classList.remove('shake');cpi='';cpf='';cps='new';document.getElementById('cpt').textContent='New PIN';document.getElementById('cperr').textContent='';dots(['cp0','cp1','cp2','cp3'],0);},700);return;}
+    const teachers=getTeachers();const tc=teachers.find(x=>x.id===currentTeacherId);
+    if(tc){tc.pin=cpf;saveTeachers(teachers);}
+    cm('cp-m');toast('PIN updated ✓');
   }
 }
-function closeCp() { document.getElementById('cp-modal').style.display = 'none'; }
 
-/* ── ADMIN ACTIONS ── */
-function deduct(id) {
-  const s = students.find(x => x.id === id);
-  if (!s || s.used >= s.total) return;
-  s.used++; save(); renderAdmin(); renderStudent();
-  toast(`${s.symbol} ${s.name} · ${s.total - s.used} left`);
-}
-function removeStudent(id) {
-  const s = students.find(x => x.id === id);
-  if (!confirm(`Remove ${s ? s.name : 'student'}?`)) return;
-  students = students.filter(x => x.id !== id); save(); renderAdmin();
-}
-function manageOpen() {
-  const list = document.getElementById('manage-list');
-  if (!students.length) {
-    list.innerHTML = '<div style="text-align:center;color:var(--gray-lt);font-size:13px;padding:1rem">No students yet</div>';
-  } else { renderManageList(); }
-  document.getElementById('manage-modal').style.display = 'flex';
-}
-function renderManageList() {
-  document.getElementById('manage-list').innerHTML = students.map(s => {
-    const rem = s.total - s.used;
-    return `<div class="manage-row">
-      <div class="manage-info"><span class="m-sym">${s.symbol}</span>
-        <div><div class="m-name">${s.name}</div><div class="m-sub">${rem} left · ${s.used}/${s.total}</div></div>
+/* ── ADMIN ── */
+function renderA(){
+  const S=getStudents(currentTeacherId);
+  const el=document.getElementById('ac');
+  if(!S.length){el.innerHTML=`<div class="empty"><div class="ei">🧘‍♀️</div><p>${t('addToBegin')}</p></div>`;return;}
+  el.innerHTML=`<div class="adm-grid">${S.map(s=>{
+    const rem=s.t-s.u,c=s.c||COL[0];
+    return`<div class="a-card" style="background:${c.bg}">
+      <button class="x-btn" onclick="del('${s.id}')">×</button>
+      <span class="a-sym">${s.sym}</span>
+      <div class="a-name" style="color:${c.tx}">${s.n}</div>
+      <div class="a-counts">
+        <div class="a-stat"><div class="a-val" style="color:${c.tx}">${rem}</div><div class="a-lbl">${t('left')}</div></div>
+        <div class="a-stat"><div class="a-val" style="color:${c.tx}">${s.u}</div><div class="a-lbl">${t('hUsed')}</div></div>
       </div>
-      <div class="m-btns">
-        <button class="m-btn minus" onclick="adj('${s.id}',-1)" ${s.used===0?'disabled':''}>−</button>
-        <span class="m-count">${s.used}</span>
-        <button class="m-btn plus" onclick="adj('${s.id}',1)" ${s.used>=s.total?'disabled':''}>+</button>
+      <div class="a-btns">
+        <button class="a-btn" onclick="openDeduct('${s.id}')" ${rem===0?'disabled':''}>−</button>
+        <button class="a-btn sm" onclick="openHist('${s.id}')">📋</button>
+        <button class="a-btn sm" onclick="openEdit('${s.id}')" title="Edit">✏️</button>
+        <button class="a-btn" onclick="openTop('${s.id}')">＋</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openDeduct(id){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
+  dedId=id;
+  document.getElementById('dt-sym').textContent=s.sym;
+  document.getElementById('dt-name').textContent=s.n;
+  document.getElementById('dt-rem').textContent=`${s.t-s.u} left`;
+  document.getElementById('dt-date').value=today();
+  document.getElementById('date-m').style.display='flex';
+}
+function confirmDeduct(){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===dedId);if(!s||s.u>=s.t)return;
+  const dateVal=document.getElementById('dt-date').value||today();
+  s.u++;if(!s.h)s.h=[];s.h.unshift({ts:Date.now(),d:dateVal});
+  saveStudents(currentTeacherId,S);renderA();cm('date-m');toast(`${s.sym} ${s.n} · ${s.t-s.u} left`);
+}
+function del(id){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);
+  if(!confirm(`Remove ${s?s.n:''}?`))return;
+  saveStudents(currentTeacherId,S.filter(x=>x.id!==id));renderA();
+}
+function openHist(id){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
+  document.getElementById('h-sym').textContent=s.sym;
+  document.getElementById('h-name').textContent=s.n;
+  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · ${s.t-s.u} ${t('hLeft')}`;
+  renderHistList(s,S);
+  document.getElementById('hist-m').style.display='flex';
+}
+function renderHistList(s,S){
+  const el=document.getElementById('h-list');
+  if(!s.h||!s.h.length){el.innerHTML=`<div class="h-empty">${t('noHist')||'No history'}</div>`;return;}
+  el.innerHTML=s.h.map((e,i)=>`
+    <div class="h-item">
+      <div class="h-num">${s.h.length-i}</div>
+      <div style="flex:1"><div class="h-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</div></div>
+      <button class="h-undo" onclick="undoEntry('${s.id}',${i})">${lang==='th'?'ยกเลิก':'Undo'}</button>
+    </div>`).join('');
+}
+function undoEntry(id,idx){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
+  if(!confirm(t('confirmRemove')))return;
+  s.h.splice(idx,1);s.u=Math.max(0,s.u-1);
+  saveStudents(currentTeacherId,S);renderA();renderHistList(s,S);
+  document.getElementById('h-meta').textContent=`${s.u} ${t('hUsed')} · ${s.t-s.u} ${t('hLeft')}`;
+  toast(t('removed'));
+}
+function openFix(){
+  const S=getStudents(currentTeacherId);
+  if(!S.length){document.getElementById('fl').innerHTML=`<div style="text-align:center;color:var(--gl);font-size:13px;padding:1rem">${t('noStudents')}</div>`;}
+  else rfl(S);
+  document.getElementById('fix-m').style.display='flex';
+}
+function rfl(S){
+  if(!S)S=getStudents(currentTeacherId);
+  document.getElementById('fl').innerHTML=S.map(s=>`
+    <div class="mrow">
+      <div class="minfo"><span class="msym2">${s.sym}</span>
+        <div><div class="mname2">${s.n}</div><div class="msub2">${s.t-s.u} left · ${s.u}/${s.t}</div></div>
+      </div>
+      <div class="mbtns">
+        <button class="mbtn mi" onclick="adj('${s.id}',-1)" ${s.u===0?'disabled':''}>−</button>
+        <span class="mct">${s.u}</span>
+        <button class="mbtn mp" onclick="adj('${s.id}',1)" ${s.u>=s.t?'disabled':''}>+</button>
+      </div>
+    </div>`).join('');
+}
+function adj(id,d){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);if(!s)return;
+  const old=s.u;s.u=Math.max(0,Math.min(s.t,s.u+d));
+  if(d>0&&s.u>old){if(!s.h)s.h=[];s.h.unshift({ts:Date.now(),d:today()});}
+  if(d<0&&s.u<old&&s.h&&s.h.length)s.h.shift();
+  saveStudents(currentTeacherId,S);renderA();rfl(S);toast(`${s.sym} ${s.n} · ${s.t-s.u} left`);
+}
+function openBank(){
+  bpi='';dots(['bp-d0','bp-d1','bp-d2','bp-d3'],0);
+  document.getElementById('bpin-err').textContent='';
+  document.getElementById('bank-pin-m').style.display='flex';
+}
+function openBankActual(){
+  const bk=getBank(currentTeacherId);
+  document.getElementById('b-bank').value=decryptBank(bk.bank,currentTeacherId);
+  document.getElementById('b-name').value=decryptBank(bk.name,currentTeacherId);
+  document.getElementById('b-num').value=decryptBank(bk.num,currentTeacherId);
+  document.getElementById('bank-m').style.display='flex';
+}
+function saveBank(){
+  const rawBank=document.getElementById('b-bank').value.trim();
+  const rawName=document.getElementById('b-name').value.trim();
+  const rawNum=document.getElementById('b-num').value.trim();
+  const bk={
+    bank:encryptBank(rawBank,currentTeacherId),
+    name:encryptBank(rawName,currentTeacherId),
+    num:encryptBank(rawNum,currentTeacherId),
+    enc:true
+  };
+  saveBank2(currentTeacherId,bk);
+  cm('bank-m');toast(t('bankSaved'));
+}
+
+/* ── ADD STUDENT ── */
+function bsg(){document.getElementById('sg').innerHTML=SYM.map(s=>`<button class="sopt${s===ssym?' on':''}" onclick="psy(this,'${s}')" type="button">${s}</button>`).join('');}
+function bcr(){document.getElementById('cr').innerHTML=COL.map((c,i)=>`<div class="cdot${c===scol?' on':''}" style="background:${c.bg};border-color:${c.rg}" onclick="pcl(this,${i})"></div>`).join('');}
+function psy(el,s){document.querySelectorAll('.sopt').forEach(e=>e.classList.remove('on'));el.classList.add('on');ssym=s;document.getElementById('ps').textContent=s;}
+function pcl(el,i){document.querySelectorAll('.cdot').forEach(e=>e.classList.remove('on'));el.classList.add('on');scol=COL[i];document.getElementById('pc').style.background=scol.bg;document.getElementById('pn').style.color=scol.tx;}
+function upPrev(){document.getElementById('pn').textContent=document.getElementById('inp').value.trim()||t('lblNameF');}
+function spk(el){document.querySelectorAll('#pkr .pko').forEach(e=>e.classList.remove('on'));el.classList.add('on');pkv=parseInt(el.dataset.v);document.getElementById('pp').textContent=pkv+' '+t('clsLbl');}
+function stpk(el){document.querySelectorAll('#tpkr .pko').forEach(e=>e.classList.remove('on'));el.classList.add('on');tpkv=parseInt(el.dataset.v);}
+function openAdd(){
+  ssym=SYM[0];scol=COL[0];pkv=10;
+  document.getElementById('inp').value='';
+  document.getElementById('ps').textContent=ssym;
+  document.getElementById('pn').textContent=t('lblNameF');
+  document.getElementById('pn').style.color=scol.tx;
+  document.getElementById('pp').textContent='10 '+t('clsLbl');
+  document.getElementById('pc').style.background=scol.bg;
+  document.getElementById('add-priv-txt').textContent=t('addPrivTxt');
+  document.querySelectorAll('#pkr .pko').forEach(e=>e.classList.toggle('on',e.dataset.v==='10'));
+  bsg();bcr();
+  document.getElementById('add-m').style.display='flex';
+  setTimeout(()=>document.getElementById('inp').focus(),60);
+}
+function saveSt(){
+  const n=document.getElementById('inp').value.trim();if(!n)return;
+  const S=getStudents(currentTeacherId);
+  S.push({id:'s_'+Date.now(),n,sym:ssym,c:scol,t:pkv,u:0,h:[]});
+  saveStudents(currentTeacherId,S);renderA();cm('add-m');toast(`${ssym} ${n} added`);
+}
+function openTop(id){
+  tid=id;const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===id);
+  document.getElementById('tn').textContent=s?`${s.sym} ${s.n}`:'';
+  tpkv=10;document.querySelectorAll('#tpkr .pko').forEach(e=>e.classList.toggle('on',e.dataset.v==='10'));
+  document.getElementById('top-m').style.display='flex';
+}
+function doTop(){
+  const S=getStudents(currentTeacherId);const s=S.find(x=>x.id===tid);if(!s)return;
+  s.t+=tpkv;saveStudents(currentTeacherId,S);renderA();cm('top-m');
+  toast(`+${tpkv} ${t('clsLbl')} · ${s.sym} ${s.n}`);
+}
+
+function cm(id){document.getElementById(id).style.display='none';}
+let tt;
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2600);}
+
+document.querySelectorAll('.mbg').forEach(b=>b.addEventListener('click',function(e){if(e.target===this)this.style.display='none';}));
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveSt();});
+document.getElementById('student-name-input').addEventListener('keydown',e=>{if(e.key==='Enter')findStudent();});
+document.getElementById('su-name').addEventListener('keydown',e=>{if(e.key==='Enter')createTeacher();});
+
+
+
+/* ═══════════════════════════════════════════
+   SUPER ADMIN
+═══════════════════════════════════════════ */
+let saPin = '0000'; // default — change on first login
+let sapi = '', sacps = 'new', sacpf = '', sacpi = '';
+
+function loadSaPin(){try{saPin=localStorage.getItem('yj_sapin')||'0000';}catch(e){}}
+function saveSaPin(p){try{localStorage.setItem('yj_sapin',p);}catch(e){}}
+function loadGasUrl(){try{const u=localStorage.getItem('yj_gas_url')||'';const el=document.getElementById('gas-url');if(el)el.value=u;}catch(e){}}
+function saveGasUrl(u){try{localStorage.setItem('yj_gas_url',u);}catch(e){}}
+
+// Triple tap on home logo
+let _slt=0,_sltimer;
+function homeLogoTap(){
+  _slt++;clearTimeout(_sltimer);
+  if(_slt>=3){_slt=0;openSaLogin();return;}
+  _sltimer=setTimeout(()=>_slt=0,600);
+}
+
+function openSaLogin(){
+  document.querySelectorAll('.screen,.sa-screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.screen,.sa-screen').forEach(s=>{s.style.display='none';});
+  sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);
+  document.getElementById('sa-err').textContent='';
+  const el=document.getElementById('sa-login-screen');
+  el.style.display='flex';el.classList.add('on');
+}
+
+function saBack(){
+  document.querySelectorAll('.sa-screen').forEach(s=>{s.style.display='none';s.classList.remove('on');});
+  document.getElementById('home-screen').style.display='block';
+  document.getElementById('home-screen').classList.add('on');
+}
+
+function saDots(ids,n){ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.classList.toggle('on',i<n);});}
+function sanp(n){if(sapi.length>=4)return;sapi+=n;saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);if(sapi.length===4)setTimeout(chkSaPin,120);}
+function sand(){sapi=sapi.slice(0,-1);saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],sapi.length);document.getElementById('sa-err').textContent='';}
+
+function chkSaPin(){
+  if(sapi===saPin){
+    document.getElementById('sa-login-screen').style.display='none';
+    document.getElementById('sa-login-screen').classList.remove('on');
+    const dash=document.getElementById('sa-dashboard-screen');
+    dash.style.display='block';dash.classList.add('on');
+    renderSaDashboard();loadGasUrl();
+  } else {
+    document.getElementById('sa-err').textContent='Wrong PIN';
+    document.getElementById('sa-dots').classList.add('shake');
+    setTimeout(()=>{
+      document.getElementById('sa-dots').classList.remove('shake');
+      sapi='';saDots(['sa-d0','sa-d1','sa-d2','sa-d3'],0);
+      document.getElementById('sa-err').textContent='';
+    },600);
+  }
+}
+
+function startSaCp(){sacps='new';sacpi='';sacpf='';document.getElementById('sa-cpt').textContent='New admin PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);document.getElementById('sa-cp-m').style.display='flex';}
+function sacpp(n){if(sacpi.length>=4)return;sacpi+=n;saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],sacpi.length);if(sacpi.length===4)setTimeout(hSaCp,120);}
+function sacpd(){sacpi=sacpi.slice(0,-1);saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],sacpi.length);}
+function hSaCp(){
+  if(sacps==='new'){sacpf=sacpi;sacpi='';sacps='confirm';document.getElementById('sa-cpt').textContent='Confirm PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);}
+  else{
+    if(sacpi!==sacpf){document.getElementById('sa-cperr').textContent="PINs don't match";document.getElementById('sa-cp-dots').classList.add('shake');setTimeout(()=>{document.getElementById('sa-cp-dots').classList.remove('shake');sacpi='';sacpf='';sacps='new';document.getElementById('sa-cpt').textContent='New admin PIN';document.getElementById('sa-cperr').textContent='';saDots(['sa-cp0','sa-cp1','sa-cp2','sa-cp3'],0);},700);return;}
+    saPin=sacpf;saveSaPin(saPin);cm('sa-cp-m');toast('Admin PIN updated ✓');
+  }
+}
+
+/* DASHBOARD */
+function renderSaDashboard(){
+  const teachers=getTeachers();
+  let totalStudents=0,totalUsed=0,totalRemaining=0,totalClasses=0;
+  teachers.forEach(tc=>{
+    const S=getStudents(tc.id);
+    totalStudents+=S.length;
+    S.forEach(s=>{totalUsed+=s.u;totalRemaining+=(s.t-s.u);totalClasses+=s.t;});
+  });
+
+  document.getElementById('sa-stats').innerHTML=`
+    <div class="sa-stat-card"><div class="sa-stat-val">${teachers.length}</div><div class="sa-stat-lbl">Teachers</div></div>
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalStudents}</div><div class="sa-stat-lbl">Students</div></div>
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalUsed}</div><div class="sa-stat-lbl">Classes used</div></div>
+    <div class="sa-stat-card"><div class="sa-stat-val">${totalRemaining}</div><div class="sa-stat-lbl">Classes left</div></div>`;
+
+  const list=document.getElementById('sa-teacher-list');
+  if(!teachers.length){list.innerHTML='<div class="empty"><p>No teachers yet</p></div>';return;}
+  list.innerHTML=teachers.map(tc=>{
+    const S=getStudents(tc.id);
+    const used=S.reduce((a,s)=>a+s.u,0);
+    const rem=S.reduce((a,s)=>a+(s.t-s.u),0);
+    const total=S.reduce((a,s)=>a+s.t,0);
+    const bk=getBank(tc.id);
+    return`<div class="sa-teacher-row">
+      <div class="sa-tr-top">
+        <div class="sa-tr-info">
+          <div class="sa-tr-ava">${tc.emoji||'🧘‍♀️'}</div>
+          <div>
+            <div class="sa-tr-name">${tc.name}</div>
+            <div class="sa-tr-cnt">${S.length} student${S.length!==1?'s':''} · ${bk.bank||'No bank set'}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button onclick="toggleSaStudents('${tc.id}')" style="background:none;border:1px solid var(--bd);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--gr)">Details</button>
+          <button class="sa-tr-del" onclick="deleteTeacher('${tc.id}','${tc.name}')" title="Delete teacher">🗑</button>
+        </div>
+      </div>
+      <div class="sa-tr-bars">
+        <div class="sa-bar-item"><div class="sa-bar-val">${S.length}</div><div class="sa-bar-lbl">students</div></div>
+        <div class="sa-bar-item"><div class="sa-bar-val">${used}</div><div class="sa-bar-lbl">used</div></div>
+        <div class="sa-bar-item"><div class="sa-bar-val">${rem}</div><div class="sa-bar-lbl">remaining</div></div>
+        <div class="sa-bar-item"><div class="sa-bar-val">${total}</div><div class="sa-bar-lbl">total</div></div>
+      </div>
+      <div class="sa-students-section" id="sa-students-${tc.id}">
+        ${S.length?S.map(s=>`<div class="sa-student-row">
+          <div class="sa-s-name"><span>${s.sym}</span><span>${s.n}</span></div>
+          <div><span class="sa-s-rem">${s.t-s.u}</span><span style="font-size:10px;color:var(--gl)"> / ${s.t}</span></div>
+        </div>`).join(''):'<div style="font-size:12px;color:var(--gl);padding:6px 0">No students yet</div>'}
       </div>
     </div>`;
   }).join('');
 }
-function adj(id, d) {
-  const s = students.find(x => x.id === id); if (!s) return;
-  s.used = Math.max(0, Math.min(s.total, s.used + d));
-  save(); renderAdmin(); renderStudent(); renderManageList();
-  toast(`${s.symbol} ${s.name} · ${s.total - s.used} left`);
-}
-function closeManage() { document.getElementById('manage-modal').style.display = 'none'; }
 
-/* ── ADD / TOPUP ── */
-function buildSymGrid() { document.getElementById('sym-grid').innerHTML = SYMBOLS.map(s => `<button class="sym-opt${s===selectedSym?' sel':''}" onclick="pickSym(this,'${s}')" type="button">${s}</button>`).join(''); }
-function buildColorRow() { document.getElementById('color-row').innerHTML = COLORS.map((c,i) => `<div class="color-dot${c===selectedColor?' sel':''}" style="background:${c.bg};border-color:${c.ring}" onclick="pickColor(this,${i})"></div>`).join(''); }
-function pickSym(el, sym) { document.querySelectorAll('.sym-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selectedSym = sym; document.getElementById('prev-sym').textContent = sym; }
-function pickColor(el, idx) { document.querySelectorAll('.color-dot').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selectedColor = COLORS[idx]; document.getElementById('prev-card').style.background = selectedColor.bg; document.getElementById('prev-name').style.color = selectedColor.text; }
-function updatePreview() { document.getElementById('prev-name').textContent = document.getElementById('inp-name').value.trim() || 'Name'; }
-function selPkg(el) { document.querySelectorAll('#pkg-row .pkg-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selPkgVal = parseInt(el.dataset.v); document.getElementById('prev-pkg').textContent = selPkgVal + ' classes'; }
-function selTopupPkg(el) { document.querySelectorAll('#topup-pkg-row .pkg-opt').forEach(e => e.classList.remove('sel')); el.classList.add('sel'); selTopupVal = parseInt(el.dataset.v); }
-function openAdd() {
-  selectedSym = SYMBOLS[0]; selectedColor = COLORS[0]; selPkgVal = 20;
-  document.getElementById('inp-name').value = '';
-  document.getElementById('prev-sym').textContent = selectedSym;
-  document.getElementById('prev-name').textContent = 'Name';
-  document.getElementById('prev-name').style.color = selectedColor.text;
-  document.getElementById('prev-pkg').textContent = '20 classes';
-  document.getElementById('prev-card').style.background = selectedColor.bg;
-  document.querySelectorAll('#pkg-row .pkg-opt').forEach(e => e.classList.toggle('sel', e.dataset.v === '20'));
-  buildSymGrid(); buildColorRow();
-  document.getElementById('modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('inp-name').focus(), 60);
-}
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
-function saveStudent() {
-  const name = document.getElementById('inp-name').value.trim(); if (!name) return;
-  students.push({ id: Date.now().toString(), name, symbol: selectedSym, color: selectedColor, total: selPkgVal, used: 0 });
-  save(); renderAdmin(); closeModal(); toast(`${selectedSym} ${name} added`);
-}
-function openTopup(id) {
-  topupId = id; const s = students.find(x => x.id === id);
-  document.getElementById('topup-name').textContent = s ? `${s.symbol} ${s.name}` : '';
-  selTopupVal = 20;
-  document.querySelectorAll('#topup-pkg-row .pkg-opt').forEach(e => e.classList.toggle('sel', e.dataset.v === '20'));
-  document.getElementById('topup-modal').style.display = 'flex';
-}
-function closeTopup() { document.getElementById('topup-modal').style.display = 'none'; }
-function doTopup() {
-  const s = students.find(x => x.id === topupId); if (!s) return;
-  s.total += selTopupVal; save(); renderAdmin(); closeTopup();
-  toast(`+${selTopupVal} for ${s.symbol} ${s.name}`);
+function toggleSaStudents(id){
+  const el=document.getElementById('sa-students-'+id);
+  if(el)el.classList.toggle('open');
 }
 
-let tt;
-function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2600); }
+function deleteTeacher(id,name){
+  if(!confirm('Delete teacher "'+name+'" and ALL their student data? This cannot be undone.'))return;
+  const teachers=getTeachers().filter(t=>t.id!==id);
+  saveTeachers(teachers);
+  localStorage.removeItem('yj_s_'+id);
+  localStorage.removeItem('yj_b_'+id);
+  renderSaDashboard();
+  toast(name+' deleted');
+}
 
-document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; }));
-document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveStudent(); });
+/* GAS EXPORT */
+const GAS_SCRIPT = `// ═══════════════════════════════════════════
+// Yoga with Jib — Class Tracker GAS Backend
+// Handles: Data export + LINE + Email notifications
+// ═══════════════════════════════════════════
 
-loadAll();
-showStudent();
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    
+    if (data.action === 'notify') {
+      return handleNotify(data);
+    } else {
+      return handleExport(data);
+    }
+  } catch(err) {
+    return respond({ok: false, error: err.message});
+  }
+}
+
+// ── NOTIFICATION HANDLER ──
+function handleNotify(data) {
+  const results = {ok: true, line: false, email: false};
+  
+  const msg = buildMessage(data);
+  
+  // LINE Notify
+  if (data.lineToken) {
+    try {
+      UrlFetchApp.fetch('https://notify-api.line.me/api/notify', {
+        method: 'post',
+        headers: {'Authorization': 'Bearer ' + data.lineToken},
+        payload: {'message': msg}
+      });
+      results.line = true;
+    } catch(e) { results.lineError = e.message; }
+  }
+  
+  // Email
+  if (data.email) {
+    try {
+      const subject = '💳 Class payment from ' + data.studentSym + ' ' + data.studentName;
+      MailApp.sendEmail(data.email, subject, msg);
+      results.email = true;
+    } catch(e) { results.emailError = e.message; }
+  }
+  
+  results.ok = results.line || results.email;
+  return respond(results);
+}
+
+function buildMessage(d) {
+  let msg = '\n🧘 Class payment notification';
+  msg += '\n━━━━━━━━━━━━━━━━';
+  msg += '\n👤 Student: ' + d.studentSym + ' ' + d.studentName;
+  msg += '\n📦 Package: ' + d.packageSize + ' classes';
+  if (d.amount) msg += '\n💰 Amount: ฿' + d.amount;
+  if (d.note) msg += '\n📝 Note: ' + d.note;
+  msg += '\n🕐 Time: ' + d.timestamp;
+  msg += '\n━━━━━━━━━━━━━━━━';
+  msg += '\nPlease confirm and update their class count.';
+  return msg;
+}
+
+// ── EXPORT HANDLER ──
+function handleExport(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  let sheet = ss.getSheetByName('Teachers') || ss.insertSheet('Teachers');
+  sheet.clearContents();
+  sheet.appendRow(['Name', 'Students', 'Classes Used', 'Classes Remaining']);
+  data.teachers.forEach(t => {
+    sheet.appendRow([t.name, t.studentCount, t.used, t.remaining]);
+  });
+  
+  let sSheet = ss.getSheetByName('Students') || ss.insertSheet('Students');
+  sSheet.clearContents();
+  sSheet.appendRow(['Teacher', 'Student', 'Package', 'Used', 'Remaining', 'Last class']);
+  data.students.forEach(s => {
+    const last = s.history && s.history.length ? s.history[0] : '-';
+    sSheet.appendRow([s.teacher, s.name, s.total, s.used, s.remaining, last]);
+  });
+  
+  let hSheet = ss.getSheetByName('History') || ss.insertSheet('History');
+  hSheet.clearContents();
+  hSheet.appendRow(['Teacher', 'Student', 'Class #', 'Date']);
+  data.students.forEach(s => {
+    (s.history || []).forEach((d, i) => {
+      hSheet.appendRow([s.teacher, s.name, i+1, d]);
+    });
+  });
+  
+  return respond({ok: true});
+}
+
+function respond(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+function showGasInstructions(){
+  document.getElementById('gas-code-block').textContent=GAS_SCRIPT;
+  document.getElementById('gas-m').style.display='flex';
+}
+
+function copyGasCode(){
+  if(navigator.clipboard){navigator.clipboard.writeText(GAS_SCRIPT).then(()=>toast('Code copied!'));}
+  else{const e=document.createElement('textarea');e.value=GAS_SCRIPT;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);toast('Code copied!');}
+}
+
+async function syncToGAS(){
+  const url=document.getElementById('gas-url').value.trim();
+  if(!url){toast('Paste your GAS URL first');return;}
+  saveGasUrl(url);
+  const btn=document.getElementById('gas-sync-btn');
+  btn.disabled=true;btn.textContent='Exporting...';
+
+  const teachers=getTeachers();
+  const payload={
+    exportedAt:new Date().toISOString(),
+    teachers:teachers.map(tc=>{
+      const S=getStudents(tc.id);
+      return{name:tc.name,studentCount:S.length,used:S.reduce((a,s)=>a+s.u,0),remaining:S.reduce((a,s)=>a+(s.t-s.u),0)};
+    }),
+    students:[]
+  };
+  teachers.forEach(tc=>{
+    const S=getStudents(tc.id);
+    S.forEach(s=>{
+      payload.students.push({
+        teacher:tc.name,name:s.n,total:s.t,used:s.u,remaining:s.t-s.u,
+        history:(s.h||[]).map(e=>e.d||new Date(e.ts).toLocaleDateString('en-GB'))
+      });
+    });
+  });
+
+  try{
+    const res=await fetch(url,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+    const json=await res.json();
+    if(json.ok){toast('✓ Exported to Google Sheets!');}
+    else{toast('Error: '+json.error);}
+  }catch(err){
+    toast('Export failed — check your GAS URL');
+  }
+  btn.disabled=false;btn.textContent='Export ↗';
+}
+
+/* init super admin */
+loadSaPin();
+migrateBankData();
+
+
+
+
+
+/* ── NOTIFICATIONS ── */
+let notifyPkgVal=10;
+
+function selNotifyPkg(el){
+  el.parentElement.querySelectorAll('.pko').forEach(e=>{
+    e.classList.remove('on');
+    e.style.borderColor='var(--bd)';e.style.background='#fff';e.style.color='var(--gr)';
+  });
+  el.classList.add('on');
+  el.style.borderColor='var(--pink)';el.style.background='var(--pl)';el.style.color='var(--pink)';
+  notifyPkgVal=parseInt(el.dataset.v);
+}
+
+function resetNotify(){
+  document.getElementById('notify-form').style.display='flex';
+  document.getElementById('notify-success').style.display='none';
+  document.getElementById('notify-amount').value='';
+  document.getElementById('notify-note').value='';
+  document.getElementById('notify-err').textContent='';
+  document.getElementById('notify-btn-lbl').textContent=lang==='th'?'แจ้งครู':'Notify teacher';
+  document.getElementById('notify-send-btn').disabled=false;
+  document.getElementById('notify-send-btn').style.opacity='1';
+  notifyPkgVal=10;
+}
+
+async function sendNotification(){
+  if(!currentStudentData)return;
+  const {student:s,teacher:tc}=currentStudentData;
+  const ct=getContact(tc.id);
+  const amount=document.getElementById('notify-amount').value.trim();
+  const note=document.getElementById('notify-note').value.trim();
+  const gasUrl=localStorage.getItem('yj_gas_url')||'';
+
+  if(!ct.lineToken&&!ct.email){
+    document.getElementById('notify-err').textContent=
+      lang==='th'?'ครูยังไม่ได้ตั้งค่าการแจ้งเตือน กรุณาติดต่อครูโดยตรง'
+      :'Teacher has not set up notifications yet. Please contact them directly.';
+    return;
+  }
+  if(!gasUrl){
+    document.getElementById('notify-err').textContent=
+      'Notification service not configured. Ask admin to set up Google Apps Script.';
+    return;
+  }
+
+  const btn=document.getElementById('notify-send-btn');
+  btn.disabled=true;btn.style.opacity='.6';
+  document.getElementById('notify-btn-lbl').textContent=lang==='th'?'กำลังส่ง...':'Sending...';
+  document.getElementById('notify-err').textContent='';
+
+  const payload={
+    action:'notify',
+    lineToken:ct.lineToken,
+    email:ct.email,
+    teacherName:tc.name,
+    studentName:s.n,
+    studentSym:s.sym,
+    packageSize:notifyPkgVal,
+    amount:amount||'',
+    note:note||'',
+    timestamp:new Date().toLocaleString(lang==='th'?'th-TH':'en-GB'),
+  };
+
+  try{
+    const res=await fetch(gasUrl,{method:'POST',body:JSON.stringify(payload)});
+    const json=await res.json();
+    if(json.ok){
+      document.getElementById('notify-form').style.display='none';
+      document.getElementById('notify-success').style.display='block';
+      document.getElementById('notify-success-msg').textContent=
+        lang==='th'?'แจ้งครูแล้วค่ะ! ✅':'Teacher notified! ✅';
+      document.getElementById('notify-success-sub').textContent=
+        lang==='th'?'ครูจะยืนยันการชำระเงินของคุณในไม่ช้า':'They will confirm your payment shortly';
+    } else {
+      throw new Error(json.error||'Failed');
+    }
+  }catch(err){
+    document.getElementById('notify-err').textContent=
+      lang==='th'?'ส่งไม่สำเร็จ กรุณาติดต่อครูโดยตรง':'Send failed. Please contact your teacher directly.';
+    btn.disabled=false;btn.style.opacity='1';
+    document.getElementById('notify-btn-lbl').textContent=lang==='th'?'แจ้งครู':'Notify teacher';
+  }
+}
+
+/* ── CONTACT INFO ── */
+function getContact(tid){
+  try{const c=JSON.parse(localStorage.getItem('yj_c_'+tid)||'{}');
+    return{phone:c.phone||'',line:c.line||'',email:c.email||'',lineToken:c.lineToken||''};}
+  catch(e){return{phone:'',line:'',email:'',lineToken:''};}
+}
+function saveContactData(tid,c){localStorage.setItem('yj_c_'+tid,JSON.stringify(c));}
+
+function openContact(){
+  const c=getContact(currentTeacherId);
+  document.getElementById('c-phone').value=c.phone;
+  document.getElementById('c-line').value=c.line;
+  document.getElementById('c-email').value=c.email;
+  document.getElementById('c-line-token').value=c.lineToken;
+  document.getElementById('contact-m').style.display='flex';
+  setTimeout(()=>document.getElementById('c-phone').focus(),60);
+}
+function saveContact(){
+  const c={
+    phone:document.getElementById('c-phone').value.trim(),
+    line:document.getElementById('c-line').value.trim(),
+    email:document.getElementById('c-email').value.trim(),
+    lineToken:document.getElementById('c-line-token').value.trim()
+  };
+  saveContactData(currentTeacherId,c);
+  cm('contact-m');
+  toast('Contact info saved 📱');
+}
+
+/* ── STUDENT TOPUP MODAL ── */
+let _stuFullNum='';
+
+function openStuTopup(){
+  if(!currentStudentData)return;
+  const {student:s, teacher:tc}=currentStudentData;
+  const bk=getBank(tc.id);
+  const ct=getContact(tc.id);
+  const notSet=lang==='th'?'(ยังไม่ได้ตั้งค่า)':'(not set)';
+
+  // title
+  document.getElementById('stu-topup-title').textContent=lang==='th'?'ต่อแพ็คเกจ':'Top up classes';
+  document.getElementById('stu-topup-sub').textContent=lang==='th'?'พร้อมที่จะเรียนต่อแล้วใช่ไหม?':'Ready to continue your yoga journey?';
+  document.getElementById('stu-verify-msg').textContent=lang==='th'
+    ?'ควรตรวจสอบกับครูก่อนโอนเงินทุกครั้งนะคะ ข้อมูลธนาคารอาจมีการเปลี่ยนแปลง — ยืนยันให้แน่ใจก่อนโอนเลยค่ะ'
+    :'Always check with your teacher before transferring. Bank details can change — confirm it is the right account first.';
+
+  // teacher contact
+  document.getElementById('stu-t-ava').textContent=tc.emoji||'🧘‍♀️';
+  document.getElementById('stu-t-name').textContent=tc.name;
+
+  const hasPhone=ct.phone&&ct.phone.length>0;
+  const hasLine=ct.line&&ct.line.length>0;
+
+  document.getElementById('stu-phone-row').style.display=hasPhone?'block':'none';
+  document.getElementById('stu-line-row').style.display=hasLine?'block':'none';
+  document.getElementById('stu-no-contact').style.display=(!hasPhone&&!hasLine)?'block':'none';
+
+  if(hasPhone)document.getElementById('stu-phone-val').textContent=ct.phone;
+  if(hasLine)document.getElementById('stu-line-val').textContent=ct.line;
+
+  // bank info
+  const dBank=decryptBank(bk.bank,tc.id)||'';
+  const dName=decryptBank(bk.name,tc.id)||'';
+  const dNum=decryptBank(bk.num,tc.id)||'';
+  _stuFullNum=dNum;
+
+  document.getElementById('stu-lbl-bank').textContent=t('lblBank');
+  document.getElementById('stu-lbl-name').textContent=t('lblAcctName');
+  document.getElementById('stu-lbl-num').textContent=t('lblAcctNum');
+  document.getElementById('stu-pm-bank').textContent=dBank||notSet;
+  document.getElementById('stu-pm-name').textContent=dName||notSet;
+  document.getElementById('stu-masked-num').textContent=dNum?maskAcct(dNum):notSet;
+
+  const revealBtn=document.getElementById('stu-reveal-btn');
+  revealBtn.textContent=lang==='th'?'แสดงเลขเต็ม / Tap to reveal':'Tap to reveal full number';
+  revealBtn.style.display=dNum?'block':'none';
+
+  const copyBtn=document.getElementById('stu-copy-btn');
+  copyBtn.classList.remove('copied');
+  document.getElementById('stu-copy-lbl').textContent=t('copyBtn');
+  copyBtn.style.display=dNum?'flex':'none';
+
+  document.getElementById('student-topup-m').style.display='flex';
+}
+
+function revealStuAcct(){
+  document.getElementById('stu-masked-num').textContent=_stuFullNum;
+  document.getElementById('stu-reveal-btn').style.display='none';
+}
+
+function copyStuAcct(){
+  if(!_stuFullNum)return;
+  const done=()=>{
+    document.getElementById('stu-copy-lbl').textContent=t('copiedBtn');
+    document.getElementById('stu-copy-btn').classList.add('copied');
+    setTimeout(()=>{
+      document.getElementById('stu-copy-lbl').textContent=t('copyBtn');
+      document.getElementById('stu-copy-btn').classList.remove('copied');
+    },2500);
+  };
+  if(navigator.clipboard){navigator.clipboard.writeText(_stuFullNum).then(done).catch(()=>{fallbackCopy(_stuFullNum);done();});}
+  else{fallbackCopy(_stuFullNum);done();}
+}
+
+let _contactCache={phone:'',line:''};
+function copyContact(type){
+  const ct=currentStudentData?getContact(currentStudentData.teacher.id):{phone:'',line:''};
+  const val=type==='phone'?ct.phone:ct.line;
+  if(!val)return;
+  if(navigator.clipboard){navigator.clipboard.writeText(val).then(()=>toast('Copied!'));}
+  else{fallbackCopy(val);toast('Copied!');}
+}
+
+/* ── BANK ENCRYPTION ── */
+// XOR cipher with teacher-specific key (PIN + teacher ID)
+function makeKey(tid){
+  try{
+    const tc=getTeachers().find(x=>x.id===tid);
+    return (tc?tc.pin:'1234')+(tid||'').slice(-4);
+  }catch(e){return'1234';}
+}
+function encryptBank(text,tid){
+  if(!text)return'';
+  try{
+    const key=makeKey(tid);
+    const enc=text.split('').map((c,i)=>
+      String.fromCharCode(c.charCodeAt(0)^key.charCodeAt(i%key.length))
+    ).join('');
+    return btoa(unescape(encodeURIComponent(enc)));
+  }catch(e){return text;}
+}
+function decryptBank(encoded,tid){
+  if(!encoded)return'';
+  try{
+    const key=makeKey(tid);
+    const dec=decodeURIComponent(escape(atob(encoded)));
+    return dec.split('').map((c,i)=>
+      String.fromCharCode(c.charCodeAt(0)^key.charCodeAt(i%key.length))
+    ).join('');
+  }catch(e){return encoded;} // fallback for unencrypted legacy data
+}
+function maskAcct(num){
+  if(!num)return'';
+  const clean=num.replace(/[-\s]/g,'');
+  if(clean.length<=4)return'••••';
+  return'•'.repeat(clean.length-4)+clean.slice(-4);
+}
+
+// Reveal full account number in payment modal
+let _fullAcctNum='';
+function revealAcct(num){
+  document.getElementById('masked-num-display').textContent=num;
+  document.getElementById('reveal-num-btn').style.display='none';
+}
+
+/* ── BANK PIN CONFIRM ── */
+let bpi='';
+function bpnp(n){
+  if(bpi.length>=4)return;
+  bpi+=n;dots(['bp-d0','bp-d1','bp-d2','bp-d3'],bpi.length);
+  if(bpi.length===4)setTimeout(chkBankPin,120);
+}
+function bpnd(){bpi=bpi.slice(0,-1);dots(['bp-d0','bp-d1','bp-d2','bp-d3'],bpi.length);document.getElementById('bpin-err').textContent='';}
+function chkBankPin(){
+  const tc=getTeachers().find(x=>x.id===currentTeacherId);
+  if(!tc)return;
+  if(bpi===tc.pin){
+    cm('bank-pin-m');
+    openBankActual();
+  } else {
+    document.getElementById('bpin-err').textContent='Wrong PIN';
+    document.getElementById('bpin-dots').classList.add('shake');
+    setTimeout(()=>{
+      document.getElementById('bpin-dots').classList.remove('shake');
+      bpi='';dots(['bp-d0','bp-d1','bp-d2','bp-d3'],0);
+      document.getElementById('bpin-err').textContent='';
+    },600);
+  }
+}
+
+/* ── MIGRATE legacy unencrypted bank data ── */
+function migrateBankData(){
+  const teachers=getTeachers();
+  teachers.forEach(tc=>{
+    const bk=getBank(tc.id);
+    if(bk.bank&&!bk.enc){
+      // data is plaintext — re-save encrypted
+      const encrypted={
+        bank:encryptBank(bk.bank,tc.id),
+        name:encryptBank(bk.name,tc.id),
+        num:encryptBank(bk.num,tc.id),
+        enc:true
+      };
+      saveBank2(tc.id,encrypted);
+    }
+  });
+}
+
+/* ── EDIT STUDENT ── */
+let editId=null, editSym=SYM[0], editCol=COL[0], editPkgVal=10;
+
+function openEdit(id){
+  const S=getStudents(currentTeacherId);
+  const s=S.find(x=>x.id===id);if(!s)return;
+  editId=id;
+  editSym=s.sym||SYM[0];
+  editCol=s.c||COL[0];
+  editPkgVal=s.t||10;
+  document.getElementById('edit-inp').value=s.n;
+  document.getElementById('edit-ps').textContent=editSym;
+  document.getElementById('edit-pn').textContent=s.n;
+  document.getElementById('edit-pn').style.color=editCol.tx;
+  document.getElementById('edit-pp').textContent=`${s.t} classes (${s.t-s.u} left)`;
+  document.getElementById('edit-pc').style.background=editCol.bg;
+  document.getElementById('edit-pkg-val').textContent=editPkgVal;
+  buildEditSg();buildEditCr();
+  document.getElementById('edit-m').style.display='flex';
+  setTimeout(()=>document.getElementById('edit-inp').focus(),60);
+}
+
+function buildEditSg(){
+  document.getElementById('edit-sg').innerHTML=SYM.map(s=>
+    `<button class="sopt${s===editSym?' on':''}" onclick="pickEditSym(this,'${s}')" type="button">${s}</button>`
+  ).join('');
+}
+function buildEditCr(){
+  document.getElementById('edit-cr').innerHTML=COL.map((c,i)=>
+    `<div class="cdot${c===editCol?' on':''}" style="background:${c.bg};border-color:${c.rg}" onclick="pickEditCol(this,${i})"></div>`
+  ).join('');
+}
+function pickEditSym(el,s){
+  document.querySelectorAll('#edit-sg .sopt').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');editSym=s;
+  document.getElementById('edit-ps').textContent=s;
+}
+function pickEditCol(el,i){
+  document.querySelectorAll('#edit-cr .cdot').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');editCol=COL[i];
+  document.getElementById('edit-pc').style.background=editCol.bg;
+  document.getElementById('edit-pn').style.color=editCol.tx;
+}
+function upEditPrev(){
+  const n=document.getElementById('edit-inp').value.trim();
+  document.getElementById('edit-pn').textContent=n||'Name';
+}
+function adjEditPkg(d){
+  const S=getStudents(currentTeacherId);
+  const s=S.find(x=>x.id===editId);if(!s)return;
+  const minVal=s.u||0; // can't set total below already used
+  editPkgVal=Math.max(minVal+1,editPkgVal+d);
+  document.getElementById('edit-pkg-val').textContent=editPkgVal;
+  document.getElementById('edit-pp').textContent=`${editPkgVal} classes (${editPkgVal-s.u} left)`;
+}
+function saveEdit(){
+  const n=document.getElementById('edit-inp').value.trim();if(!n)return;
+  const S=getStudents(currentTeacherId);
+  const s=S.find(x=>x.id===editId);if(!s)return;
+  s.n=n;s.sym=editSym;s.c=editCol;s.t=editPkgVal;
+  saveStudents(currentTeacherId,S);
+  renderA();cm('edit-m');
+  toast(`${editSym} ${n} updated`);
+}
+
+/* ── INIT ── */
+try{lang=localStorage.getItem('yj_lang')||'en';}catch(e){}
+applyLang();
 </script>
 </body>
 </html>
