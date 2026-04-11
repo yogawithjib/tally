@@ -356,11 +356,11 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 /* Video cards */
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* Breathing widget */
-.breath-widget{padding:2rem 0 2.5rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
-.breath-title{font-size:10px;font-weight:600;color:#ccc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.5rem}
-.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
-.bpreset{border:none;border-radius:8px;background:#f5f5f5;padding:6px 14px;font-size:11px;font-weight:500;color:#aaa;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .2s;user-select:none;-webkit-tap-highlight-color:transparent}
-.bpreset.on{background:var(--pl);color:var(--pink);font-weight:600}
+.breath-widget{padding:1.75rem 0 2.5rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
+.breath-title{font-size:10px;font-weight:600;color:#ccc;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.25rem}
+.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:1.75rem;flex-wrap:wrap}
+.bpreset{border:1.5px solid var(--bd);border-radius:20px;background:#fff;padding:5px 14px;font-size:11px;font-weight:500;color:#aaa;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .2s;user-select:none;-webkit-tap-highlight-color:transparent}
+.bpreset.on{border-color:var(--pink);color:var(--pink);background:var(--pl)}
 .breath-rings-wrap{position:relative;width:180px;height:180px;margin:0 auto 1.5rem;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
 .breath-ring{position:absolute;border-radius:50%;border:1.5px solid #fb2a7b;transition:transform .9s cubic-bezier(.4,0,.2,1),opacity .9s cubic-bezier(.4,0,.2,1)}
 .br1{width:60px;height:60px;opacity:.9}
@@ -371,6 +371,7 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 .breath-count{font-size:22px;font-weight:300;color:#111;line-height:1.1;margin-top:2px}
 .breath-tap{font-size:18px;opacity:.35}
 .breath-guide{font-size:11px;font-weight:300;color:#ccc;min-height:16px;margin-top:.5rem}
+/* Responsive */
 @media (min-width:600px){
   body{background:#f0f0f0}
   .page{max-width:520px;background:#fafafa;box-shadow:0 2px 32px rgba(0,0,0,.08);min-height:100vh;padding:0 2rem 4rem;margin:0 auto}
@@ -679,9 +680,9 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
       </div>
     </div>
 
-</div>
 
-</div><!-- /page -->
+
+<!-- /page -->
 
 <!-- ═══════════════════════════════════════ -->
 <!-- SUPER ADMIN LOGIN -->
@@ -849,7 +850,10 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 <div class="mbg" id="contact-m" style="display:none">
   <div class="modal">
     <div class="mhd">📱 Contact info</div>
-    <div id="contact-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:12px;line-height:1.5"></div>
+    <div id="contact-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:12px"></div>
+    <div style="font-size:12px;font-weight:300;color:var(--gl);margin-bottom:1rem;line-height:1.6">
+      Your students will see this when they want to top up — so they can reach you to confirm.
+    </div>
     <div style="font-size:11px;font-weight:300;color:var(--gl);margin-bottom:12px;line-height:1.6">
       Shown to students when they top up. Used to send you payment notifications.
     </div>
@@ -1081,8 +1085,8 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 <div class="mbg" id="bank-m" style="display:none">
   <div class="modal">
     <div class="mhd">Bank details</div>
-    <div id="bank-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:8px;line-height:1.5"></div>
-    <div class="secure-badge">🔒 Encrypted locally · plain text shared with students</div>
+    <div id="bank-saved-preview" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;color:#166534;margin-bottom:8px"></div>
+    <div class="secure-badge">🔒 Encrypted &amp; PIN protected</div>
     <div class="bank-settings-row">
       <div class="setting-field"><label>Bank name</label><input id="b-bank" type="text" placeholder="e.g. Kasikorn, SCB" maxlength="40"/></div>
       <div class="setting-field"><label>Account name</label><input id="b-name" type="text" maxlength="60"/></div>
@@ -1579,35 +1583,23 @@ async function findStudent(){
   }
   document.getElementById('find-err').textContent='';
   currentStudentData={student:found, teacher:foundTeacher};
-  // Pull fresh student data from Firebase before rendering
-  try{
-    const freshStudents=await fsGetStudents(foundTeacher.id);
-    if(freshStudents.length){
-      localStorage.setItem('yj_s_'+foundTeacher.id,JSON.stringify(freshStudents));
-      const freshFound=freshStudents.find(function(x){return x.id===found.id;});
-      if(freshFound){found=freshFound;currentStudentData.student=freshFound;}
-    }
-  }catch(e){}
   showStudentView();
 }
 
-
 async function showStudentView(){
   if(!currentStudentData)return;
-  // Always re-fetch fresh data from Firebase
   try{
     const tc=currentStudentData.teacher;
-    const freshStudents=await fsGetStudents(tc.id);
-    if(freshStudents.length){
-      localStorage.setItem('yj_s_'+tc.id,JSON.stringify(freshStudents));
-      const fresh=freshStudents.find(function(x){return x.id===currentStudentData.student.id;});
-      if(fresh)currentStudentData.student=fresh;
+    const fresh=await fsGetStudents(tc.id);
+    if(fresh.length){
+      localStorage.setItem('yj_s_'+tc.id,JSON.stringify(fresh));
+      const s=fresh.find(function(x){return x.id===currentStudentData.student.id;});
+      if(s)currentStudentData.student=s;
     }
   }catch(e){}
   renderStudentView(currentStudentData.student,currentStudentData.teacher);
   go('student-view-screen');
 }
-
 /* ── STUDENT VIEW ── */
 function bigRing(rem,tot,c){
   const r=56,cx=70,cy=70,circ=2*Math.PI*r,p=Math.max(0,Math.min(1,rem/tot));
@@ -1622,71 +1614,44 @@ function fmtDateStr(str){if(!str)return'';const d=new Date(str+'T12:00:00');retu
 function fmtTs(ts){const d=new Date(ts);return d.toLocaleDateString(lang==='th'?'th-TH':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
 function today(){return new Date().toISOString().split('T')[0];}
 
-function renderStudentView(s, tc){
-  const rem=s.t-s.u, c=s.c||COL[0];
+function renderStudentView(s,tc){
+  const rem=s.t-s.u,c=s.c||COL[0];
   const pct=rem/s.t;
   const scl=rem<0?'sdebt':rem===0?'sout':pct<=.25?'slow':'sok';
   const stx=rem<0?(lang==='th'?'ติดหนี้ '+Math.abs(rem)+' คลาส':'Owes '+Math.abs(rem)+' class'+(Math.abs(rem)!==1?'es':'')):(rem===0?t('out'):pct<=.25?t('low'):t('active'));
   const wMain=(t('wMain')||'Hi {name}! 🙏').replace('{name}',s.n);
-
-  // Sort all history oldest first
-  const allH=s.h&&s.h.length?[...s.h].sort(function(a,b){
-    return (a.d?new Date(a.d):new Date(a.ts))-(b.d?new Date(b.d):new Date(b.ts));
-  }):[];
-
-  // Current package = most recent s.t entries
+  const allH=s.h&&s.h.length?[...s.h].sort(function(a,b){return(a.d?new Date(a.d):new Date(a.ts))-(b.d?new Date(b.d):new Date(b.ts));}):[];
   const pkgH=allH.slice(-s.t);
-
   function makeRows(entries,offset){
-    if(!entries.length)return '<div style="font-size:12px;color:var(--gl);opacity:.6;padding:4px 0">'+(lang==='th'?'ยังไม่มีบันทึก':'No classes yet')+'</div>';
-    return entries.map(function(e,i){
-      return '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)">'
-        +'<span style="font-size:10px;font-weight:600;color:var(--pink);min-width:20px;text-align:center">'+(offset+i+1)+'</span>'
-        +'<span style="font-size:12px;color:inherit;font-weight:300">'+(e.d?fmtDateStr(e.d):fmtTs(e.ts))+'</span>'
-        +'</div>';
-    }).join('');
+    if(!entries.length)return '<div style="font-size:12px;color:var(--gl);padding:4px 0">'+(lang==='th'?'ยังไม่มีบันทึก':'No classes yet')+'</div>';
+    return entries.map(function(e,i){return'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)"><span style="font-size:10px;font-weight:600;color:var(--pink);min-width:20px;text-align:center">'+(offset+i+1)+'</span><span style="font-size:12px;font-weight:300">'+(e.d?fmtDateStr(e.d):fmtTs(e.ts))+'</span></div>';}).join('');
   }
-
   const pkgRows=makeRows(pkgH,allH.length-pkgH.length);
   const hasMore=allH.length>pkgH.length;
-  const histRows=makeRows(allH,0);
   const topupBtn=rem<=0
     ?'<button onclick="openStuTopup()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:6px;font-family:inherit">💳 '+(lang==='th'?'ชำระเงิน':'Pay now')+'</button>'
     :'<button class="topup-student-btn" onclick="openStuTopup()">💳 '+(lang==='th'?'ต่อแพ็คเกจ':'Top up')+'</button>';
-
   const area=document.getElementById('student-card-area');
   area.innerHTML='<div class="student-card-big" style="background:'+c.bg+'">'
     +'<div class="sc-sym">'+s.sym+'</div>'
     +'<div class="sc-name" style="color:'+c.tx+'">'+wMain+'</div>'
     +'<div class="sc-teacher" style="color:'+c.tx+'">with '+(tc?tc.name:'')+'</div>'
-    +(rem<0
-      ?'<div class="debt-banner"><div class="debt-amount">−'+Math.abs(rem)+'</div><div class="debt-lbl">'+(lang==='th'?'คลาสที่ค้างชำระ':'classes owed')+'</div><div class="debt-note">'+(lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance')+'</div></div>'
+    +(rem<0?'<div class="debt-banner"><div class="debt-amount">−'+Math.abs(rem)+'</div><div class="debt-lbl">'+(lang==='th'?'คลาสที่ค้างชำระ':'classes owed')+'</div><div class="debt-note">'+(lang==='th'?'กรุณาต่อแพ็คเกจ':'Please top up')+'</div></div>'
       :'<div class="sc-ring-wrap">'+bigRing(rem,s.t,c)+'<div class="sc-ring-inner"><div class="sc-rem" style="color:'+c.tx+'">'+rem+'</div><div class="sc-lbl" style="color:'+c.tx+'">'+t('left')+'</div></div></div>')
     +'<div class="sc-status '+scl+'">'+stx+'</div>'
     +topupBtn
-    // Current package classes
     +'<div class="hist-section">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
     +'<div class="hist-sec-title" style="color:'+c.tx+';margin-bottom:0">'+(lang==='th'?'📅 แพ็คเกจนี้':'📅 This package')+'</div>'
-    +(hasMore?'<button onclick="toggleStuHistory(this,'+JSON.stringify(histRows)+')" style="font-size:11px;color:var(--pink);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 0">'+( lang==='th'?'ดูทั้งหมด →':'See all →')+'</button>':'')
-    +'</div>'
-    +'<div id="stu-pkg-rows">'+pkgRows+'</div>'
-    +'</div>'
-    +'</div>';
+    +(hasMore?'<button onclick="toggleStuHistory(this,''+allH.map(function(e,i){return'<div style=\"display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)\"><span style=\"font-size:10px;font-weight:600;color:var(--pink);min-width:20px;text-align:center\">'+(i+1)+'</span><span style=\"font-size:12px;font-weight:300\">'+(e.d?fmtDateStr(e.d):fmtTs(e.ts))+'</span></div>';}).join('').replace(/'/g,"&#39;")+'')" style="font-size:11px;color:var(--pink);background:none;border:none;cursor:pointer;font-family:inherit">'+(lang==='th'?'ดูทั้งหมด →':'See all →')+'</button>':'')
+    +'</div><div id="stu-pkg-rows">'+pkgRows+'</div></div></div>';
 }
-
 function toggleStuHistory(btn,histRows){
   const box=document.getElementById('stu-pkg-rows');
   if(!box)return;
-  const isExpanded=btn.dataset.expanded==='1';
-  if(isExpanded){
-    // Collapse back to current package
-    if(currentStudentData)renderStudentView(currentStudentData.student,currentStudentData.teacher);
-  } else {
-    btn.dataset.expanded='1';
-    btn.textContent=lang==='th'?'← แพ็คเกจนี้':'← This package';
-    box.innerHTML=histRows;
-  }
+  const exp=btn.dataset.exp==='1';
+  if(exp){btn.dataset.exp='';btn.textContent=lang==='th'?'ดูทั้งหมด →':'See all →';if(currentStudentData)renderStudentView(currentStudentData.student,currentStudentData.teacher);}
+  else{btn.dataset.exp='1';btn.textContent=lang==='th'?'← แพ็คเกจนี้':'← This package';box.innerHTML=histRows;}
 }
 
 function showPay(){
@@ -1965,34 +1930,29 @@ function openBank(){
   document.getElementById('bpin-err').textContent='';
   document.getElementById('bank-pin-m').style.display='flex';
 }
-async function openBankActual(){
-  // Fetch plain text from Firebase first, fall back to decrypted localStorage
-  let rawBank='',rawName='',rawNum='';
-  try{
-    const fb=await fsGetBank(currentTeacherId);
-    if(fb&&fb.bank&&!fb.enc){rawBank=fb.bank;rawName=fb.name||'';rawNum=fb.num||'';}
-    else{const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
-  }catch(e){const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
-  document.getElementById('b-bank').value=rawBank;
-  document.getElementById('b-name').value=rawName;
-  document.getElementById('b-num').value=rawNum;
-  // Show current-saved preview
-  const prev=document.getElementById('bank-saved-preview');
-  if(prev){
-    prev.textContent=rawBank&&rawName?rawBank+' · '+rawName+(rawNum?' · '+maskAcct(rawNum):''):'';
-    prev.style.display=(rawBank||rawName)?'block':'none';
-  }
-  document.getElementById('bank-m').style.display='flex';
+function openBankActual(){
+  (async()=>{
+    let rawBank='',rawName='',rawNum='';
+    try{
+      const fb=await fsGetBank(currentTeacherId);
+      if(fb&&fb.bank&&!fb.enc){rawBank=fb.bank;rawName=fb.name||'';rawNum=fb.num||'';}
+      else{const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
+    }catch(e){const bk=getBank(currentTeacherId);rawBank=decryptBank(bk.bank,currentTeacherId);rawName=decryptBank(bk.name,currentTeacherId);rawNum=decryptBank(bk.num,currentTeacherId);}
+    document.getElementById('b-bank').value=rawBank;
+    document.getElementById('b-name').value=rawName;
+    document.getElementById('b-num').value=rawNum;
+    const prev=document.getElementById('bank-saved-preview');
+    if(prev){const t=rawBank&&rawName?rawBank+' · '+rawName+(rawNum?' · '+maskAcct(rawNum):''):'';prev.textContent=t;prev.style.display=t?'block':'none';}
+    document.getElementById('bank-m').style.display='flex';
+  })();
 }
 function saveBank(){
   const rawBank=document.getElementById('b-bank').value.trim();
   const rawName=document.getElementById('b-name').value.trim();
   const rawNum=document.getElementById('b-num').value.trim();
-  // Encrypted to localStorage (protects on teacher's device)
+  fsSaveBank(currentTeacherId,{bank:rawBank,name:rawName,num:rawNum,enc:false});
   const enc={bank:encryptBank(rawBank,currentTeacherId),name:encryptBank(rawName,currentTeacherId),num:encryptBank(rawNum,currentTeacherId),enc:true};
   localStorage.setItem('yj_b_'+currentTeacherId,JSON.stringify(enc));
-  // Plain text to Firebase (students read from here)
-  fsSaveBank(currentTeacherId,{bank:rawBank,name:rawName,num:rawNum,enc:false});
   cm('bank-m');toast(t('bankSaved'));
 }
 
@@ -2064,7 +2024,6 @@ function saveSaPin(p){
 function loadGasUrl(){try{const u=localStorage.getItem('yj_gas_url')||'';const el=document.getElementById('gas-url');if(el)el.value=u;}catch(e){}}
 function saveGasUrl(u){
   try{localStorage.setItem('yj_gas_url',u);}catch(e){}
-  // Also save to Firebase so students can fetch it
   if(db)db.collection('system').doc('config').set({gasUrl:u}).catch(function(){});
 }
 
@@ -2404,16 +2363,12 @@ function resetNotify(){
 async function sendNotification(){
   if(!currentStudentData)return;
   const {student:s,teacher:tc}=currentStudentData;
-  // Always fetch contact from Firebase — student localStorage won't have teacher's contact
   let ct={phone:'',line:'',email:'',lineToken:''};
   try{const fc=await fsGetContact(tc.id);if(fc)ct=fc;}catch(e){ct=getContact(tc.id);}
   const amount=document.getElementById('notify-amount').value.trim();
   const note=document.getElementById('notify-note').value.trim();
-  // GAS URL stored in Firebase under system/config
   let gasUrl=localStorage.getItem('yj_gas_url')||'';
-  if(!gasUrl&&db){
-    try{const doc=await db.collection('system').doc('config').get();if(doc.exists)gasUrl=doc.data().gasUrl||'';}catch(e){}
-  }
+  if(!gasUrl&&db){try{const doc=await db.collection('system').doc('config').get();if(doc.exists)gasUrl=doc.data().gasUrl||'';}catch(e){}}
 
   if(!ct.email){
     document.getElementById('notify-err').textContent=
@@ -2479,25 +2434,14 @@ function getContact(tid){
 function saveContactData(tid,c){localStorage.setItem('yj_c_'+tid,JSON.stringify(c));}
 
 async function openContact(){
-  // Fetch from Firebase first, fall back to localStorage
   let c={phone:'',line:'',email:''};
-  try{const fc=await fsGetContact(currentTeacherId);if(fc&&(fc.phone||fc.email||fc.line))c=fc;}
+  try{const fc=await fsGetContact(currentTeacherId);if(fc&&(fc.phone||fc.email||fc.line)){c=fc;saveContactData(currentTeacherId,c);}}
   catch(e){c=getContact(currentTeacherId);}
-  // Sync to localStorage so it's available offline
-  if(c.phone||c.email||c.line)saveContactData(currentTeacherId,c);
   document.getElementById('c-phone').value=c.phone||'';
   document.getElementById('c-line').value=c.line||'';
   document.getElementById('c-email').value=c.email||'';
-  // Show current-saved preview
   const prev=document.getElementById('contact-saved-preview');
-  if(prev){
-    const parts=[];
-    if(c.phone)parts.push(c.phone);
-    if(c.line)parts.push('LINE: '+c.line);
-    if(c.email)parts.push(c.email);
-    prev.textContent=parts.length?parts.join('  ·  '):'';
-    prev.style.display=parts.length?'block':'none';
-  }
+  if(prev){const p=[c.phone,c.line?'LINE: '+c.line:'',c.email].filter(Boolean);prev.textContent=p.join('  ·  ');prev.style.display=p.length?'block':'none';}
   document.getElementById('contact-m').style.display='flex';
   setTimeout(()=>document.getElementById('c-phone').focus(),60);
 }
@@ -2869,14 +2813,10 @@ function getYtId(url){
 
 function resolveThumb(thumbField,url){
   if(thumbField){
-    // Google Drive: try multiple URL formats
-    const driveM=thumbField.match(/[-\w]{25,}/);
-    const idFromDrive=(thumbField.includes('drive.google.com')||thumbField.includes('docs.google.com'))&&driveM?driveM[0]:'';
-    if(idFromDrive)return'https://drive.google.com/thumbnail?id='+idFromDrive+'&sz=w400';
-    // Direct image URL
+    const driveM=thumbField.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+    if(driveM)return'https://lh3.googleusercontent.com/d/'+driveM[1];
     if(thumbField.startsWith('http'))return thumbField;
   }
-  // Fall back to YouTube thumbnail
   const ytId=getYtId(url);
   if(ytId)return'https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg';
   return'';
@@ -2995,35 +2935,7 @@ function startBreath(){
   document.getElementById('breath-guide').textContent='';
   runBreathPhase();
 }
-function stopBreath(){
-  bRunning=false;clearTimeout(bTimer);resetBreathUI();
-}
-function setRings(inhale,hold,dur){
-  const core=document.getElementById('breath-core');
-  const r1=document.getElementById('br1');
-  const r2=document.getElementById('br2');
-  const r3=document.getElementById('br3');
-  [r1,r2,r3].forEach(function(r,i){
-    if(!r)return;
-    r.style.transitionDuration=dur>0?(dur+i*.08)+'s':'0s';
-  });
-  if(inhale){
-    if(core){core.style.transform='scale(1.18)';core.style.background='#ffd0e8';}
-    if(r1){r1.style.transform='scale(1.8)';r1.style.opacity='.55';}
-    if(r2){r2.style.transform='scale(2.5)';r2.style.opacity='.28';}
-    if(r3){r3.style.transform='scale(3.2)';r3.style.opacity='.12';}
-  } else if(hold){
-    if(core){core.style.transform='scale(1.1)';core.style.background='#fff0f6';}
-    if(r1){r1.style.transform='scale(1.4)';r1.style.opacity='.35';}
-    if(r2){r2.style.transform='scale(1.8)';r2.style.opacity='.15';}
-    if(r3){r3.style.transform='scale(2.2)';r3.style.opacity='.07';}
-  } else {
-    if(core){core.style.transform='scale(1)';core.style.background='var(--pl)';}
-    if(r1){r1.style.transform='scale(1)';r1.style.opacity='.9';}
-    if(r2){r2.style.transform='scale(1)';r2.style.opacity='0';}
-    if(r3){r3.style.transform='scale(1)';r3.style.opacity='0';}
-  }
-}
+function stopBreath(){bRunning=false;clearTimeout(bTimer);resetBreathUI();}
 function resetBreathUI(){
   document.getElementById('breath-phase').textContent='';
   document.getElementById('breath-count').textContent='';
@@ -3040,22 +2952,39 @@ function runBreathPhase(){
   const isIn=name.includes('Inhale')||name.includes('เข้า');
   const isHold=name.includes('Hold')||name.includes('กลั้น');
   document.getElementById('breath-phase').textContent=name;
-  // Blob visual
   setRings(isIn,isHold,isHold?0.4:dur);
-  // Countdown
   let cnt=dur;
   document.getElementById('breath-count').textContent=cnt;
   function tick(){
     cnt--;
-    if(cnt<=0){
-      if(!bRunning)return;
-      bPhase=(bPhase+1)%p.phases.length;
-      runBreathPhase();return;
-    }
+    if(cnt<=0){if(!bRunning)return;bPhase=(bPhase+1)%p.phases.length;runBreathPhase();return;}
     document.getElementById('breath-count').textContent=cnt;
     bTimer=setTimeout(tick,1000);
   }
   bTimer=setTimeout(tick,1000);
+}
+function setRings(inhale,hold,dur){
+  const core=document.getElementById('breath-core');
+  const r1=document.getElementById('br1');
+  const r2=document.getElementById('br2');
+  const r3=document.getElementById('br3');
+  [r1,r2,r3].forEach(function(r,i){if(r)r.style.transitionDuration=dur>0?(dur+i*.08)+'s':'0s';});
+  if(inhale){
+    if(core){core.style.transform='scale(1.18)';core.style.background='#ffd0e8';}
+    if(r1){r1.style.transform='scale(1.8)';r1.style.opacity='.55';}
+    if(r2){r2.style.transform='scale(2.5)';r2.style.opacity='.28';}
+    if(r3){r3.style.transform='scale(3.2)';r3.style.opacity='.12';}
+  } else if(hold){
+    if(core){core.style.transform='scale(1.1)';core.style.background='#fff0f6';}
+    if(r1){r1.style.transform='scale(1.4)';r1.style.opacity='.35';}
+    if(r2){r2.style.transform='scale(1.8)';r2.style.opacity='.15';}
+    if(r3){r3.style.transform='scale(2.2)';r3.style.opacity='.07';}
+  } else {
+    if(core){core.style.transform='scale(1)';core.style.background='var(--pl)';}
+    if(r1){r1.style.transform='scale(1)';r1.style.opacity='.9';}
+    if(r2){r2.style.transform='scale(1)';r2.style.opacity='0';}
+    if(r3){r3.style.transform='scale(1)';r3.style.opacity='0';}
+  }
 }
 </script>
 </body>
