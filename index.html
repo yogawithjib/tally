@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+@font-face {
+  font-family: 'FabfeltScript';
+  src: url('https://yogawithjib.github.io/tally/FabfeltScript-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-display: swap;
+}
 :root {
   --pink:#fb2a7b; --pink-l:#f3f3f3; --pink-m:#e0e0e0; --pink-d:#d91f65;
   --grey:#888; --grey-l:#f5f5f5; --grey-m:#ddd;
@@ -25,7 +31,7 @@ html,body{height:100%;font-family:'IBM Plex Sans Thai',sans-serif;background:var
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:#fff;position:sticky;top:0;z-index:20;border-bottom:1px solid var(--grey-m)}
 .hdr-logo{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
 .hdr-logo .logo-icon{width:38px;height:38px;background:var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
-.hdr-logo .app-name{font-size:15px;font-weight:600;color:var(--pink)}
+.hdr-logo .app-name{font-size:22px;font-weight:bold;color:var(--pink);font-family:'FabfeltScript',cursive}
 .hdr-right{display:flex;align-items:center;gap:8px}
 .lang-btn{font-size:12px;font-weight:600;color:var(--grey);background:var(--white);border:1.5px solid var(--grey-m);border-radius:20px;padding:4px 10px;cursor:pointer;transition:.15s}
 .lang-btn:hover{border-color:var(--pink);color:var(--pink)}
@@ -863,12 +869,12 @@ async function screenHome(s){
   const makeRoleCard=(emoji,label,sub,role)=>{
     const card=el('div');
     card.style.cssText=`background:var(--white);border-radius:var(--r);padding:28px 12px 22px;
-      text-align:center;border:2px dashed var(--pink-m);cursor:pointer;transition:.15s;box-shadow:var(--sh-s)`;
+      text-align:center;border:1px dotted var(--pink);cursor:pointer;transition:.15s;box-shadow:var(--sh-s)`;
     card.innerHTML=`<div style="font-size:52px;margin-bottom:14px;line-height:1">${emoji}</div>
 <div style="font-size:15px;font-weight:600;margin-bottom:5px">${label}</div>
 <div style="font-size:12px;color:var(--grey)">${sub}</div>`;
-    card.addEventListener('mouseenter',()=>{card.style.borderColor='var(--pink)';card.style.background='var(--pink-l)';});
-    card.addEventListener('mouseleave',()=>{card.style.borderColor='var(--pink-m)';card.style.background='var(--white)';});
+    card.addEventListener('mouseenter',()=>{card.style.borderColor='var(--pink)';card.style.borderStyle='solid';card.style.background='var(--pink-l)';});
+    card.addEventListener('mouseleave',()=>{card.style.borderColor='var(--pink)';card.style.borderStyle='dotted';card.style.background='var(--white)';});
     card.addEventListener('click',()=>render(s2=>screenUsernameEntry(s2,role)));
     return card;
   };
