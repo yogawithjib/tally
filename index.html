@@ -1008,11 +1008,14 @@ async function loadVideos(container){
     const ytFallback=ytThumb(url);
     const imgSrc=thumb||ytFallback;
 
+    const PINK_EMOJI=['🌸','🌺','🌷','💕','🌹','🩰','🎀','💗','🦩','🌸','🫶','💓','🩷','🌼','🧘‍♀️','🤸‍♀️','🦋','🌻','💖','🪷'];
+    const randEmoji=()=>PINK_EMOJI[Math.floor(Math.random()*PINK_EMOJI.length)];
+
     card.innerHTML=imgSrc
       ?`<img class="video-thumb" src="${imgSrc}" alt="" loading="lazy"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'${ytFallback&&imgSrc!==ytFallback?`;if(!this.dataset.tried){this.dataset.tried=1;this.style.display='';this.src='${ytFallback}'}`:''}">
-         <div class="video-thumb-ph" style="display:none">🧘</div>`
-      :`<div class="video-thumb-ph">🧘</div>`;
+         <div class="video-thumb-ph" style="display:none">${randEmoji()}</div>`
+      :`<div class="video-thumb-ph">${randEmoji()}</div>`;
     if(!thumb)card.innerHTML=`<div class="video-thumb-ph">🧘</div>`;
     else card.innerHTML+=`<div class="video-thumb-ph" style="display:none">🧘</div>`;
     
