@@ -1,6 +1,6 @@
 # 🧘🏻‍♀️ Yoga with Jib — Class Tracker
 
-**A class tracking app built for yoga teachers and their students.**
+**A beautiful, secure class tracking app built for yoga teachers and their students.**
 
 👉 **[Open the app → yogawithjib.github.io/tally](https://yogawithjib.github.io/tally)**
 
@@ -87,3 +87,28 @@ Contact your teacher directly — they'll get you set up. 🙏
 ---
 
 *Free to use · No app download needed · Works on any phone or browser*
+
+---
+
+## ⚖️ Disclaimer
+
+**Yoga with Jib — Class Tracker App**
+
+This application ("Tally by Yoga with Jib") is provided as a convenience tool for tracking prepaid yoga class packages. By using this app, you agree to the following:
+
+**1. Data & Privacy**
+This app stores only usernames and class counts. No full names, ID numbers, phone numbers, or sensitive personal data should be entered. The developer accepts no responsibility for any sensitive information entered in violation of these guidelines. Data is stored on your device and Firebase, and may be sent via Google Apps Script if configured by your teacher.
+
+**2. Payments**
+Always verify bank details directly with your teacher before transferring any funds. Yoga with Jib accepts no liability for payments made to incorrect accounts, fraudulent accounts, or any financial disputes arising from use of this app.
+
+**3. Class Records**
+Records are maintained in good faith. Any discrepancy between the app and actual classes attended should be resolved directly between teacher and student. Yoga with Jib is not liable for data loss, technical errors, or record inaccuracies.
+
+**4. Service Availability**
+This app is provided "as is" without warranty of any kind. Yoga with Jib makes no guarantee of uptime, data persistence, or continued availability of this service.
+
+**5. Third-Party Services**
+This app integrates with Google Apps Script, Firebase, and GitHub Pages. Their use is subject to each provider's terms of service. Yoga with Jib is not responsible for their availability or data handling practices.
+
+*Last updated: April 2026*
