@@ -3,11 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Yoga with Jib</title>
+<title>Yoga with Jib — Class Tracker</title>
+<meta name="description" content="Track your yoga classes with Yoga with Jib. Check your balance, view history, and top up your package.">
+<meta name="theme-color" content="#fb2a7b">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤸🏻</text></svg>"/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
-@font-face{font-family:'FabfeltScript';src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
+@font-face{font-family:'FabfeltScript';font-display:swap;src:url('FabfeltScript-Bold.otf') format('opentype'),url('fabfeltscript-bold.ttf') format('truetype');font-weight:bold}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif}
 body{background:#fafafa;min-height:100vh}
 .page{max-width:680px;margin:0 auto;padding:0 1.5rem 4rem}
@@ -397,12 +402,12 @@ body{background:#fafafa;min-height:100vh}
     <div class="home-hero-sub" id="h-sub2">Choose your role to continue</div>
   </div>
   <div class="role-grid">
-    <div class="role-card" onclick="go('student-login-screen')">
+    <div class="role-card" id="role-card-student">
       <div class="role-icon">🤸🏻</div>
       <div class="role-title" id="role-student">I'm a student</div>
       <div class="role-sub" id="role-student-sub">Check my classes</div>
     </div>
-    <div class="role-card" onclick="showTeacherList()">
+    <div class="role-card" id="role-card-teacher">
       <div class="role-icon">🧘🏻‍♀️</div>
       <div class="role-title" id="role-teacher">I'm a teacher</div>
       <div class="role-sub" id="role-teacher-sub">Manage students</div>
@@ -1754,17 +1759,24 @@ function maskName(name){
 
 /* ── SCREENS ── */
 function go(id){
-  document.querySelectorAll('.screen,.sa-screen').forEach(function(s){
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(function(s){
     s.classList.remove('on');
     s.style.display='none';
   });
+  document.querySelectorAll('.sa-screen').forEach(function(s){
+    s.style.display='none';
+    s.classList.remove('on');
+  });
+  // Show target
   var el=document.getElementById(id);
-  if(!el)return;
+  if(!el){console.error('Screen not found:',id);return;}
   el.classList.add('on');
-  // Use flex for screens that need it, block for others
-  var flexScreens=['student-login-screen','teacher-login-screen','login-screen',
+  var flex=['student-login-screen','teacher-login-screen','login-screen',
     'signup-screen','student-pin-screen','sa-login-screen'];
-  el.style.display=flexScreens.indexOf(id)>=0?'flex':'block';
+  el.style.display=flex.indexOf(id)>=0?'flex':'block';
+  // Scroll to top
+  window.scrollTo(0,0);
 }
 function goHome(){
   currentTeacherId=null;currentStudentData=null;pi='';endSession();
@@ -3225,6 +3237,20 @@ function toggleGuide(id){
 /* ── INIT ── */
 try{lang=localStorage.getItem('yj_lang')||'en';}catch(e){}
 applyLang();
+// Attach role card listeners
+document.addEventListener('DOMContentLoaded',function(){
+  var sc=document.getElementById('role-card-student');
+  var tc=document.getElementById('role-card-teacher');
+  if(sc)sc.addEventListener('click',function(){go('student-login-screen');});
+  if(tc)tc.addEventListener('click',function(){showTeacherList();});
+});
+// Also attach immediately in case DOMContentLoaded already fired
+(function(){
+  var sc=document.getElementById('role-card-student');
+  var tc=document.getElementById('role-card-teacher');
+  if(sc)sc.onclick=function(){go('student-login-screen');};
+  if(tc)tc.onclick=function(){showTeacherList();};
+})();
 loadSaPin();
 migrateBankData();
 shuffleLibrary();
