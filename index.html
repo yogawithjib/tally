@@ -638,9 +638,7 @@ body{background:#fafafa;min-height:100vh}
   </div>
   <div id="student-card-area"></div>
   
-    <!-- LIBRARY IN STUDENT VIEW -->
-    <div class="library-section" id="lib-sec-student">
-      <div class="lib-title">&#10024; Explore more</div>
+    
       <a class="lib-link" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank">
         <div class="lib-dot"></div>
         <span class="lib-en">Beginner's guide</span><span class="lib-th">คู่มือผู้ฝึกใหม่</span>
@@ -1743,8 +1741,8 @@ function applyLang(){
   const discTh=document.getElementById('disc-th');
   if(discEn)discEn.style.display=lang==='th'?'none':'block';
   if(discTh)discTh.style.display=lang==='th'?'block':'none';
-  const discEn=document.getElementById('disc-content-en');
-  const discTh=document.getElementById('disc-content-th');
+  const discEn=document.getElementById('disc-en');
+  const discTh=document.getElementById('disc-th');
   if(discEn)discEn.style.display=lang==='th'?'none':'block';
   if(discTh)discTh.style.display=lang==='th'?'block':'none';
   const pricePh=lang==='th'?'ราคาต่อแพ็คเกจ':'price per package';
@@ -3192,7 +3190,7 @@ function toggleDisc(){
 
 
 function shuffleLibrary(){
-  ['lib-sec-1','lib-sec-student'].forEach(function(id){
+  ['lib-sec-1'].forEach(function(id){
     var sec=document.getElementById(id);
     if(!sec)return;
     var links=Array.from(sec.querySelectorAll('.lib-link'));
