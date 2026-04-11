@@ -1757,26 +1757,6 @@ function screenSuperAdminPin(s){
   state._curFn=screenSuperAdminPin;
   s.appendChild(makeHeader({back:true,onBack:goHome}));
 
-  const ADMIN_LOCK_MS=12*60*60*1000;
-  const ADMIN_BF_KEY='yj_bf_superadmin';
-
-  function adminBfCheck(){
-    try{
-      const d=JSON.parse(localStorage.getItem(ADMIN_BF_KEY)||'{"a":0,"t":0}');
-      if(d.a>=MAX_ATT){
-        const elapsed=Date.now()-d.t;
-        if(elapsed<ADMIN_LOCK_MS){
-          const rem=ADMIN_LOCK_MS-elapsed;
-          const h=Math.floor(rem/3600000);
-          const m=Math.floor((rem%3600000)/60000);
-          return{locked:true,msg:h>0?`${h}h ${m}m`:`${m}m`};
-        }
-        localStorage.removeItem(ADMIN_BF_KEY);
-      }
-      return{locked:false};
-    }catch{return{locked:false};}
-  }
-
   const card=el('div','card');
   card.style.marginTop='24px';
   card.innerHTML=`<div class="text-center">
@@ -1788,42 +1768,18 @@ ${pinPadHTML('adm',6)}
 <div id="adm-err" class="alert alert-err mt-8" style="display:none"></div>`;
   s.appendChild(card);
 
-  const errDiv=$('adm-err');
-  const bf=adminBfCheck();
-  if(bf.locked){
-    errDiv.style.display='';
-    errDiv.textContent=lang==='th'?`🔒 ถูกล็อค — ลองใหม่ใน ${bf.msg}`:`🔒 Locked out — try again in ${bf.msg}`;
-    return;
-  }
-
   attachPinPad(card,'adm',async(pin)=>{
-    const bf2=adminBfCheck();
-    if(bf2.locked){
-      errDiv.style.display='';
-      errDiv.textContent=lang==='th'?`🔒 ถูกล็อค — ลองใหม่ใน ${bf2.msg}`:`🔒 Locked out — try again in ${bf2.msg}`;
-      resetDots('adm');return;
-    }
     let adminPin=null;
     if(fbReady){try{const d=await fbRead('system/admin');adminPin=d?.pin;}catch{}}
     const hashed=await hashPin(pin);
     const match=adminPin?hashed===adminPin:pin==='000000';
     if(match){
-      localStorage.removeItem(ADMIN_BF_KEY);
       state.user={type:'admin'};
       startSession();
       render(s2=>screenSuperAdmin(s2));
     }else{
-      const d=JSON.parse(localStorage.getItem(ADMIN_BF_KEY)||'{"a":0,"t":0}');
-      d.a++;d.t=Date.now();
-      localStorage.setItem(ADMIN_BF_KEY,JSON.stringify(d));
-      const bf3=adminBfCheck();
       errDiv.style.display='';
-      if(bf3.locked){
-        errDiv.textContent=lang==='th'?`🔒 พยายามเกินกำหนด — ถูกล็อค ${bf3.msg}`:`🔒 Too many attempts — locked for ${bf3.msg}`;
-      }else{
-        const left=MAX_ATT-d.a;
-        errDiv.textContent=lang==='th'?`PIN ไม่ถูกต้อง (เหลือ ${left} ครั้ง)`:`Wrong PIN — ${left} attempt${left===1?'':'s'} left`;
-      }
+      errDiv.textContent=t('wrongPin');
       resetDots('adm');
     }
   },6);
