@@ -1609,34 +1609,67 @@ function renderStudentView(s, tc){
   const rem=s.t-s.u, c=s.c||COL[0];
   const pct=rem/s.t;
   const scl=rem<0?'sdebt':rem===0?'sout':pct<=.25?'slow':'sok';
-  const stx=rem<0?(lang==='th'?`ติดหนี้ ${Math.abs(rem)} คลาส`:`Owes ${Math.abs(rem)} class${Math.abs(rem)!==1?'es':''}`):(rem===0?t('out'):pct<=.25?t('low'):t('active'));
-  const wMain=(t('wMain')||'Hi {name}! 🙏').replace('{name}', s.n);
-  const sortedH = s.h&&s.h.length ? [...s.h].sort((a,b)=>{
-    const da=a.d?new Date(a.d):new Date(a.ts);
-    const db2=b.d?new Date(b.d):new Date(b.ts);
-    return da-db2;
-  }) : [];
-  const histHtml = sortedH.length
-    ? sortedH.map((e,i)=>`<div class="hist-item-row"><span class="hi-num">${i+1}</span><span class="hi-date">${e.d?fmtDateStr(e.d):fmtTs(e.ts)}</span></div>`).join('')
-    : `<div class="no-hist-txt">${t('noHist')}</div>`;
+  const stx=rem<0?(lang==='th'?'ติดหนี้ '+Math.abs(rem)+' คลาส':'Owes '+Math.abs(rem)+' class'+(Math.abs(rem)!==1?'es':'')):(rem===0?t('out'):pct<=.25?t('low'):t('active'));
+  const wMain=(t('wMain')||'Hi {name}! 🙏').replace('{name}',s.n);
+
+  // Sort all history oldest first
+  const allH=s.h&&s.h.length?[...s.h].sort(function(a,b){
+    return (a.d?new Date(a.d):new Date(a.ts))-(b.d?new Date(b.d):new Date(b.ts));
+  }):[];
+
+  // Current package = most recent s.t entries
+  const pkgH=allH.slice(-s.t);
+
+  function makeRows(entries,offset){
+    if(!entries.length)return '<div style="font-size:12px;color:var(--gl);opacity:.6;padding:4px 0">'+(lang==='th'?'ยังไม่มีบันทึก':'No classes yet')+'</div>';
+    return entries.map(function(e,i){
+      return '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)">'
+        +'<span style="font-size:10px;font-weight:600;color:var(--pink);min-width:20px;text-align:center">'+(offset+i+1)+'</span>'
+        +'<span style="font-size:12px;color:inherit;font-weight:300">'+(e.d?fmtDateStr(e.d):fmtTs(e.ts))+'</span>'
+        +'</div>';
+    }).join('');
+  }
+
+  const pkgRows=makeRows(pkgH,allH.length-pkgH.length);
+  const hasMore=allH.length>pkgH.length;
+  const histRows=makeRows(allH,0);
+  const topupBtn=rem<=0
+    ?'<button onclick="openStuTopup()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:6px;font-family:inherit">💳 '+(lang==='th'?'ชำระเงิน':'Pay now')+'</button>'
+    :'<button class="topup-student-btn" onclick="openStuTopup()">💳 '+(lang==='th'?'ต่อแพ็คเกจ':'Top up')+'</button>';
 
   const area=document.getElementById('student-card-area');
-  area.innerHTML=`
-    <div class="student-card-big" style="background:${c.bg}">
-      <div class="sc-sym">${s.sym}</div>
-      <div class="sc-name" style="color:${c.tx}">${wMain}</div>
-      <div class="sc-teacher" style="color:${c.tx}">with ${tc?tc.name:''}</div>
-      ${rem<0?`<div class='debt-banner'><div class='debt-amount'>−${Math.abs(rem)}</div><div class='debt-lbl'>${lang==='th'?'คลาสที่ค้างชำระ':'classes owed'}</div><div class='debt-note'>${lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance'}</div></div>`:`<div class='sc-ring-wrap'>${bigRing(rem,s.t,c)}<div class='sc-ring-inner'><div class='sc-rem' style='color:${c.tx}'>${rem}</div><div class='sc-lbl' style='color:${c.tx}'>${t('left')}</div></div></div>`}
-      <div class="sc-status ${scl}">${stx}</div>
-      ${rem<=0?`<button onclick='openStuTopup()' style='width:100%;padding:11px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;font-family:inherit'>💳 ${lang==='th'?'ชำระเงิน / Pay now':'Pay now'}</button>`:''}
-      <button class="topup-student-btn" onclick="openStuTopup()">
-        💳 ${lang==='th'?'ต่อแพ็คเกจ / Top up':'Top up my classes'}
-      </button>
-      <div class="hist-section">
-        <div class="hist-sec-title" style="color:${c.tx}">${t('histTitle')}</div>
-        ${histHtml}
-      </div>
-    </div>`;
+  area.innerHTML='<div class="student-card-big" style="background:'+c.bg+'">'
+    +'<div class="sc-sym">'+s.sym+'</div>'
+    +'<div class="sc-name" style="color:'+c.tx+'">'+wMain+'</div>'
+    +'<div class="sc-teacher" style="color:'+c.tx+'">with '+(tc?tc.name:'')+'</div>'
+    +(rem<0
+      ?'<div class="debt-banner"><div class="debt-amount">−'+Math.abs(rem)+'</div><div class="debt-lbl">'+(lang==='th'?'คลาสที่ค้างชำระ':'classes owed')+'</div><div class="debt-note">'+(lang==='th'?'กรุณาต่อแพ็คเกจเพื่อเคลียรยอดค้าง':'Please top up to clear your balance')+'</div></div>'
+      :'<div class="sc-ring-wrap">'+bigRing(rem,s.t,c)+'<div class="sc-ring-inner"><div class="sc-rem" style="color:'+c.tx+'">'+rem+'</div><div class="sc-lbl" style="color:'+c.tx+'">'+t('left')+'</div></div></div>')
+    +'<div class="sc-status '+scl+'">'+stx+'</div>'
+    +topupBtn
+    // Current package classes
+    +'<div class="hist-section">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+    +'<div class="hist-sec-title" style="color:'+c.tx+';margin-bottom:0">'+(lang==='th'?'📅 แพ็คเกจนี้':'📅 This package')+'</div>'
+    +(hasMore?'<button onclick="toggleStuHistory(this,'+JSON.stringify(histRows)+')" style="font-size:11px;color:var(--pink);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 0">'+( lang==='th'?'ดูทั้งหมด →':'See all →')+'</button>':'')
+    +'</div>'
+    +'<div id="stu-pkg-rows">'+pkgRows+'</div>'
+    +'</div>'
+    +'</div>';
+}
+
+function toggleStuHistory(btn,histRows){
+  const box=document.getElementById('stu-pkg-rows');
+  if(!box)return;
+  const isExpanded=btn.dataset.expanded==='1';
+  if(isExpanded){
+    // Collapse back to current package
+    if(currentStudentData)renderStudentView(currentStudentData.student,currentStudentData.teacher);
+  } else {
+    btn.dataset.expanded='1';
+    btn.textContent=lang==='th'?'← แพ็คเกจนี้':'← This package';
+    box.innerHTML=histRows;
+  }
 }
 
 function showPay(){
