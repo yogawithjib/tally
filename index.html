@@ -407,6 +407,22 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
 .llink{min-height:44px;display:flex;align-items:center;justify-content:center;padding:4px 8px}
 .lang-btn,.ipill,.apill{min-width:44px;min-height:44px}
 .nb{min-height:52px;user-select:none;-webkit-tap-highlight-color:transparent}
+
+/* ── BREATHING TIMER ── */
+.breath-widget{padding:1.75rem 0 2rem;margin-top:2rem;border-top:1px solid #f0f0f0;text-align:center}
+.breath-title{font-size:10px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1.25rem}
+.breath-presets{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.bpreset{border:1.5px solid var(--bd);border-radius:20px;background:#fff;padding:5px 14px;font-size:12px;font-weight:500;color:#888;cursor:pointer;font-family:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+.bpreset.on{border-color:var(--pink);color:var(--pink);background:var(--pl)}
+.breath-circle-wrap{position:relative;width:160px;height:160px;margin:0 auto 1.25rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.breath-ring-outer{position:absolute;inset:0;border-radius:50%;background:var(--pl);transition:transform 0s linear}
+.breath-ring-mid{position:absolute;inset:16px;border-radius:50%;background:#ffd0e8;opacity:.6}
+.breath-ring-inner{position:absolute;inset:32px;border-radius:50%;background:var(--pink);opacity:.25}
+.breath-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.breath-phase{font-size:13px;font-weight:500;color:var(--pink);letter-spacing:.5px}
+.breath-count{font-size:28px;font-weight:600;color:#111;line-height:1.1;margin-top:2px}
+.breath-tap{font-size:10px;font-weight:300;color:var(--gl);margin-top:4px}
+.breath-guide{font-size:11px;font-weight:300;color:var(--gl);min-height:16px}
 </style>
 </head>
 <body>
@@ -450,6 +466,27 @@ button,a[onclick],[onclick]{-webkit-tap-highlight-color:transparent}
       <div id="vid-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--gl);font-size:12px" id="vid-loading">Loading videos...</div>
       </div>
+    </div>
+
+    <!-- BREATHING TIMER -->
+    <div class="breath-widget" id="breath-widget">
+      <div class="breath-title">🫁 Breathing guide</div>
+      <div class="breath-presets">
+        <button class="bpreset on" onclick="setBreath(this,'box')" data-k="box">Box 4-4-4-4</button>
+        <button class="bpreset" onclick="setBreath(this,'478')" data-k="478">4-7-8</button>
+        <button class="bpreset" onclick="setBreath(this,'ujjayi')" data-k="ujjayi">Ujjayi 4-8</button>
+      </div>
+      <div class="breath-circle-wrap" id="breath-circle" onclick="toggleBreath()">
+        <div class="breath-ring-outer" id="breath-outer"></div>
+        <div class="breath-ring-mid" id="breath-mid"></div>
+        <div class="breath-ring-inner"></div>
+        <div class="breath-center">
+          <div class="breath-phase" id="breath-phase">Tap to start</div>
+          <div class="breath-count" id="breath-count"></div>
+          <div class="breath-tap" id="breath-tap">🫁</div>
+        </div>
+      </div>
+      <div class="breath-guide" id="breath-guide">Breathe with the circle</div>
     </div>
 
 </div>
@@ -1791,6 +1828,18 @@ function applyLang(){
   const ct=document.querySelector('#stu-contact-box .font-size-11px');
   // contact title
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(L[k])el.textContent=L[k];});
+  // Disclaimer label + language switch
+  const discLbl=document.getElementById('disc-lbl');
+  if(discLbl)discLbl.textContent=lang==='th'?'ข้อจำกัดความรับผิดชอบ':'Legal disclaimer';
+  const dEn=document.getElementById('disc-en');
+  const dTh=document.getElementById('disc-th');
+  if(dEn)dEn.style.display=lang==='th'?'none':'block';
+  if(dTh)dTh.style.display=lang==='th'?'block':'none';
+  // Nav back labels
+  document.querySelectorAll('.nav-back').forEach(function(b){
+    if(b.textContent.trim().includes('Home')||b.textContent.trim().includes('หน้าหลัก'))
+      b.innerHTML='&#8592; '+(lang==='th'?'หน้าหลัก':'Home');
+  });
 }
 
 function maskName(name){
@@ -3318,6 +3367,97 @@ function showVideoLink(grid){
     +'</div>'
     +'<span style="color:var(--pink);font-size:18px">→</span></a>';
 }
+
+/* ── BREATHING TIMER ── */
+const BREATH_PATTERNS={
+  box:{phases:['Inhale','Hold','Exhale','Hold'],times:[4,4,4,4],label:'Box breathing — calming & balancing'},
+  '478':{phases:['Inhale','Hold','Exhale'],times:[4,7,8],label:'4-7-8 — helps you sleep & relax'},
+  ujjayi:{phases:['Inhale','Exhale'],times:[4,8],label:'Ujjayi — energising & focused'}
+};
+const BREATH_TH={
+  box:{phases:['หายใจเข้า','กลั้น','หายใจออก','กลั้น'],label:'Box breathing — ผ่อนคลายและสมดุล'},
+  '478':{phases:['หายใจเข้า','กลั้น','หายใจออก'],label:'4-7-8 — ช่วยให้หลับและผ่อนคลาย'},
+  ujjayi:{phases:['หายใจเข้า','หายใจออก'],label:'Ujjayi — กระตุ้นพลังงาน'}
+};
+
+let bKey='box', bRunning=false, bTimer=null, bPhase=0, bCount=0;
+
+function setBreath(el,key){
+  document.querySelectorAll('.bpreset').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  bKey=key;
+  if(bRunning)stopBreath();
+  resetBreathUI();
+}
+
+function toggleBreath(){
+  if(bRunning)stopBreath();
+  else startBreath();
+}
+
+function startBreath(){
+  bRunning=true;bPhase=0;
+  document.getElementById('breath-tap').style.display='none';
+  runBreathPhase();
+}
+
+function stopBreath(){
+  bRunning=false;
+  clearTimeout(bTimer);
+  resetBreathUI();
+}
+
+function resetBreathUI(){
+  bCount=0;bPhase=0;
+  document.getElementById('breath-phase').textContent=lang==='th'?'แตะเพื่อเริ่ม':'Tap to start';
+  document.getElementById('breath-count').textContent='';
+  document.getElementById('breath-tap').style.display='block';
+  document.getElementById('breath-tap').textContent='🫁';
+  setBreathScale(1,0);
+  const p=BREATH_PATTERNS[bKey];
+  const g=lang==='th'?BREATH_TH[bKey].label:p.label;
+  document.getElementById('breath-guide').textContent=g;
+}
+
+function runBreathPhase(){
+  if(!bRunning)return;
+  const p=BREATH_PATTERNS[bKey];
+  const phases=lang==='th'?BREATH_TH[bKey].phases:p.phases;
+  const dur=p.times[bPhase];
+  const phaseName=phases[bPhase];
+  const isIn=phaseName.includes('Inhale')||phaseName.includes('เข้า');
+  const isOut=phaseName.includes('Exhale')||phaseName.includes('ออก');
+
+  document.getElementById('breath-phase').textContent=phaseName;
+  // Animate circle
+  const targetScale=isIn?1.22:isOut?0.88:1;
+  const transDur=isIn||isOut?dur:0.3;
+  setBreathScale(targetScale,transDur);
+
+  bCount=dur;
+  document.getElementById('breath-count').textContent=bCount;
+  countBreath(dur,function(){
+    if(!bRunning)return;
+    bPhase=(bPhase+1)%p.phases.length;
+    runBreathPhase();
+  });
+}
+
+function countBreath(sec,done){
+  if(sec<=0){done();return;}
+  document.getElementById('breath-count').textContent=sec;
+  bTimer=setTimeout(function(){countBreath(sec-1,done);},1000);
+}
+
+function setBreathScale(scale,dur){
+  const el=document.getElementById('breath-outer');
+  if(!el)return;
+  el.style.transition=dur>0?'transform '+dur+'s ease-in-out':'none';
+  el.style.transform='scale('+scale+')';
+  const mid=document.getElementById('breath-mid');
+  if(mid){mid.style.transition=el.style.transition;mid.style.transform='scale('+(scale*.95)+')';}
+}
+
 /* ── YOGA SUTRA TAGLINE ── */
 const YOGA_SUTRAS = [
   {su:'1.2', en:'"Yoga is the stilling of the fluctuations of the mind."'},
