@@ -16,15 +16,15 @@ body{background:#fafafa;min-height:100vh}
 #login-screen.on,#signup-screen.on,#student-login-screen.on{display:flex}
 
 /* HEADER */
-.hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0 1rem}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:.875rem 0 .75rem}
 .logo{font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink);line-height:1;user-select:none}
 .sub{font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 .lang-btn{background:#fff;border:1.5px solid var(--bd);border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#111;transition:all .15s;letter-spacing:1px}
 .lang-btn:hover{border-color:var(--pink);color:var(--pink)}
 
 /* HOME */
-.home-hero{text-align:center;padding:1.5rem 0 2rem}
-.home-hero-icon{font-size:28px;margin-bottom:12px}
+.home-hero{text-align:center;padding:1rem 0 1.5rem}
+.home-hero-icon{font-size:28px;margin-bottom:6px}
 .home-hero-title{font-size:17px;font-weight:500;color:#111;margin-bottom:6px}
 .home-hero-sub{font-size:13px;font-weight:300;color:var(--gl);line-height:1.6}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
@@ -35,7 +35,7 @@ body{background:#fafafa;min-height:100vh}
 .role-sub{font-size:12px;font-weight:300;color:var(--gl)}
 
 /* STUDENT LOGIN */
-#student-login-screen{flex-direction:column;align-items:center;padding:1.5rem 0}
+#student-login-screen{flex-direction:column;align-items:center;padding:.875rem 0}
 .slogin-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:320px}
 .slogin-hd{font-size:16px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
 .slogin-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem;line-height:1.5}
@@ -65,7 +65,7 @@ body{background:#fafafa;min-height:100vh}
 .privacy-text{font-size:12px;font-weight:300;color:#555;line-height:1.7}
 
 /* AUTH BOX */
-#login-screen,#signup-screen{flex-direction:column;align-items:center;padding:1.5rem 0}
+#login-screen,#signup-screen{flex-direction:column;align-items:center;padding:1rem 0}
 .auth-box{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px}
 .auth-hd{font-size:15px;font-weight:600;color:#111;margin-bottom:.25rem;text-align:center}
 .auth-sub{font-size:12px;font-weight:300;color:var(--gl);text-align:center;margin-bottom:1.25rem}
@@ -317,7 +317,7 @@ body{background:#fafafa;min-height:100vh}
 
 /* TEACHER USERNAME LOGIN */
 #teacher-login-screen.on{display:flex}
-#teacher-login-screen{flex-direction:column;align-items:center;padding:2rem 0;min-height:60vh;justify-content:center}
+#teacher-login-screen{flex-direction:column;align-items:center;padding:1rem 0}
 .tlogin-box{background:#f5f5f5;border-radius:24px;padding:2rem 1.75rem;width:100%;max-width:320px;border:1px solid #e8e8e8}
 .tlogin-hd{font-size:16px;font-weight:600;color:#111;margin-bottom:4px;text-align:center}
 .tlogin-sub{font-size:12px;font-weight:300;color:#999;text-align:center;margin-bottom:1.5rem;line-height:1.6}
@@ -329,7 +329,7 @@ body{background:#fafafa;min-height:100vh}
 .t-find-err{color:#f87171;font-size:12px;text-align:center;margin-top:8px;min-height:16px}
 /* Spacing improvements */
 .role-grid{margin-bottom:2rem}
-.home-hero{padding:2rem 0 2.5rem}
+.home-hero{padding:1.25rem 0 1.75rem}
 .library-section{padding:2rem 0 1.5rem;margin-top:2.5rem}
 
 .debt-banner{background:#FFE0EC;border:1.5px solid #fb2a7b;border-radius:14px;padding:1rem 1.25rem;margin-bottom:12px;text-align:center}
@@ -381,11 +381,11 @@ body{background:#fafafa;min-height:100vh}
   .sa-stats{grid-template-columns:repeat(3,1fr)}
   .modal{max-width:420px;padding:1.75rem}
   .modal.wide{max-width:480px}
-  .hd{padding:2rem 0 1.5rem}
+  .hd{padding:1rem 0 .875rem}
   .logo{font-size:40px}
   .teacher-card{padding:1.25rem 1.5rem}
   .teacher-name{font-size:16px}
-  .nav-bar{padding:.875rem .5rem}
+  .nav-bar{padding:.625rem .5rem}
   .slogin-box,.tlogin-box,.stu-pin-box,.auth-box{max-width:380px}
   .find-btn,.t-find-btn,.bs-full{padding:14px;font-size:16px}
   .name-input,.t-name-input{font-size:16px;padding:14px 18px}
@@ -632,7 +632,7 @@ body{background:#fafafa;min-height:100vh}
 
 
 <!-- STUDENT PIN SCREEN -->
-<div id="student-pin-screen" class="screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
+<div id="student-pin-screen" class="screen" style="display:none;flex-direction:column;align-items:center;padding:1rem 0">
   <div style="background:#fff;border:1px solid var(--bd);border-radius:20px;padding:1.75rem;width:100%;max-width:300px;margin:0 auto 1.5rem">
     <div style="font-size:36px;text-align:center;margin-bottom:8px" id="stu-pin-avatar">🌸</div>
     <div style="font-size:15px;font-weight:600;color:#111;margin-bottom:4px;text-align:center" id="stu-pin-hd">Set your PIN</div>
@@ -848,7 +848,7 @@ body{background:#fafafa;min-height:100vh}
 
 <!-- ═══════════════════════════════════════ -->
 <!-- SUPER ADMIN LOGIN -->
-<div id="sa-login-screen" class="sa-screen" style="display:none;flex-direction:column;align-items:center;padding:1.5rem 0;min-height:60vh;justify-content:center">
+<div id="sa-login-screen" class="sa-screen" style="display:none;flex-direction:column;align-items:center;padding:1rem 0">
   <div style="margin-bottom:1.5rem;text-align:center">
     <div class="logo" style="font-family:'FabfeltScript',cursive;font-size:36px;color:var(--pink)">Yoga with Jib</div>
     <div style="font-size:10px;font-weight:300;color:var(--gl);letter-spacing:2px;text-transform:uppercase;margin-top:4px">SUPER ADMIN</div>
