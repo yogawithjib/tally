@@ -1148,7 +1148,8 @@ ${lastDate?`<div class="text-center text-xs text-grey mt-4">${t('lastClass')}: $
   s.appendChild(card);
   
   // Top up button
-  const tu=el('div','',`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`);
+  const tu=el('div');
+  tu.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`;
   s.appendChild(tu);
   $('topup-btn').onclick=()=>render(s2=>screenTopUp(s2));
   
@@ -1338,7 +1339,7 @@ async function renderTabBody(container,teacher,tab,students){
   if(tab==='students'){
     // Add button
     const addRow=el('div');
-    addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">+ ${t('addStudent')}</button></div>`;
+    addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
     $('add-student-btn').onclick=()=>showAddStudentModal(teacher);
     
