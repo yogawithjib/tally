@@ -1753,7 +1753,19 @@ function maskName(name){
 }
 
 /* ── SCREENS ── */
-function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function go(id){
+  document.querySelectorAll('.screen,.sa-screen').forEach(function(s){
+    s.classList.remove('on');
+    s.style.display='none';
+  });
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('on');
+  // Use flex for screens that need it, block for others
+  var flexScreens=['student-login-screen','teacher-login-screen','login-screen',
+    'signup-screen','student-pin-screen','sa-login-screen'];
+  el.style.display=flexScreens.indexOf(id)>=0?'flex':'block';
+}
 function goHome(){
   currentTeacherId=null;currentStudentData=null;pi='';endSession();
   go('home-screen');
