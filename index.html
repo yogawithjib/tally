@@ -1337,7 +1337,8 @@ async function renderTabBody(container,teacher,tab,students){
   container.innerHTML='';
   if(tab==='students'){
     // Add button
-    const addRow=el('div','',`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">+ ${t('addStudent')}</button></div>`);
+    const addRow=el('div');
+    addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">+ ${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
     $('add-student-btn').onclick=()=>showAddStudentModal(teacher);
     
