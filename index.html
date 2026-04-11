@@ -574,7 +574,34 @@ body{background:#fafafa;min-height:100vh}
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn-sv">TH</button>
   </div>
   <div id="student-card-area"></div>
-  <button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
+  
+    <!-- LIBRARY IN STUDENT VIEW -->
+    <div class="library-section" id="lib-sec-student">
+      <div class="lib-title">&#10024; Explore more</div>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/forbeginners.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Beginner's guide</span><span class="lib-th">คู่มือผู้ฝึกใหม่</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/videos.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">Practice yoga online</span><span class="lib-th">ฝึกโยคะออนไลน์</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+      <a class="lib-link" href="https://yogawithjib.github.io/library/pranayama.html" target="_blank">
+        <div class="lib-dot">
+      <a class="lib-link" href="https://yogawithjib.github.io/library/diary.html" target="_blank">
+        <div class="lib-dot"></div>
+        <span class="lib-en">A yoga teacher's diary</span><span class="lib-th">ไดอารี่ครูโยคะ</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+    </div>
+        <span class="lib-en">Box breathing</span><span class="lib-th">ฝึกหายใจรูปกล่อง</span>
+        <span class="lib-arr">&rarr;</span>
+      </a>
+    </div>
+
+<button class="logout-btn" id="logout-student-btn" onclick="goHome()">← Back</button>
 </div>
 
 <!-- ADMIN VIEW -->
@@ -1690,7 +1717,7 @@ function findTeacher(){
   }
   document.getElementById('t-find-err').textContent='';
   currentTeacherId=tc.id;
-  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${maskName(tc.name)}`;
+  document.getElementById('login-teacher-name').textContent=`${tc.emoji||'🧘‍♀️'} ${tc.name}`;
   pi='';dots(['d0','d1','d2','d3'],0);
   document.getElementById('lerr').textContent='';
   go('login-screen');
@@ -2796,7 +2823,7 @@ function toggleDisc(){
 
 
 function shuffleLibrary(){
-  ['lib-sec-1','lib-sec-2','lib-sec-admin'].forEach(function(id){
+  ['lib-sec-1','lib-sec-2','lib-sec-admin','lib-sec-student'].forEach(function(id){
     var sec=document.getElementById(id);
     if(!sec)return;
     var links=Array.from(sec.querySelectorAll('.lib-link'));
