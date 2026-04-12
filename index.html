@@ -1107,7 +1107,9 @@ ${pinPadHTML('s')}
           student.pin=hashed;
           state.user={type:'student',student,teacher};
           startSession();
-          render(s2=>screenStudentCard(s2));
+          // Route to emoji picker if no emoji set yet
+          if(!student.studentEmoji)render(s2=>screenEmojiPicker(s2));
+          else render(s2=>screenStudentCard(s2));
         }catch(e){errDiv.style.display='';errDiv.className='alert alert-err';errDiv.textContent='Error: '+e.message;firstPin='';}
       }else{
         errDiv.style.display='';errDiv.className='alert alert-err';errDiv.textContent=t('pinMismatch');
@@ -1128,7 +1130,8 @@ ${pinPadHTML('s')}
         bfClear(student.id);
         state.user={type:'student',student,teacher};
         startSession();
-        render(s2=>screenStudentCard(s2));
+        if(!student.studentEmoji)render(s2=>screenEmojiPicker(s2));
+        else render(s2=>screenStudentCard(s2));
       }else{
         bfFail(student.id);
         const bf3=bfCheck(student.id);
@@ -1147,6 +1150,84 @@ function resetDots(id){
 // ═══════════════════════════════════════════════════════════
 // SCREEN: STUDENT CARD
 // ═══════════════════════════════════════════════════════════
+// ─── Motivational card ─────────────────────────────────────
+function buildMotivationalCard(hist){
+  if(!hist||!hist.length)return null;
+
+  const sorted=[...hist].sort();
+  const total=sorted.length;
+
+  // Streak — count consecutive weeks with at least 1 class
+  function getWeekKey(dateStr){
+    const d=new Date(dateStr);
+    const jan1=new Date(d.getFullYear(),0,1);
+    return d.getFullYear()+'-W'+Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+  }
+  const weeks=[...new Set(sorted.map(getWeekKey))];
+  let streak=1;
+  for(let i=weeks.length-1;i>0;i--){
+    const [y1,w1]=weeks[i].split('-W').map(Number);
+    const [y2,w2]=weeks[i-1].split('-W').map(Number);
+    const diff=(y1-y2)*52+(w1-w2);
+    if(diff===1)streak++;
+    else break;
+  }
+
+  // Milestones
+  const MILESTONES=[
+    {n:5,   emoji:'🌱', en:'5 classes!',          th:'5 ครั้งแล้ว!'},
+    {n:10,  emoji:'🌿', en:'10 classes!',         th:'10 ครั้งแล้ว!'},
+    {n:20,  emoji:'🌸', en:'20 classes!',         th:'20 ครั้งแล้ว!'},
+    {n:30,  emoji:'🌺', en:'30 classes!',         th:'30 ครั้งแล้ว!'},
+    {n:50,  emoji:'🦋', en:'50 classes!',         th:'50 ครั้งแล้ว!'},
+    {n:75,  emoji:'🌻', en:'75 classes!',         th:'75 ครั้งแล้ว!'},
+    {n:100, emoji:'🏆', en:'100 classes!',        th:'100 ครั้งแล้ว!'},
+    {n:150, emoji:'✨', en:'150 classes!',        th:'150 ครั้งแล้ว!'},
+    {n:200, emoji:'🧘', en:'200 classes — legend!',th:'200 ครั้ง — สุดยอด!'},
+  ];
+  const reached=MILESTONES.filter(m=>total>=m.n);
+  const current=reached[reached.length-1]||null;
+  const next=MILESTONES.find(m=>total<m.n)||null;
+  const justHit=current&&current.n===total;
+
+  const card=el('div','card');
+  card.style.cssText='margin:0 16px 14px;background:var(--pink-l);border:1.5px solid var(--pink-m)';
+
+  // Streak display
+  const streakBar=`<div style="display:flex;align-items:center;gap:10px">
+<div style="font-size:26px">${streak>=4?'🔥':streak>=2?'⚡':'💧'}</div>
+<div>
+  <div style="font-size:15px;font-weight:600">${streak} ${lang==='th'?'สัปดาห์ติดต่อกัน':'week streak'}</div>
+  <div style="font-size:11px;color:var(--grey)">${streak>=8?(lang==='th'?'ไม่หยุดเลย! 🔥':'Unstoppable! 🔥'):streak>=4?(lang==='th'?'สม่ำเสมอมาก!':'Very consistent!'):streak>=2?(lang==='th'?'ทำได้ดี!':'Keep it up!'):lang==='th'?'เริ่มต้นสัปดาห์นี้':'Start of a new streak'}</div>
+</div>
+</div>`;
+
+  // Milestone display
+  const milestoneBar=current?`<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--pink-m)">
+<div style="font-size:26px">${current.emoji}</div>
+<div style="flex:1">
+  <div style="font-size:14px;font-weight:600;color:var(--pink)">${lang==='th'?current.th:current.en} ${justHit?'🎉':''}</div>
+  ${next?`<div style="margin-top:4px">
+    <div style="height:5px;background:var(--pink-m);border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:${Math.round(((total-current.n)/(next.n-current.n))*100)}%;background:var(--pink);border-radius:3px;transition:width .6s ease"></div>
+    </div>
+    <div style="font-size:10px;color:var(--grey);margin-top:3px">${next.n-total} ${lang==='th'?'ครั้งถึง':'to go until'} ${next.emoji} ${next.n}</div>
+  </div>`:'<div style="font-size:11px;color:var(--pink);margin-top:2px">'+( lang==='th'?'สุดยอดมาก! 🙏':'Amazing dedication! 🙏')+'</div>'}
+</div>
+</div>`:next?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--pink-m)">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:12px">
+  <span style="color:var(--grey)">${lang==='th'?'เป้าหมายแรก':'First milestone'} ${next.emoji} ${next.n}</span>
+  <span style="color:var(--pink);font-weight:600">${total}/${next.n}</span>
+</div>
+<div style="height:5px;background:var(--pink-m);border-radius:3px;overflow:hidden">
+  <div style="height:100%;width:${Math.round((total/next.n)*100)}%;background:var(--pink);border-radius:3px"></div>
+</div>
+</div>`:'';
+
+  card.innerHTML=streakBar+milestoneBar;
+  return card;
+}
+
 async function screenStudentCard(s){
   state._curFn=screenStudentCard;
   const{student,teacher}=state.user;
@@ -1180,6 +1261,10 @@ ${lastDate?`<div class="text-center"><div class="stat-num" style="font-size:13px
 </div>`;
     s.appendChild(card);
 
+    // Motivational section
+    const motiv=buildMotivationalCard(hist);
+    if(motiv)s.appendChild(motiv);
+
     // Top up button → top up for per-class
     const tu=el('div');
     tu.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`;
@@ -1208,7 +1293,7 @@ ${pay&&pay.amount?`<span style="font-weight:600;color:var(--pink);font-size:12px
 
   const card=el('div','card');
   card.innerHTML=`<div class="text-center">
-<div style="font-size:28px">${teacher.emoji||'🧘'}</div>
+<div style="font-size:28px">${student.studentEmoji||teacher.emoji||'🧘'}</div>
 <div class="bold" style="font-size:18px;margin:6px 0">${student.n||student.sym}</div>
 <div class="text-grey text-sm">@${student.sym}</div>
 </div>
@@ -1219,8 +1304,22 @@ ${ringHTML(c,tot)}
 <div class="text-center"><div class="stat-num" style="${c<0?'color:#b91c1c':''}">${c}</div><div class="text-xs text-grey">${t('remaining')}</div></div>
 </div>
 ${lastDate?`<div class="text-center text-xs text-grey mt-4">${t('lastClass')}: ${fmtDate(lastDate)}</div>`:''}
-${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}: ฿${student.price.toLocaleString()}</div>`:''}`;
+${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}: ฿${student.price.toLocaleString()}</div>`:''}
+<div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+<button id="sc-leaderboard" class="btn btn-ghost btn-sm">🏆 ${lang==='th'?'อันดับ':'Leaderboard'}</button>
+<button id="sc-feed" class="btn btn-ghost btn-sm">📣 ${lang==='th'?'กิจกรรม':'Activity'}</button>
+<button id="sc-emoji" class="btn btn-ghost btn-sm">${student.studentEmoji||'😊'} ${lang==='th'?'เปลี่ยน':'Change'}</button>
+</div>`;
+
+  // End of card HTML done
   s.appendChild(card);
+  $('sc-leaderboard').onclick=()=>render(screenLeaderboard);
+  $('sc-feed').onclick=()=>render(screenFeed);
+  $('sc-emoji').onclick=()=>render(screenEmojiPicker);
+
+  // Motivational section
+  const motiv=buildMotivationalCard(hist);
+  if(motiv)s.appendChild(motiv);
 
   // Easter egg: hold the ring for 2s → singing bowl 🎵
   setTimeout(()=>{
@@ -2248,29 +2347,54 @@ function confirmDeleteStudent(student,teacher){
 }
 
 function showAddStudentModal(teacher){
-  const{overlay,close}=showModal(`<div class="modal-title">+ ${t('addStudent')}</div>
+  const{modal,close}=showModal(`<div class="modal-title">+ ${t('addStudent')}</div>
 <div class="input-group"><label class="input-label">${t('name')}</label>
 <input class="input" id="a-name" placeholder="Name"></div>
 <div class="input-group"><label class="input-label">${t('username')}</label>
 <input class="input" id="a-sym" placeholder="username" autocapitalize="none"></div>
-<div class="input-group"><label class="input-label">${t('numClasses')}</label>
-<input class="input" id="a-c" type="number" value="10" min="0"></div>
-<div class="input-group"><label class="input-label">${t('price')} (฿)</label>
-<input class="input" id="a-price" type="number" placeholder="0"></div>
-<button class="btn btn-primary btn-full" id="a-ok">${t('save')}</button>
+<div style="display:flex;gap:8px;margin-bottom:14px">
+  <button id="a-pkg-btn" class="btn btn-primary flex-1" style="border-radius:var(--r-xs);padding:10px">${lang==='th'?'📦 แพ็กเกจ':'📦 Package'}</button>
+  <button id="a-pc-btn" class="btn btn-ghost flex-1" style="border-radius:var(--r-xs);padding:10px">${lang==='th'?'📌 รายครั้ง':'📌 Per class'}</button>
+</div>
+<div id="a-pkg-fields">
+  <div class="input-group"><label class="input-label">${t('numClasses')}</label>
+  <input class="input" id="a-c" type="number" value="10" min="0"></div>
+  <div class="input-group"><label class="input-label">${t('price')} (฿)</label>
+  <input class="input" id="a-price" type="number" placeholder="0"></div>
+</div>
+<div id="a-pc-fields" style="display:none">
+  <div class="input-group"><label class="input-label">${lang==='th'?'ราคาต่อครั้ง (฿)':'Price per class (฿)'}</label>
+  <input class="input" id="a-pc-price" type="number" placeholder="0"></div>
+</div>
+<button class="btn btn-primary btn-full mt-8" id="a-ok">${t('save')}</button>
 <div id="a-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  let isPerClass=false;
+  const pkgBtn=$('a-pkg-btn'), pcBtn=$('a-pc-btn');
+  pkgBtn.onclick=()=>{
+    isPerClass=false;
+    pkgBtn.className='btn btn-primary flex-1';pkgBtn.style.borderRadius='var(--r-xs)';pkgBtn.style.padding='10px';
+    pcBtn.className='btn btn-ghost flex-1';pcBtn.style.borderRadius='var(--r-xs)';pcBtn.style.padding='10px';
+    $('a-pkg-fields').style.display='';$('a-pc-fields').style.display='none';
+  };
+  pcBtn.onclick=()=>{
+    isPerClass=true;
+    pcBtn.className='btn btn-primary flex-1';pcBtn.style.borderRadius='var(--r-xs)';pcBtn.style.padding='10px';
+    pkgBtn.className='btn btn-ghost flex-1';pkgBtn.style.borderRadius='var(--r-xs)';pkgBtn.style.padding='10px';
+    $('a-pkg-fields').style.display='none';$('a-pc-fields').style.display='';
+  };
+
   $('a-ok').onclick=async()=>{
     const name=$('a-name').value.trim();
     const sym=$('a-sym').value.trim().toLowerCase();
-    const c=parseInt($('a-c').value)||10;
-    const price=parseFloat($('a-price').value)||0;
+    const price=isPerClass?parseFloat($('a-pc-price').value)||0:parseFloat($('a-price').value)||0;
+    const c=isPerClass?0:parseInt($('a-c').value)||10;
     if(!sym){$('a-err').style.display='';$('a-err').textContent='Username required';return;}
-    // check duplicate
     const existing=C.get('students_'+teacher.id)||[];
     if(existing.find(s=>s.sym===sym)){$('a-err').style.display='';$('a-err').textContent='Username already exists';return;}
     $('a-ok').disabled=true;
     const newId='s_'+Date.now();
-    const data={n:name,sym,c,t:c,u:0,h:[],price,pin:null,updatedAt:new Date().toISOString()};
+    const data={n:name,sym,c,t:c,u:0,h:[],price,pin:null,perClass:isPerClass,updatedAt:new Date().toISOString()};
     try{
       await fbWrite(`teachers/${teacher.id}/students/${newId}`,data,false);
       const students=[...existing,{id:newId,...data}];
@@ -3125,7 +3249,177 @@ function confirmDeleteTeacher(teacherId,teacherName,onDone){
 }
 
 // ═══════════════════════════════════════════════════════════
-// BREATHING WIDGET
+// EMOJI PICKER SCREEN
+// ═══════════════════════════════════════════════════════════
+const ALL_EMOJIS=['😀','😎','🥰','🤩','😇','🧘','🤸','🏄','🧗','🎯','🎨','🎸','🎭','🦁','🐯','🦊','🐺','🦋','🐬','🦅','🦚','🦜','🐙','🦈','🌸','🌺','🌻','🌹','🌷','🌿','🍀','🎋','🌊','⭐','🌙','☀️','🔥','💫','🌈','❄️','🍓','🍊','🍋','🍇','🥝','🍄','🌮','🍜','🍕','🎂','🚀','🛸','🎪','🎠','🏔️','🌋','🏝','🎡','🎢','💎','🔮','🧿','🪬','🎀','🪷','🫧','🌴','🦩','🦢','🕊️','🐝','🦋','🌺','🌸'];
+
+const EMOJI_POOL=[...new Set(ALL_EMOJIS)]; // deduplicate
+
+function getUsedEmojis(teacher){
+  const students=C.get('students_'+teacher.id)||[];
+  return new Set(students.filter(s=>s.studentEmoji).map(s=>s.studentEmoji));
+}
+
+async function screenEmojiPicker(s){
+  state._curFn=screenEmojiPicker;
+  const{student,teacher}=state.user;
+  s.appendChild(makeHeader({}));
+
+  const card=el('div','card');
+  const used=getUsedEmojis(teacher);
+  // Remove current student's own emoji from used set (so they can re-pick it)
+  if(student.studentEmoji)used.delete(student.studentEmoji);
+
+  const available=EMOJI_POOL.filter(e=>!used.has(e));
+  let selected=student.studentEmoji||'';
+
+  card.innerHTML=`<div class="text-center" style="margin-bottom:16px">
+<div style="font-size:36px" id="ep-preview">${selected||'?'}</div>
+<div class="bold" style="font-size:16px;margin-top:8px">${lang==='th'?'เลือก Emoji ของคุณ':'Pick your emoji'}</div>
+<div class="text-grey text-sm mt-4">${lang==='th'?'ไม่ซ้ำกับคนอื่นในกลุ่มเดียวกัน':'Unique within your teacher\'s group'}</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:260px;overflow-y:auto;padding:4px 0" id="ep-grid">
+${EMOJI_POOL.map(e=>{
+  const taken=used.has(e)&&e!==selected;
+  return`<button data-emoji="${e}" style="font-size:26px;width:44px;height:44px;border-radius:10px;border:2px solid ${e===selected?'var(--pink)':taken?'transparent':'var(--grey-m)'};background:${e===selected?'var(--pink-l)':taken?'#f5f5f5':'#fff'};cursor:${taken?'not-allowed':'pointer'};opacity:${taken?.3:1};transition:.12s">${e}</button>`;
+}).join('')}
+</div>
+<button class="btn btn-primary btn-full mt-16" id="ep-confirm" ${selected?'':'disabled'}>${lang==='th'?'ยืนยัน':'Confirm'}</button>`;
+  s.appendChild(card);
+
+  card.querySelector('#ep-grid').querySelectorAll('[data-emoji]').forEach(btn=>{
+    const emoji=btn.dataset.emoji;
+    if(used.has(emoji)&&emoji!==selected)return;
+    btn.onclick=()=>{
+      selected=emoji;
+      $('ep-preview').textContent=emoji;
+      $('ep-confirm').disabled=false;
+      card.querySelectorAll('[data-emoji]').forEach(b=>{
+        const taken=used.has(b.dataset.emoji)&&b.dataset.emoji!==emoji;
+        b.style.border=`2px solid ${b.dataset.emoji===emoji?'var(--pink)':taken?'transparent':'var(--grey-m)'}`;
+        b.style.background=b.dataset.emoji===emoji?'var(--pink-l)':taken?'#f5f5f5':'#fff';
+      });
+    };
+  });
+
+  $('ep-confirm').onclick=async()=>{
+    if(!selected)return;
+    $('ep-confirm').disabled=true;
+    try{
+      await writeStudent(teacher.id,student.id,{studentEmoji:selected});
+      student.studentEmoji=selected;
+      syncStudentCache(student,teacher);
+      render(s2=>screenStudentCard(s2));
+    }catch(e){toast('Error: '+e.message);$('ep-confirm').disabled=false;}
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// LEADERBOARD + FEED
+// ═══════════════════════════════════════════════════════════
+function calcStreak(hist){
+  if(!hist||!hist.length)return 0;
+  const sorted=[...hist].sort();
+  function getWeek(d){const dt=new Date(d);const jan=new Date(dt.getFullYear(),0,1);return dt.getFullYear()+'-W'+Math.ceil(((dt-jan)/86400000+jan.getDay()+1)/7);}
+  const weeks=[...new Set(sorted.map(getWeek))];
+  let streak=1;
+  for(let i=weeks.length-1;i>0;i--){
+    const[y1,w1]=weeks[i].split('-W').map(Number);
+    const[y2,w2]=weeks[i-1].split('-W').map(Number);
+    if((y1-y2)*52+(w1-w2)===1)streak++;else break;
+  }
+  return streak;
+}
+
+async function screenLeaderboard(s){
+  state._curFn=screenLeaderboard;
+  const{student,teacher}=state.user;
+  s.appendChild(makeHeader({back:true,onBack:()=>render(screenStudentCard)}));
+
+  const title=el('div');
+  title.style.cssText='text-align:center;padding:12px 20px 4px';
+  title.innerHTML=`<div style="font-size:20px;font-weight:600">🏆 ${lang==='th'?'ลีดเดอร์บอร์ด':'Leaderboard'}</div>
+<div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?'สัปดาห์ที่ติดต่อกัน':'Consecutive week streak'}</div>`;
+  s.appendChild(title);
+
+  const body=el('div');body.innerHTML=`<div class="empty-state"><div class="loading-spin"></div></div>`;
+  s.appendChild(body);
+
+  try{
+    const students=await getStudents(teacher.id);
+    const ranked=students
+      .filter(st=>st.studentEmoji&&st.h?.length)
+      .map(st=>({emoji:st.studentEmoji,streak:calcStreak(st.h),total:st.h.length,isMe:st.id===student.id}))
+      .sort((a,b)=>b.streak-a.streak||b.total-a.total);
+
+    if(!ranked.length){body.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีข้อมูล':'No data yet'}</div>`;return;}
+
+    const MEDALS=['🥇','🥈','🥉'];
+    body.innerHTML='';
+    ranked.forEach((r,i)=>{
+      const row=el('div');
+      row.style.cssText=`display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #f5f5f5;${r.isMe?'background:var(--pink-l);':''}`;
+      row.innerHTML=`<span style="font-size:18px;width:28px;text-align:center">${MEDALS[i]||String(i+1)}</span>
+<span style="font-size:32px">${r.emoji}</span>
+<div style="flex:1">
+  <div style="font-weight:600;font-size:14px">${r.isMe?`(${lang==='th'?'คุณ':'You'}) `:''}${r.streak} ${lang==='th'?'สัปดาห์':'week'} streak 🔥</div>
+  <div style="font-size:11px;color:var(--grey)">${r.total} ${lang==='th'?'ครั้งทั้งหมด':'total classes'}</div>
+</div>`;
+      body.appendChild(row);
+    });
+  }catch(e){body.innerHTML=`<div class="empty-state">${e.message}</div>`;}
+  s.appendChild(el('div','version',VER));
+}
+
+async function screenFeed(s){
+  state._curFn=screenFeed;
+  const{student,teacher}=state.user;
+  s.appendChild(makeHeader({back:true,onBack:()=>render(screenStudentCard)}));
+
+  const title=el('div');
+  title.style.cssText='text-align:center;padding:12px 20px 4px';
+  title.innerHTML=`<div style="font-size:20px;font-weight:600">📣 ${lang==='th'?'กิจกรรม':'Activity'}</div>
+<div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?'กลุ่มของคุณ':'Your group'}</div>`;
+  s.appendChild(title);
+
+  const body=el('div');body.innerHTML=`<div class="empty-state"><div class="loading-spin"></div></div>`;
+  s.appendChild(body);
+
+  try{
+    const students=await getStudents(teacher.id);
+    // Build feed from all students' class histories
+    const events=[];
+    students.forEach(st=>{
+      if(!st.studentEmoji)return;
+      (st.h||[]).forEach(date=>{
+        events.push({emoji:st.studentEmoji,date,isMe:st.id===student.id});
+      });
+    });
+    events.sort((a,b)=>b.date>a.date?1:-1);
+    const recent=events.slice(0,40);
+
+    if(!recent.length){body.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีกิจกรรม':'No activity yet'}</div>`;return;}
+
+    body.innerHTML='';
+    let lastDate='';
+    recent.forEach(ev=>{
+      if(ev.date!==lastDate){
+        lastDate=ev.date;
+        const sep=el('div');
+        sep.style.cssText='font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;padding:10px 20px 4px';
+        sep.textContent=fmtDate(ev.date);
+        body.appendChild(sep);
+      }
+      const row=el('div');
+      row.style.cssText=`display:flex;align-items:center;gap:10px;padding:10px 20px;${ev.isMe?'background:var(--pink-l);':''}`;
+      const msg=lang==='th'?'เข้าเรียนแล้ว 🧘':'practiced 🧘';
+      row.innerHTML=`<span style="font-size:28px">${ev.emoji}</span>
+<span style="font-size:13px;color:var(--text-s)">${ev.isMe?`<strong>${lang==='th'?'คุณ':'You'}</strong>`:ev.emoji} ${msg}</span>`;
+      body.appendChild(row);
+    });
+  }catch(e){body.innerHTML=`<div class="empty-state">${e.message}</div>`;}
+  s.appendChild(el('div','version',VER));
+}
 // ═══════════════════════════════════════════════════════════
 let breathState={active:false,phase:'in',timer:null};
 
