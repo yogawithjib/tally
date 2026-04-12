@@ -1768,6 +1768,15 @@ async function screenTeacherDash(s){
       if(activeTab==='students')renderTabBody(body,teacher,'students',fresh);
     });
   }
+
+  // Footer disclaimer
+  const footer=el('div');
+  footer.style.cssText='padding:2px 20px 20px;margin-top:8px';
+  footer.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:9px;color:#ddd;line-height:2;border-top:0.5px solid #f5f5f5;padding-top:10px">
+<div><span style="color:#d0d0d0;font-weight:600;font-size:9px;display:block;margin-bottom:2px">${lang==='th'?'เกี่ยวกับ':'About'}</span>${lang==='th'?'ระบบติดตามแพ็กเกจคลาส':'Class package tracker'}<br>${lang==='th'?'โดย Yoga with Jib':'by Yoga with Jib'}<br>© 2025</div>
+<div><span style="color:#d0d0d0;font-weight:600;font-size:9px;display:block;margin-bottom:2px">${lang==='th'?'ข้อกำหนด':'Terms'}</span>${lang==='th'?'ใช้งานตามความเสี่ยงของตนเอง':'Use at your own risk'}<br>${lang==='th'?'ข้อมูลอาจไม่ถูกต้อง 100%':'Data may not be 100% accurate'}<br>${lang==='th'?'ไม่รับผิดชอบความเสียหาย':'Not liable for losses'}</div>
+</div>`;
+  s.appendChild(footer);
 }
 
 function renderStats(container,students){
