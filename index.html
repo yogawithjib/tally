@@ -1951,11 +1951,7 @@ function renderIncomeList(container,view,months,years,students,teacher){
     months.forEach(m=>{
       const card=el('div','card');
       card.style.margin='0 16px 10px';
-      card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
-<div style="font-size:14px;font-weight:600">${m.label}</div>
-<div style="font-size:16px;font-weight:600;color:var(--pink)">฿${m.total.toLocaleString()}</div>
-</div>
-<div>${m.entries.sort((a,b)=>b.date>a.date?1:-1).map(e=>`
+      const rowsHTML=m.entries.sort((a,b)=>b.date>a.date?1:-1).map(e=>`
 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--grey-l);font-size:12px">
   <span style="color:var(--grey);flex-shrink:0;min-width:72px">${fmtDate(e.date)}</span>
   ${e._studio?`<span style="font-size:10px;background:#E6F1FB;color:#0C447C;border-radius:8px;padding:2px 7px;font-weight:600;flex-shrink:0">🏛</span>`:''}
@@ -1963,7 +1959,22 @@ function renderIncomeList(container,view,months,years,students,teacher){
   ${e._studio&&e._log?`<span style="font-size:11px;color:var(--grey)">${e._log.classes}cls</span>`:''}
   <span style="font-weight:600;color:var(--pink);flex-shrink:0">฿${Number(e.amount).toLocaleString()}</span>
   ${e.note&&!e._studio?`<span style="color:var(--grey);font-size:11px;flex-shrink:0">${e.note}</span>`:''}
-</div>`).join('')}</div>`;
+</div>`).join('');
+      card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" data-toggle>
+<div style="font-size:14px;font-weight:600">${m.label}</div>
+<div style="display:flex;align-items:center;gap:8px">
+  <div style="font-size:16px;font-weight:600;color:var(--pink)">฿${m.total.toLocaleString()}</div>
+  <span style="font-size:11px;color:var(--grey)">▶</span>
+</div>
+</div>
+<div class="collapse-rows" style="display:none;margin-top:8px">${rowsHTML}</div>`;
+      card.querySelector('[data-toggle]').onclick=()=>{
+        const rows=card.querySelector('.collapse-rows');
+        const arr=card.querySelector('[data-toggle] span');
+        const open=rows.style.display!=='none';
+        rows.style.display=open?'none':'block';
+        arr.textContent=open?'▶':'▼';
+      };
       container.appendChild(card);
     });
   }else if(view==='year'){
@@ -1972,9 +1983,20 @@ function renderIncomeList(container,view,months,years,students,teacher){
       card.style.margin='0 16px 10px';
       const monthRows=Object.entries(yr.months).sort((a,b)=>b[0]>a[0]?1:-1).map(([mon,data])=>{
         const label=new Date(mon+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'long'});
-        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey)">'+label+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--grey)">'+data.entries.length+' '+( lang==='th'?'รายการ':'pmts')+'</span><span style="font-weight:600;color:var(--pink)">฿'+data.total.toLocaleString()+'</span></div></div>';
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey)">'+label+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--grey)">'+data.entries.length+' '+(lang==='th'?'รายการ':'pmts')+'</span><span style="font-weight:600;color:var(--pink)">฿'+data.total.toLocaleString()+'</span></div></div>';
       }).join('');
-      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><div style="font-size:18px;font-weight:600">'+yr.year+'</div><div style="font-size:18px;font-weight:600;color:var(--pink)">฿'+yr.total.toLocaleString()+'</div></div><div style="font-size:11px;color:var(--grey);margin-bottom:8px">'+yr.entries.length+' '+( lang==='th'?'รายการ':'payments')+'</div>'+monthRows;
+      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" data-toggle>'+
+        '<div style="font-size:18px;font-weight:600">'+yr.year+'</div>'+
+        '<div style="display:flex;align-items:center;gap:8px"><div style="font-size:18px;font-weight:600;color:var(--pink)">฿'+yr.total.toLocaleString()+'</div><span style="font-size:11px;color:var(--grey)">▶</span></div>'+
+        '</div>'+
+        '<div class="collapse-rows" style="display:none;margin-top:8px"><div style="font-size:11px;color:var(--grey);margin-bottom:6px">'+yr.entries.length+' '+(lang==='th'?'รายการ':'payments')+'</div>'+monthRows+'</div>';
+      card.querySelector('[data-toggle]').onclick=()=>{
+        const rows=card.querySelector('.collapse-rows');
+        const arr=card.querySelector('[data-toggle] span');
+        const open=rows.style.display!=='none';
+        rows.style.display=open?'none':'block';
+        arr.textContent=open?'▶':'▼';
+      };
       container.appendChild(card);
     });
   }else if(view==='student'&&students){
@@ -1995,17 +2017,17 @@ function renderIncomeList(container,view,months,years,students,teacher){
       perStudent.forEach(({st,total,entries})=>{
         const card=el('div','card');card.style.margin='0 16px 10px';
         const rows=entries.map(e=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey);flex-shrink:0;min-width:72px">'+fmtDate(e.date)+'</span><span style="font-weight:600;color:var(--pink);flex-shrink:0">฿'+Number(e.amount).toLocaleString()+'</span>'+(e.classes?'<span style="font-size:11px;color:var(--grey)">'+e.classes+' cls</span>':'')+(e.note?'<span style="font-size:11px;color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e.note+'</span>':'')+'</div>').join('');
-        const hdr='<div style="display:flex;justify-content:space-between;align-items:center" data-toggle-src><div><div style="font-size:14px;font-weight:600">'+(st.n||st.sym)+'</div><div style="font-size:11px;color:var(--grey)">@'+st.sym+' · '+entries.length+' '+(lang==='th'?'รายการ':'payments')+'</div></div><div style="display:flex;align-items:center;gap:8px"><div style="font-size:16px;font-weight:600;color:var(--pink)">฿'+total.toLocaleString()+'</div><span style="font-size:11px;color:var(--grey)">▼</span></div></div>';
+        const hdr='<div style="display:flex;justify-content:space-between;align-items:center" data-toggle-src><div><div style="font-size:14px;font-weight:600">'+(st.n||st.sym)+'</div><div style="font-size:11px;color:var(--grey)">@'+st.sym+' · '+entries.length+' '+(lang==='th'?'รายการ':'payments')+'</div></div><div style="display:flex;align-items:center;gap:8px"><div style="font-size:16px;font-weight:600;color:var(--pink)">฿'+total.toLocaleString()+'</div><span style="font-size:11px;color:var(--grey)">▶</span></div></div>';
         const rowsHTML='<div class="src-rows" style="margin-top:8px">'+rows+'</div>';
         card.innerHTML=hdr+rowsHTML;
         // Collapsed by default — toggle on tap
         const rowsEl=card.querySelector('.src-rows');
         const arr=card.querySelector('[data-toggle-src] span');
-        rowsEl.style.display='none';arr.textContent='▼';
+        rowsEl.style.display='none';arr.textContent='▶';
         card.querySelector('[data-toggle-src]').onclick=()=>{
           const open=rowsEl.style.display!=='none';
           rowsEl.style.display=open?'none':'block';
-          arr.textContent=open?'▼':'▲';
+          arr.textContent=open?'▶':'▼';
         };
         container.appendChild(card);
       });
@@ -3637,7 +3659,7 @@ async function screenSuperAdmin(s){
   guideWrap.style.cssText='margin:20px 16px 8px';
   guideWrap.innerHTML=`<button id="guide-toggle" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fff;border:0.5px solid var(--grey-m);border-radius:var(--r-s);padding:12px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--text)">
 <span>📖 ${lang==='th'?'คู่มือผู้ดูแลระบบ':'Admin Guidebook'}</span>
-<span id="guide-arr" style="font-size:12px;color:var(--grey)">▼</span>
+<span id="guide-arr" style="font-size:12px;color:var(--grey)">▶</span>
 </button>
 <div id="guide-body" style="display:none;margin-top:8px"></div>`;
   s.appendChild(guideWrap);
@@ -3646,7 +3668,7 @@ async function screenSuperAdmin(s){
     const body=$('guide-body');
     const arr=$('guide-arr');
     const open=body.style.display!=='none';
-    if(open){body.style.display='none';arr.textContent='▼';}
+    if(open){body.style.display='none';arr.textContent='▶';}
     else{
       body.style.display='block';
       arr.textContent='▲';
@@ -4369,7 +4391,7 @@ function buildBreathWidget(){
   const w=el('div','breath-widget');
   w.innerHTML=`<div class="breath-header" id="breath-hdr">
 <span class="breath-title">🌬 ${t('breathe')}</span>
-<span class="breath-arrow" id="breath-arr">▼</span>
+<span class="breath-arrow" id="breath-arr">▶</span>
 </div>
 <div class="breath-body" id="breath-body" style="display:none">
 <div style="display:flex;gap:12px;margin-bottom:20px;align-items:flex-end">
@@ -4399,7 +4421,7 @@ function buildBreathWidget(){
     const arr=w.querySelector('#breath-arr');
     const open=body.style.display!=='none';
     body.style.display=open?'none':'block';
-    arr.textContent=open?'▼':'▲';
+    arr.textContent=open?'▶':'▼';
   };
 
   w.querySelector('#breath-start').onclick=()=>{
