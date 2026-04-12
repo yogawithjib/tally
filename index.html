@@ -1735,8 +1735,12 @@ async function screenTeacherDash(s){
   const statsDiv=el('div','stats-bar',null);statsDiv.id='stats-bar';
   s.appendChild(statsDiv);
   
-  // Tabs
-  const tabs=el('div','tab-row');
+  // Studio log button (if teacher has studios)
+  const studioWrap=el('div');
+  studioWrap.id='studio-log-wrap';
+  studioWrap.style.cssText='padding:0 16px 10px;display:none';
+  studioWrap.innerHTML=`<button class="btn btn-ghost btn-full" id="studio-log-btn">🏛 ${lang==='th'?'บันทึกรายได้สตูดิโอ':'Log studio income'}</button>`;
+  s.appendChild(studioWrap);
   tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">👥 ${lang==='th'?'นักเรียน':'Students'}</div>
 <div class="tab ${activeTab==='income'?'active':''}" data-tab="income">💰 ${lang==='th'?'รายได้':'Income'}</div>
 <div class="tab ${activeTab==='settings'?'active':''}" data-tab="settings">⚙️ ${lang==='th'?'ตั้งค่า':'Settings'}</div>`;
@@ -1757,6 +1761,13 @@ async function screenTeacherDash(s){
   const students=await getStudents(teacher.id);
   // Silently migrate legacy payments into topups for all students
   students.forEach(st=>{if((st.payments||[]).length)migratePaymentsToTopups(st,teacher);});
+
+  // Show studio log button if teacher has studios
+  if((teacher.studios||[]).length){
+    $('studio-log-wrap').style.display='';
+    $('studio-log-btn').onclick=()=>showLogStudioModal(teacher);
+  }
+
   renderStats(statsDiv,students);
   renderTabBody(body,teacher,activeTab,students);
   
@@ -1810,11 +1821,10 @@ async function migratePaymentsToTopups(student,teacher){
 }
 
 // ─── Income helpers ─────────────────────────────────────────
-function buildMonthlyIncome(students){
+function buildMonthlyIncome(students,teacher){
   const map={};
   students.forEach(st=>{
     const hasTopups=(st.topups||[]).length>0;
-    // Only read payments[] if no topups (not yet migrated)
     const sources=hasTopups
       ?(st.topups||[]).filter(tp=>tp.paid!==false).map(tp=>({date:tp.date,amount:tp.price||0,note:tp.note||'',studentName:st.n||st.sym||'?',_teacher:st._teacher||null}))
       :(st.payments||[]).map(p=>({date:p.date,amount:p.amount||0,note:p.note||'',studentName:st.n||st.sym||'?',_teacher:st._teacher||null}));
@@ -1825,6 +1835,14 @@ function buildMonthlyIncome(students){
       map[month].total+=p.amount||0;
       map[month].entries.push(p);
     });
+  });
+  const studioLogs=(teacher?.studioLogs||[]).filter(l=>l.paid!==false);
+  studioLogs.forEach(l=>{
+    const month=l.month;
+    if(!month)return;
+    if(!map[month])map[month]={month,total:0,entries:[]};
+    map[month].total+=l.net||0;
+    map[month].entries.push({date:month+'-01',amount:l.net||0,note:l.note||'',studentName:l.studioName,_studio:true,_log:l,_teacher:null});
   });
   return Object.values(map).sort((a,b)=>b.month>a.month?1:-1).map(m=>({
     ...m,
@@ -1854,8 +1872,8 @@ function buildYearlyIncome(students){
   return Object.values(map).sort((a,b)=>b.year>a.year?1:-1);
 }
 
-function renderIncomeTab(container,students){
-  const months=buildMonthlyIncome(students);
+function renderIncomeTab(container,students,teacher){
+  const months=buildMonthlyIncome(students,teacher);
   const years=buildYearlyIncome(students);
 
   // Grand total — topups if available, else legacy payments
@@ -1933,9 +1951,11 @@ function renderIncomeList(container,view,months,years,students){
 <div>${m.entries.sort((a,b)=>b.date>a.date?1:-1).map(e=>`
 <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--grey-l);font-size:12px">
   <span style="color:var(--grey);flex-shrink:0;min-width:72px">${fmtDate(e.date)}</span>
+  ${e._studio?`<span style="font-size:10px;background:#E6F1FB;color:#0C447C;border-radius:8px;padding:2px 7px;font-weight:600;flex-shrink:0">🏛</span>`:''}
   <span style="flex:1;font-weight:500">${e.studentName}</span>
+  ${e._studio&&e._log?`<span style="font-size:11px;color:var(--grey)">${e._log.classes}cls</span>`:''}
   <span style="font-weight:600;color:var(--pink);flex-shrink:0">฿${Number(e.amount).toLocaleString()}</span>
-  ${e.note?`<span style="color:var(--grey);font-size:11px;flex-shrink:0">${e.note}</span>`:''}
+  ${e.note&&!e._studio?`<span style="color:var(--grey);font-size:11px;flex-shrink:0">${e.note}</span>`:''}
 </div>`).join('')}</div>`;
       container.appendChild(card);
     });
@@ -1995,7 +2015,7 @@ async function renderTabBody(container,teacher,tab,students){
 
   }else if(tab==='income'){
     if(!students)students=await getStudents(teacher.id);
-    renderIncomeTab(container,students);
+    renderIncomeTab(container,students,teacher);
 
   }else{
     renderSettingsTab(container,teacher);
@@ -2477,6 +2497,92 @@ ${sessions.length?`<div style="margin-top:14px;border-top:1px solid var(--grey-m
   openModal();
 }
 
+function showLogStudioModal(teacher){
+  const studios=teacher.studios||[];
+  if(!studios.length){toast(lang==='th'?'กรุณาเพิ่มสตูดิโอก่อน':'Add a studio first in Settings');return;}
+
+  const studioOpts=studios.map((s,i)=>`<option value="${i}">${s.name} · ฿${Number(s.rate||0).toLocaleString()}/class · ${s.tax||0}% tax</option>`).join('');
+  const nowYM=new Date().toISOString().slice(0,7);
+
+  const{modal,close}=showModal(`<div class="modal-title">🏛 ${lang==='th'?'บันทึกรายได้สตูดิโอ':'Log studio income'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'สตูดิโอ':'Studio'}</label>
+<select class="input" id="sl-studio">${studioOpts}</select></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'เดือน':'Month'}</label>
+<input class="input" id="sl-month" type="month" value="${nowYM}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนคลาสที่สอน':'Classes taught'}</label>
+<input class="input" id="sl-classes" type="number" min="1" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคาต่อคลาส (฿)':'Rate per class (฿)'}</label>
+<input class="input" id="sl-rate" type="number" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หัก ณ ที่จ่าย (%)':'Withholding tax (%)'}</label>
+<input class="input" id="sl-tax" type="number" min="0" max="100" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนนักเรียน (ไม่จำเป็น)':'Headcount (optional)'}</label>
+<input class="input" id="sl-heads" type="number" min="0" placeholder="—"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ':'Note'}</label>
+<input class="input" id="sl-note" placeholder="${lang==='th'?'ไม่จำเป็น':'optional'}"></div>
+<div id="sl-calc" style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:12px;font-size:13px"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:14px">
+  <div style="font-size:13px;font-weight:600">${lang==='th'?'ได้รับเงินแล้ว':'Paid'}</div>
+  <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+    <input type="checkbox" id="sl-paid" checked style="opacity:0;width:0;height:0">
+    <span id="sl-paid-track" style="position:absolute;inset:0;border-radius:12px;background:var(--pink);transition:.2s">
+      <span id="sl-paid-thumb" style="position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s"></span>
+    </span>
+  </label>
+</div>
+<button class="btn btn-primary btn-full" id="sl-save">🏛 ${lang==='th'?'บันทึก':'Save'}</button>
+<div id="sl-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  // Pre-fill from selected studio
+  function fillFromStudio(){
+    const idx=parseInt($('sl-studio').value)||0;
+    const s=studios[idx];
+    if(s){$('sl-rate').value=s.rate||'';$('sl-tax').value=s.tax??3;}
+    updateCalc();
+  }
+  function updateCalc(){
+    const classes=parseInt($('sl-classes').value)||0;
+    const rate=parseFloat($('sl-rate').value)||0;
+    const tax=parseFloat($('sl-tax').value)||0;
+    const gross=classes*rate;
+    const taxAmt=Math.round(gross*tax/100);
+    const net=gross-taxAmt;
+    $('sl-calc').innerHTML=`<div style="display:flex;justify-content:space-between"><span style="color:var(--grey)">${lang==='th'?'รวม':'Gross'}</span><span>฿${gross.toLocaleString()}</span></div>`+
+      (tax?`<div style="display:flex;justify-content:space-between"><span style="color:var(--grey)">Tax ${tax}%</span><span style="color:#b91c1c">−฿${taxAmt.toLocaleString()}</span></div>`:'')+(gross?`<div style="display:flex;justify-content:space-between;font-weight:600"><span>${lang==='th'?'รับสุทธิ':'Net'}</span><span style="color:var(--pink)">฿${net.toLocaleString()}</span></div>`:'');
+  }
+  $('sl-studio').onchange=fillFromStudio;
+  $('sl-classes').oninput=$('sl-rate').oninput=$('sl-tax').oninput=updateCalc;
+  fillFromStudio();
+
+  const cb=$('sl-paid'),track=$('sl-paid-track'),thumb=$('sl-paid-thumb');
+  cb.onchange=()=>{track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';thumb.style.left=cb.checked?'23px':'3px';};
+  track.onclick=()=>{cb.checked=!cb.checked;cb.dispatchEvent(new Event('change'));};
+
+  $('sl-save').onclick=async()=>{
+    const idx=parseInt($('sl-studio').value)||0;
+    const studio=studios[idx];
+    const month=$('sl-month').value||nowYM;
+    const classes=parseInt($('sl-classes').value)||0;
+    const rate=parseFloat($('sl-rate').value)||0;
+    const tax=parseFloat($('sl-tax').value)||0;
+    const heads=parseInt($('sl-heads').value)||null;
+    const note=$('sl-note').value.trim();
+    const paid=cb.checked;
+    if(!classes){$('sl-err').style.display='';$('sl-err').textContent=lang==='th'?'กรุณาใส่จำนวนคลาส':'Enter number of classes';return;}
+    const gross=classes*rate;
+    const taxAmt=Math.round(gross*tax/100);
+    const net=gross-taxAmt;
+    $('sl-save').disabled=true;
+    const log={id:'slog_'+Date.now(),studioId:studio.id,studioName:studio.name,month,classes,rate,tax,gross,taxAmt,net,paid,headcount:heads,note,ts:new Date().toISOString()};
+    const logs=[...(teacher.studioLogs||[]),log];
+    try{
+      await fbWrite(`teachers/${teacher.id}`,{studioLogs:logs},true);
+      teacher.studioLogs=logs;
+      close();toast(`✅ ${studio.name} · ฿${net.toLocaleString()} net`);
+      render(s2=>screenTeacherDash(s2));
+    }catch(e){$('sl-err').style.display='';$('sl-err').textContent='Error: '+e.message;$('sl-save').disabled=false;}
+  };
+}
+
 function showDeductModal(student,teacher){
   function openModal(){
     const hist=[...(student.h||[])].sort();
@@ -2900,11 +3006,85 @@ ${['กสิกรไทย (KBank)','ไทยพาณิชย์ (SCB)','�
     $('save-ct-btn').disabled=false;
   };
   
+  // Studios section
+  const studioSection=el('div');
+  studioSection.id='studio-settings';
+  container.appendChild(studioSection);
+  renderStudioSettings(studioSection,teacher);
+
   container.appendChild(el('div','version',VER));
 }
 
-// ═══════════════════════════════════════════════════════════
-// SCREEN: TEACHER SIGNUP
+function renderStudioSettings(container,teacher){
+  const studios=teacher.studios||[];
+  container.innerHTML=`<div class="section-title" style="margin-top:8px">🏛 ${lang==='th'?'สตูดิโอ':'Studios'}</div>`;
+
+  studios.forEach((studio,i)=>{
+    const card=el('div','card');
+    card.style.marginBottom='8px';
+    card.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+<span style="font-weight:600;font-size:14px">${studio.name}</span>
+<div style="display:flex;gap:6px">
+<button data-edit-studio="${i}" class="btn btn-ghost btn-sm">✏️</button>
+<button data-del-studio="${i}" class="btn btn-danger btn-sm">🗑</button>
+</div>
+</div>
+<div style="font-size:12px;color:var(--grey)">฿${Number(studio.rate||0).toLocaleString()}/${lang==='th'?'คลาส':'class'} · ${lang==='th'?'หัก':'Tax'} ${studio.tax||0}%</div>`;
+    container.appendChild(card);
+  });
+
+  const addBtn=el('button');
+  addBtn.className='btn btn-ghost btn-full';
+  addBtn.textContent=`+ ${lang==='th'?'เพิ่มสตูดิโอ':'Add studio'}`;
+  container.appendChild(addBtn);
+  addBtn.onclick=()=>showAddStudioModal(teacher,()=>{renderStudioSettings(container,teacher);});
+
+  container.querySelectorAll('[data-edit-studio]').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=parseInt(btn.dataset.editStudio);
+      showAddStudioModal(teacher,()=>{renderStudioSettings(container,teacher);},i,studios[i]);
+    };
+  });
+  container.querySelectorAll('[data-del-studio]').forEach(btn=>{
+    btn.onclick=async()=>{
+      const i=parseInt(btn.dataset.delStudio);
+      if(!confirm(`${lang==='th'?'ลบสตูดิโอ':'Delete studio'} "${studios[i].name}"?`))return;
+      const newStudios=studios.filter((_,si)=>si!==i);
+      await fbWrite(`teachers/${teacher.id}`,{studios:newStudios},true);
+      teacher.studios=newStudios;
+      renderStudioSettings(container,teacher);
+    };
+  });
+}
+
+function showAddStudioModal(teacher,onDone,editIdx=null,existing=null){
+  const{close}=showModal(`<div class="modal-title">${editIdx!==null?'✏️ '+( lang==='th'?'แก้ไขสตูดิโอ':'Edit studio'):'🏛 '+( lang==='th'?'เพิ่มสตูดิโอ':'Add studio')}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ชื่อสตูดิโอ':'Studio name'}</label>
+<input class="input" id="st-name" value="${existing?.name||''}" placeholder="${lang==='th'?'เช่น YogaWorks Thonglor':'e.g. YogaWorks Thonglor'}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคาต่อคลาส (฿)':'Rate per class (฿)'}</label>
+<input class="input" id="st-rate" type="number" value="${existing?.rate||''}" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หัก ณ ที่จ่าย (%) — ใส่ 0 ถ้าไม่มี':'Withholding tax (%) — 0 if none'}</label>
+<input class="input" id="st-tax" type="number" min="0" max="100" value="${existing?.tax??3}" placeholder="3"></div>
+<button class="btn btn-primary btn-full mt-8" id="st-save">${t('save')}</button>
+<div id="st-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('st-save').onclick=async()=>{
+    const name=$('st-name').value.trim();
+    const rate=parseFloat($('st-rate').value)||0;
+    const tax=parseFloat($('st-tax').value)||0;
+    if(!name){$('st-err').style.display='';$('st-err').textContent=lang==='th'?'กรุณาใส่ชื่อสตูดิโอ':'Please enter studio name';return;}
+    $('st-save').disabled=true;
+    const studios=[...(teacher.studios||[])];
+    const studio={name,rate,tax,id:existing?.id||'studio_'+Date.now()};
+    if(editIdx!==null)studios[editIdx]=studio;
+    else studios.push(studio);
+    try{
+      await fbWrite(`teachers/${teacher.id}`,{studios},true);
+      teacher.studios=studios;
+      close();onDone();toast(t('saveDone'));
+    }catch(e){$('st-err').style.display='';$('st-err').textContent='Error: '+e.message;$('st-save').disabled=false;}
+  };
+}
 // ═══════════════════════════════════════════════════════════
 async function screenTeacherSignup(s){
   state._curFn=screenTeacherSignup;
