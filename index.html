@@ -1160,7 +1160,51 @@ async function screenStudentCard(s){
   const c=student.c??0, tot=student.t??0, used=student.u??0;
   const hist=student.h||[];
   const payments=student.payments||[];
-  const lastDate=hist.length?hist[hist.length-1]:null;
+  const isPerClass=!!student.perClass;
+  const lastDate=[...hist].sort().slice(-1)[0]||null;
+
+  // Per-class student view
+  if(isPerClass){
+    const totalPaid=payments.reduce((a,p)=>a+(p.amount||0),0);
+    const card=el('div','card');
+    card.innerHTML=`<div class="text-center">
+<div style="font-size:28px">${teacher.emoji||'🧘'}</div>
+<div class="bold" style="font-size:18px;margin:6px 0">${student.n||student.sym}</div>
+<div class="text-grey text-sm">@${student.sym}</div>
+<span class="pill mt-8" style="background:var(--grey-l);color:var(--grey)">${lang==='th'?'รายครั้ง':'Per class'}</span>
+</div>
+<div style="display:flex;justify-content:center;gap:24px;margin:16px 0">
+<div class="text-center"><div class="stat-num">${hist.length}</div><div class="text-xs text-grey">${lang==='th'?'ครั้งทั้งหมด':'Sessions'}</div></div>
+${totalPaid?`<div class="text-center"><div class="stat-num">฿${totalPaid.toLocaleString()}</div><div class="text-xs text-grey">${lang==='th'?'จ่ายรวม':'Total paid'}</div></div>`:''}
+${lastDate?`<div class="text-center"><div class="stat-num" style="font-size:13px">${fmtDate(lastDate)}</div><div class="text-xs text-grey">${t('lastClass')}</div></div>`:''}
+</div>`;
+    s.appendChild(card);
+
+    // Top up button → top up for per-class
+    const tu=el('div');
+    tu.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`;
+    s.appendChild(tu);
+    $('topup-btn').onclick=()=>render(s2=>screenTopUp(s2));
+
+    // Session history
+    if(payments.length||hist.length){
+      const sec=el('div','section-title');sec.textContent=`📅 ${lang==='th'?'ประวัติการเรียน':'Session history'}`;
+      s.appendChild(sec);
+      const hCard=el('div','card');
+      const sorted=[...hist].sort().reverse();
+      hCard.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px">${sorted.map((d,i)=>{
+        const pay=payments.slice().reverse()[i];
+        return`<div class="history-item" style="justify-content:space-between">
+<div class="history-dot"></div>
+<span style="flex:1">${fmtDate(d)}</span>
+${pay&&pay.amount?`<span style="font-weight:600;color:var(--pink);font-size:12px">฿${Number(pay.amount).toLocaleString()}</span>`:''}
+</div>`;
+      }).join('')}</div>`;
+      s.appendChild(hCard);
+    }
+    s.appendChild(el('div','version',VER));
+    return;
+  }
 
   const card=el('div','card');
   card.innerHTML=`<div class="text-center">
@@ -1711,13 +1755,36 @@ async function renderTabBody(container,teacher,tab,students){
 }
 
 function buildStudentCard(student,teacher){
-  const c=student.c??0,tot=student.t??0,used=student.u??0;
+  const c=student.c??0,tot=student.t??0;
   const hist=student.h||[];
-  const last=hist.length?hist[hist.length-1]:null;
-  const badgeCls=c<=0?'empty':c<=2?'low':'';
-  
+  const last=[...hist].sort().slice(-1)[0]||null;
+  const isPerClass=!!student.perClass;
+
   const card=el('div','student-card');
-  card.innerHTML=`<div class="student-card-top">
+
+  if(isPerClass){
+    const lastPay=(student.payments||[]).slice(-1)[0];
+    card.innerHTML=`<div class="student-card-top">
+<div class="student-info">
+<div class="student-name">${student.n||student.sym}</div>
+<div class="student-meta">@${student.sym}${last?' · '+fmtDate(last):''}</div>
+</div>
+<span class="pill" style="background:var(--grey-l);color:var(--grey);font-size:11px;flex-shrink:0">${lang==='th'?'รายครั้ง':'Per class'}</span>
+</div>
+<div style="font-size:11px;color:var(--grey);margin:5px 0 2px">${lang==='th'?'เรียนไปแล้ว':'Sessions'}: <strong>${hist.length}</strong>${lastPay?` · ${lang==='th'?'จ่ายล่าสุด':'Last paid'}: ฿${Number(lastPay.amount).toLocaleString()}`:''}</div>
+<div class="student-actions">
+<button class="btn btn-primary btn-sm" data-action="logclass">📌 ${lang==='th'?'บันทึกครั้ง':'Log class'}</button>
+<button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
+<button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
+<button class="btn btn-danger btn-sm" data-action="del">🗑</button>
+</div>`;
+    card.querySelector('[data-action=logclass]').onclick=()=>showLogClassModal(student,teacher);
+    card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
+    card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
+    card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
+  }else{
+    const badgeCls=c<=0?'empty':c<=2?'low':'';
+    card.innerHTML=`<div class="student-card-top">
 <div class="student-info">
 <div class="student-name">${student.n||student.sym}</div>
 <div class="student-meta">@${student.sym}${last?' · '+fmtDate(last):''}</div>
@@ -1725,7 +1792,7 @@ function buildStudentCard(student,teacher){
 <div class="student-badge ${badgeCls}">${c}/${tot}</div>
 </div>
 ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);margin:6px 0 2px">
-💰 ${lang==='th'?'รับเงินล่าสุด':'Last payment'}: <strong>${fmtDate((student.payments[student.payments.length-1].date))}</strong> — ฿${Number(student.payments[student.payments.length-1].amount||0).toLocaleString()}
+💰 ${lang==='th'?'รับเงินล่าสุด':'Last payment'}: <strong>${fmtDate(student.payments[student.payments.length-1].date)}</strong> — ฿${Number(student.payments[student.payments.length-1].amount||0).toLocaleString()}
 </div>`:''}
 <div class="student-actions">
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
@@ -1736,14 +1803,14 @@ ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);ma
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
 </div>`;
-  
-  card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
-  card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
-  card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
-  card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student,teacher);
-  card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
-  card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
-  card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
+    card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
+    card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
+    card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
+    card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student,teacher);
+    card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
+    card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
+    card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
+  }
   return card;
 }
 
@@ -1967,6 +2034,49 @@ async function writeStudent(teacherId,studentId,data){
   return stamped;
 }
 
+function showLogClassModal(student,teacher){
+  const sessions=[...(student.h||[])].sort().reverse();
+  const payments=student.payments||[];
+
+  const sessionRows=sessions.map((d,i)=>{
+    const pay=payments.slice().reverse()[i];
+    return`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:6px 10px">
+<span style="color:var(--grey);flex-shrink:0">${fmtDate(d)}</span>
+${pay?`<span style="font-weight:600;color:var(--pink)">฿${Number(pay.amount).toLocaleString()}</span>`:'<span style="color:var(--grey-m)">—</span>'}
+</div>`;
+  }).join('');
+
+  const{close}=showModal(`<div class="modal-title">📌 ${lang==='th'?'บันทึกครั้ง':'Log class'} — ${student.n||student.sym}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่เรียน':'Class date'}</label>
+<input class="input" id="lc-date" type="date" value="${todayISO()}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ค่าเรียน (฿)':'Amount paid (฿)'}</label>
+<input class="input" id="lc-amount" type="number" min="0" placeholder="${student.price||'0'}" value="${student.price||''}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ (ไม่จำเป็น)':'Note (optional)'}</label>
+<input class="input" id="lc-note" placeholder="${lang==='th'?'เช่น โอน KBank':'e.g. cash'}"></div>
+<button class="btn btn-primary btn-full mt-8" id="lc-save">📌 ${lang==='th'?'บันทึก':'Log'}</button>
+<div id="lc-err" class="alert alert-err mt-8" style="display:none"></div>
+${sessions.length?`<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
+<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">${lang==='th'?'ประวัติทั้งหมด':'History'} (${sessions.length})</div>
+<div style="display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto">${sessionRows}</div>
+</div>`:''}`)  ;
+
+  $('lc-save').onclick=async()=>{
+    const date=$('lc-date').value||todayISO();
+    const amount=parseFloat($('lc-amount').value)||0;
+    const note=$('lc-note').value.trim();
+    $('lc-save').disabled=true;
+    const newH=[...(student.h||[]),date].sort();
+    const newPay=[...(student.payments||[]),{date,amount,note,ts:new Date().toISOString()}];
+    try{
+      await writeStudent(teacher.id,student.id,{h:newH,payments:newPay,u:(student.u||0)+1});
+      student.h=newH;student.payments=newPay;student.u=(student.u||0)+1;
+      syncStudentCache(student,teacher);
+      close();toast(`✅ ${lang==='th'?'บันทึกแล้ว':'Logged'}${amount?` · ฿${amount.toLocaleString()}`:''}`);;
+      render(s2=>screenTeacherDash(s2));
+    }catch(e){$('lc-err').style.display='';$('lc-err').textContent='Error: '+e.message;$('lc-save').disabled=false;}
+  };
+}
+
 function showDeductModal(student,teacher){
   function openModal(){
     const hist=[...(student.h||[])].sort();
@@ -2076,26 +2186,41 @@ function showEditStudentModal(student,teacher){
 <input class="input" id="e-sym" value="${student.sym||''}" placeholder="username" autocapitalize="none"></div>
 <div class="input-group"><label class="input-label">${t('price')} (฿)</label>
 <input class="input" id="e-price" type="number" value="${student.price||''}" placeholder="0"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:14px">
+  <div>
+    <div style="font-size:13px;font-weight:600">${lang==='th'?'โหมดรายครั้ง':'Per class mode'}</div>
+    <div style="font-size:11px;color:var(--grey);margin-top:2px">${lang==='th'?'ไม่ใช้แพ็กเกจ จ่ายทีละครั้ง':'No package — pay per session'}</div>
+  </div>
+  <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;cursor:pointer">
+    <input type="checkbox" id="e-perclass" ${student.perClass?'checked':''} style="opacity:0;width:0;height:0">
+    <span id="e-perclass-track" style="position:absolute;inset:0;border-radius:12px;background:${student.perClass?'var(--pink)':'var(--grey-m)'};transition:.2s">
+      <span id="e-perclass-thumb" style="position:absolute;top:3px;left:${student.perClass?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s"></span>
+    </span>
+  </label>
+</div>
 <div class="input-group"><label class="input-label">${t('studentPin')}</label>
 <input class="input" id="e-pin" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
-<button class="btn btn-primary btn-full" id="e-ok">${t('save')}</button>
+<button class="btn btn-primary btn-full mt-8" id="e-ok">${t('save')}</button>
 <div id="e-err" class="alert alert-err mt-8" style="display:none"></div>`);
+  const cb=$('e-perclass'),track=$('e-perclass-track'),thumb=$('e-perclass-thumb');
+  const updateToggle=()=>{track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';thumb.style.left=cb.checked?'23px':'3px';};
+  cb.onchange=updateToggle;
+  track.onclick=()=>{cb.checked=!cb.checked;updateToggle();};
   $('e-ok').onclick=async()=>{
     const name=$('e-name').value.trim();
     const sym=$('e-sym').value.trim().toLowerCase();
     const price=parseFloat($('e-price').value)||0;
     const pinRaw=$('e-pin').value;
+    const perClass=cb.checked;
     if(!sym){$('e-err').style.display='';$('e-err').textContent='Username required';return;}
     $('e-ok').disabled=true;
-    const upd={n:name,sym,price};
+    const upd={n:name,sym,price,perClass};
     if(pinRaw.length===4){upd.pin=await hashPin(pinRaw);}
     else if(pinRaw.length>0&&pinRaw.length<4){$('e-err').style.display='';$('e-err').textContent='PIN must be 4 digits';$('e-ok').disabled=false;return;}
     try{
       await writeStudent(teacher.id,student.id,upd);
       Object.assign(student,upd);
-      const students=C.get('students_'+teacher.id)||[];
-      const idx=students.findIndex(s=>s.id===student.id);
-      if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
+      syncStudentCache(student,teacher);
       close();toast(t('saveDone'));
       render(s2=>screenTeacherDash(s2));
     }catch(e){$('e-err').style.display='';$('e-err').textContent='Error: '+e.message;$('e-ok').disabled=false;}
