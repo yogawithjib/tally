@@ -2375,21 +2375,6 @@ async function screenSuperAdmin(s){
     };
   });
 
-  // Library link
-  const libLink=el('div');
-  libLink.style.cssText='text-align:center;padding:24px 20px 8px';
-  libLink.innerHTML=`<a href="https://yogawithjib.github.io/library/" target="_blank"
-    style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--grey-m);
-    border-radius:var(--r-s);padding:12px 18px;text-decoration:none;color:var(--text);font-size:13px;
-    font-weight:600;transition:.15s;box-shadow:var(--sh-s)"
-    onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'"
-    onmouseout="this.style.borderColor='var(--grey-m)';this.style.color='var(--text)'">
-    <span style="font-size:18px">📚</span>
-    <span>${lang==='th'?'คลังความรู้สำหรับครูโยคะ':'Yoga Teacher Resource Library'}</span>
-    <span style="color:var(--grey);font-weight:400">↗</span>
-  </a>`;
-  s.appendChild(libLink);
-
   // Guidebook — collapsible
   const guideWrap=el('div');
   guideWrap.style.cssText='margin:20px 16px 8px';
