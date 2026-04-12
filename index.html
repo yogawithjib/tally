@@ -1708,6 +1708,8 @@ async function screenTeacherDash(s){
   });
   
   const students=await getStudents(teacher.id);
+  // Silently migrate legacy payments into topups for all students
+  students.forEach(st=>{if((st.payments||[]).length)migratePaymentsToTopups(st,teacher);});
   renderStats(statsDiv,students);
   renderTabBody(body,teacher,activeTab,students);
   
@@ -2037,7 +2039,12 @@ function showStudentPackagesModal(student,teacher){
       }).join('');
     }
 
-    const{modal,close}=showModal('<div class="modal-title">📦 '+( student.n||student.sym)+'</div><div style="font-size:12px;color:var(--grey);margin-bottom:12px">'+( lang==='th'?'รวม':'Total')+': '+hist.length+' '+( lang==='th'?'คลาส':'classes')+' · '+( lang==='th'?'เหลือ':'Remaining')+': '+c+'</div><div style="max-height:60vh;overflow-y:auto">'+pkgHTML()+'</div>');
+    const legacyPays=(student.payments||[]).length
+      ?'<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--grey-l)"><div style="font-size:11px;color:var(--grey);margin-bottom:6px">'+(lang==='th'?'การชำระเงินเก่า':'Legacy payments')+'</div>'+
+        [...(student.payments||[])].reverse().map(p=>'<div style="font-size:12px;background:var(--grey-l);border-radius:6px;padding:5px 10px;margin-bottom:4px;display:flex;gap:8px"><span style="color:var(--grey)">'+fmtDate(p.date)+'</span><span style="font-weight:600;color:var(--pink)">฿'+Number(p.amount||0).toLocaleString()+'</span>'+(p.note?'<span style="color:var(--grey)">'+p.note+'</span>':'')+' </div>').join('')+
+        '</div>'
+      :'';
+    const{modal,close}=showModal('<div class="modal-title">📦 '+(student.n||student.sym)+'</div><div style="font-size:12px;color:var(--grey);margin-bottom:12px">'+(lang==='th'?'รวม':'Total')+': '+hist.length+' '+(lang==='th'?'คลาส':'classes')+' · '+(lang==='th'?'เหลือ':'Remaining')+': '+c+'</div><div style="max-height:60vh;overflow-y:auto">'+pkgHTML()+legacyPays+'</div>');
 
     modal.querySelectorAll('[data-edit-pkg]').forEach(btn=>{
       btn.onclick=()=>{
