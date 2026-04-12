@@ -2044,7 +2044,50 @@ function showStudentPackagesModal(student,teacher){
         [...(student.payments||[])].reverse().map(p=>'<div style="font-size:12px;background:var(--grey-l);border-radius:6px;padding:5px 10px;margin-bottom:4px;display:flex;gap:8px"><span style="color:var(--grey)">'+fmtDate(p.date)+'</span><span style="font-weight:600;color:var(--pink)">฿'+Number(p.amount||0).toLocaleString()+'</span>'+(p.note?'<span style="color:var(--grey)">'+p.note+'</span>':'')+' </div>').join('')+
         '</div>'
       :'';
-    const{modal,close}=showModal('<div class="modal-title">📦 '+(student.n||student.sym)+'</div><div style="font-size:12px;color:var(--grey);margin-bottom:12px">'+(lang==='th'?'รวม':'Total')+': '+hist.length+' '+(lang==='th'?'คลาส':'classes')+' · '+(lang==='th'?'เหลือ':'Remaining')+': '+c+'</div><div style="max-height:60vh;overflow-y:auto">'+pkgHTML()+legacyPays+'</div>');
+
+    // Calculate expected remaining from topups
+    const expectedC=(student.topups||[]).reduce((a,tp)=>a+tp.classes,0)-(student.u||0);
+    const mismatch=c!==expectedC&&(student.topups||[]).length>0;
+
+    const{modal,close}=showModal('<div class="modal-title">📦 '+(student.n||student.sym)+'</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
+      '<div style="font-size:12px;color:var(--grey)">'+(lang==='th'?'รวม':'Total')+': '+hist.length+' '+(lang==='th'?'คลาส':'classes')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+      '<span style="font-size:12px;color:var(--grey)">'+(lang==='th'?'เหลือ':'Remaining')+':</span>'+
+      '<input id="pkg-remaining" type="number" value="'+c+'" style="width:56px;font-size:13px;font-weight:600;color:var(--pink);border:1px solid var(--pink-m);border-radius:6px;padding:3px 6px;text-align:center;font-family:inherit">'+
+      (mismatch?'<span style="font-size:10px;background:#fef9c3;color:#854d0e;border-radius:8px;padding:2px 7px;cursor:pointer" id="pkg-fix-btn" title="Fix mismatch">⚠️ '+(lang==='th'?'ไม่ตรง':'Mismatch')+'</span>':'')+'</div></div>'+
+      '<div style="max-height:60vh;overflow-y:auto">'+pkgHTML()+legacyPays+'</div>');
+
+    // Override remaining count
+    const remInput=modal.querySelector('#pkg-remaining');
+    let remSaveTimer=null;
+    remInput.onchange=async()=>{
+      clearTimeout(remSaveTimer);
+      const newC=parseInt(remInput.value);
+      if(isNaN(newC))return;
+      remSaveTimer=setTimeout(async()=>{
+        try{
+          await writeStudent(teacher.id,student.id,{c:newC});
+          student.c=newC;syncStudentCache(student,teacher);
+          toast('✅ '+(lang==='th'?'แก้ไขแล้ว':'Updated'));
+        }catch(e){toast('Error: '+e.message);}
+      },600);
+    };
+
+    // Mismatch fix — set c to expected value
+    const fixBtn=modal.querySelector('#pkg-fix-btn');
+    if(fixBtn){
+      fixBtn.onclick=async()=>{
+        const newC=expectedC;
+        try{
+          await writeStudent(teacher.id,student.id,{c:newC});
+          student.c=newC;syncStudentCache(student,teacher);
+          remInput.value=newC;
+          fixBtn.remove();
+          toast('✅ '+(lang==='th'?'แก้ไขแล้ว':'Fixed to ')+newC);
+        }catch(e){toast('Error: '+e.message);}
+      };
+    }
 
     modal.querySelectorAll('[data-edit-pkg]').forEach(btn=>{
       btn.onclick=()=>{
