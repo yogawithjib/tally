@@ -37,8 +37,12 @@ html,body{height:100%;font-family:'IBM Plex Sans Thai',sans-serif;background:var
 .hdr-logo .app-name .byline{font-family:'DM Sans','IBM Plex Sans Thai',sans-serif;font-size:11px;font-weight:300;color:#aaa;letter-spacing:.04em;line-height:1}
 .hdr-logo .app-name .byline .script{font-family:'FabfeltScript',cursive;color:#fb2a7b;font-size:15px;font-weight:bold;letter-spacing:0}
 .hdr-right{display:flex;align-items:center;gap:8px}
-.lang-btn{font-size:12px;font-weight:600;color:var(--grey);background:var(--white);border:1.5px solid var(--grey-m);border-radius:20px;padding:4px 10px;cursor:pointer;transition:.15s}
-.lang-btn:hover{border-color:var(--pink);color:var(--pink)}
+.lang-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.lang-toggle .lang-lbl{font-size:12px;font-weight:600;color:var(--grey)}
+.lang-toggle .lang-lbl.active{color:var(--pink)}
+.toggle-track{width:36px;height:20px;background:var(--pink);border-radius:20px;position:relative;transition:.2s;flex-shrink:0}
+.toggle-thumb{width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:.2s}
+.toggle-track.en .toggle-thumb{left:18px}
 .back-btn{background:none;border:none;color:var(--pink);font-size:22px;cursor:pointer;padding:4px;line-height:1}
 .logout-btn{background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;padding:4px 8px;border-radius:20px;transition:.15s}
 .logout-btn:hover{color:var(--pink)}
@@ -788,8 +792,10 @@ function makeHeader({back,logout,title,onBack,onLogout,showSessionInfo}={}){
   left.addEventListener('click',handleLogoTap);
   
   const right=el('div','hdr-right');
-  const lb=el('button','lang-btn');
-  lb.textContent=lang==='th'?'EN':'TH';
+  const lb=el('div','lang-toggle');
+  lb.innerHTML=`<span class="lang-lbl ${lang==='th'?'active':''}">TH</span>
+<div class="toggle-track ${lang==='en'?'en':''}"><div class="toggle-thumb"></div></div>
+<span class="lang-lbl ${lang==='en'?'active':''}">EN</span>`;
   lb.onclick=()=>{lang=lang==='th'?'en':'th';localStorage.setItem('yj_lang',lang);render(state._curFn);};
   right.appendChild(lb);
   
@@ -837,8 +843,7 @@ function ringHTML(c,tot){
   const r=54,circ=2*Math.PI*r;
   const ratio=tot>0?Math.min(c/tot,1):0;
   const offset=circ*(1-ratio);
-  const pct=Math.round(ratio*100);
-  return`<div class="ring-wrap"><div style="position:relative;width:140px;height:140px">
+  return`<div class="ring-wrap"><div style="position:relative;width:140px;height:140px" id="ring-touch-zone">
 <svg class="ring-svg" viewBox="0 0 120 120"><circle class="ring-track" cx="60" cy="60" r="${r}"/><circle class="ring-fill" cx="60" cy="60" r="${r}" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/></svg>
 <div class="ring-text-wrap"><div class="ring-num">${c}</div><div class="ring-label">${t('classesLeft')}</div></div>
 </div></div>`;
@@ -880,10 +885,18 @@ async function screenHome(s){
   // Hero
   const hero=el('div');
   hero.style.cssText='text-align:center;padding:4px 20px 20px';
-  hero.innerHTML=`<div style="font-size:34px;margin-bottom:10px">✨</div>
+  let sparkTaps=0,sparkTimer=null;
+  hero.innerHTML=`<div id="hero-sparkle" style="font-size:34px;margin-bottom:10px;cursor:pointer;user-select:none">✨</div>
 <div style="font-size:21px;font-weight:600;margin-bottom:6px">${t('whoAreYou')}</div>
 <div style="font-size:14px;color:var(--grey)">${t('chooseRole')}</div>`;
   s.appendChild(hero);
+
+  hero.querySelector('#hero-sparkle').addEventListener('click',()=>{
+    sparkTaps++;
+    clearTimeout(sparkTimer);
+    if(sparkTaps>=3){sparkTaps=0;triggerSparkleRain();}
+    else sparkTimer=setTimeout(()=>{sparkTaps=0;},600);
+  });
 
   // Role cards
   const grid=el('div');
@@ -958,6 +971,14 @@ async function screenHome(s){
   trackVisit(vcDiv);
 
   s.appendChild(el('div','version',VER));
+
+  const disclaimer=el('div');
+  disclaimer.style.cssText='padding:2px 20px 20px';
+  disclaimer.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:9px;color:#ddd;line-height:2;border-top:0.5px solid #f5f5f5;padding-top:10px">
+<div><span style="color:#d0d0d0;font-weight:600;font-size:9px;display:block;margin-bottom:2px">${lang==='th'?'เกี่ยวกับ':'About'}</span>${lang==='th'?'ระบบติดตามแพ็กเกจคลาส':'Class package tracker'}<br>${lang==='th'?'โดย Yoga with Jib':'by Yoga with Jib'}<br>© 2025</div>
+<div><span style="color:#d0d0d0;font-weight:600;font-size:9px;display:block;margin-bottom:2px">${lang==='th'?'ข้อกำหนด':'Terms'}</span>${lang==='th'?'ใช้งานตามความเสี่ยงของตนเอง':'Use at your own risk'}<br>${lang==='th'?'ข้อมูลอาจไม่ถูกต้อง 100%':'Data may not be 100% accurate'}<br>${lang==='th'?'ไม่รับผิดชอบความเสียหาย':'Not liable for losses'}</div>
+</div>`;
+  s.appendChild(disclaimer);
 }
 
 // ─── Username entry (after role chosen) ────────────────────
@@ -1158,13 +1179,22 @@ ${lastDate?`<div class="text-center text-xs text-grey mt-4">${t('lastClass')}: $
 ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}: ฿${student.price.toLocaleString()}</div>`:''}`;
   s.appendChild(card);
 
-  // Top up button
-  const tu=el('div');
-  tu.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`;
-  s.appendChild(tu);
-  $('topup-btn').onclick=()=>render(s2=>screenTopUp(s2));
-
-  // Tabs — packages / classes / payments
+  // Easter egg: hold the ring for 2s → singing bowl 🎵
+  setTimeout(()=>{
+    const zone=card.querySelector('#ring-touch-zone');
+    if(!zone)return;
+    let holdTimer=null;
+    const start=()=>{holdTimer=setTimeout(()=>playSingingBowl(),2000);};
+    const end=()=>clearTimeout(holdTimer);
+    zone.addEventListener('mousedown',start);
+    zone.addEventListener('mouseup',end);
+    zone.addEventListener('mouseleave',end);
+    zone.addEventListener('touchstart',start,{passive:true});
+    zone.addEventListener('touchend',end);
+    zone.addEventListener('touchcancel',end);
+    zone.style.cursor='pointer';
+    zone.title='🎵';
+  },100);
   const hasPay=payments.length>0;
   let activeTab='packages';
 
@@ -2325,6 +2355,29 @@ async function screenSuperAdmin(s){
       const rejected=allSignups.filter(sg=>sg.status==='rejected').length;
       const totalRem=totalSold-totalUsed;
 
+      // Visitor count from Firestore
+      let visitCount=0;
+      try{const vs=await fbRead('system/stats');visitCount=vs?.visits||0;}catch{}
+
+      // Location stats — group by country then province
+      const byCountry={};
+      teachers.forEach(tc=>{
+        const loc=tc.location||'';
+        const parts=loc.split(',').map(s=>s.trim()).filter(Boolean);
+        const country=parts[parts.length-1]||'Unknown';
+        const province=parts.length>=2?parts[parts.length-2]:'';
+        if(!byCountry[country])byCountry[country]={count:0,provinces:{}};
+        byCountry[country].count++;
+        if(province)byCountry[country].provinces[province]=(byCountry[country].provinces[province]||0)+1;
+      });
+      const locationHTML=Object.entries(byCountry).sort((a,b)=>b[1].count-a[1].count).map(([country,data])=>{
+        const provs=Object.entries(data.provinces).sort((a,b)=>b[1]-a[1]);
+        return`<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px">
+<div><span style="font-weight:600">${country}</span>${provs.length?`<span style="color:var(--grey);font-size:11px;margin-left:6px">${provs.map(([p,n])=>`${p}${n>1?` ×${n}`:''}`).join(' · ')}</span>`:''}</div>
+<span style="font-weight:600;color:var(--pink);flex-shrink:0;margin-left:8px">${data.count}</span>
+</div>`;
+      }).join('');
+
       statsDiv.innerHTML=`
 <div class="section-title" style="padding-top:4px">📊 ${lang==='th'?'สถิติรวม':'Global Stats'}</div>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
@@ -2336,17 +2389,22 @@ async function screenSuperAdmin(s){
   <div class="stat-chip"><div class="stat-num" style="${totalRem<0?'color:#b91c1c':''}">${totalRem}</div><div class="stat-lbl">${totalRem<0?(lang==='th'?'ติดหนี้':'Debt'):(lang==='th'?'คงเหลือ':'Left')}</div></div>
   <div class="stat-chip"><div class="stat-num" style="${studentsInDebt?'color:#b91c1c':''}">${studentsInDebt}</div><div class="stat-lbl">${lang==='th'?'นักเรียนติดหนี้':'In debt'}</div></div>
   <div class="stat-chip"><div class="stat-num" style="${studentsNoPin?'color:#f59e0b':''}">${studentsNoPin}</div><div class="stat-lbl">${lang==='th'?'ยังไม่มี PIN':'No PIN'}</div></div>
-  <div class="stat-chip"><div class="stat-num">${approved}</div><div class="stat-lbl">${lang==='th'?'ครูอนุมัติแล้ว':'Approved'}</div></div>
+  <div class="stat-chip"><div class="stat-num">${visitCount.toLocaleString()}</div><div class="stat-lbl">👀 ${lang==='th'?'ผู้เยี่ยมชม':'Visits'}</div></div>
 </div>
 ${totalRevenue>0?`<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;font-size:13px">
   <span style="color:var(--grey)">${lang==='th'?'มูลค่าแพ็กเกจรวม':'Total package value'}</span>
   <span style="font-weight:600;float:right">฿${totalRevenue.toLocaleString()}</span>
+</div>`:''}
+${locationHTML?`<div style="background:#fff;border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;box-shadow:var(--sh-s)">
+<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">📍 ${lang==='th'?'ที่ตั้งครู':'Teacher locations'}</div>
+${locationHTML}
 </div>`:''}
 ${teacherBreakdown.length>1?`<div class="section-title" style="padding:10px 4px 6px;font-size:11px">${lang==='th'?'แยกตามครู':'Per teacher'}</div>
 <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px">
 ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:#fff;border-radius:var(--r-xs);padding:7px 10px;box-shadow:var(--sh-s)">
   <span style="font-size:16px">${b.teacher.emoji||'🧘'}</span>
   <span style="flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.teacher.name||b.teacher.username}</span>
+  <span style="color:var(--grey);font-size:11px">${b.teacher.location||''}</span>
   <span style="color:var(--grey)">${b.students} ${lang==='th'?'คน':'stu'}</span>
   <span class="pill ${b.rem<0?'pill-red':b.rem===0?'pill-amber':'pill-pink'}">${b.rem<0?'−':''}${Math.abs(b.rem)}</span>
 </div>`).join('')}
@@ -2940,6 +2998,75 @@ function downloadCSV(rows,filename){
   const a=document.createElement('a');
   a.href=url;a.download=filename;a.click();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EASTER EGGS
+// ═══════════════════════════════════════════════════════════
+function triggerSparkleRain(){
+  const EMOJIS=['✨','🌸','🧘','🌺','💫','🌿','🙏','💕','⭐','🌷'];
+  const count=32;
+  const container=document.createElement('div');
+  container.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';
+  document.body.appendChild(container);
+
+  for(let i=0;i<count;i++){
+    const span=document.createElement('span');
+    const emoji=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const x=Math.random()*100;
+    const delay=Math.random()*1.2;
+    const size=14+Math.random()*18;
+    const dur=1.5+Math.random()*1.2;
+    span.textContent=emoji;
+    span.style.cssText=`position:absolute;left:${x}%;top:-40px;font-size:${size}px;opacity:0;
+      animation:sparkle-fall ${dur}s ${delay}s ease-in forwards`;
+    container.appendChild(span);
+  }
+
+  // Inject keyframes once
+  if(!document.getElementById('sparkle-style')){
+    const st=document.createElement('style');
+    st.id='sparkle-style';
+    st.textContent=`@keyframes sparkle-fall{
+      0%{opacity:0;transform:translateY(0) rotate(0deg) scale(0.5)}
+      15%{opacity:1}
+      80%{opacity:.8}
+      100%{opacity:0;transform:translateY(105vh) rotate(${360+Math.random()*360}deg) scale(1.1)}
+    }`;
+    document.head.appendChild(st);
+  }
+
+  setTimeout(()=>container.remove(),3500);
+  toast('🌸 Namaste 🙏',2500);
+}
+
+function playSingingBowl(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    // Fundamental + harmonics to mimic a bowl
+    const freqs=[220,440,660,880];
+    const gains=[0.5,0.25,0.12,0.06];
+    freqs.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.value=freq;
+      gain.gain.setValueAtTime(0,ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(gains[i],ctx.currentTime+0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+4);
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+4.2);
+    });
+    // Visual pulse on the ring
+    const ring=document.querySelector('.ring-fill');
+    if(ring){
+      ring.style.stroke='#fb2a7b';
+      ring.style.filter='drop-shadow(0 0 8px #fb2a7b88)';
+      setTimeout(()=>{ring.style.filter='';},4000);
+    }
+    toast('🎵',2000);
+  }catch(e){console.warn('bowl',e);}
 }
 
 // ═══════════════════════════════════════════════════════════
