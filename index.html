@@ -1875,13 +1875,14 @@ function renderIncomeTab(container,students){
 </div>`;
   container.appendChild(tot);
 
-  // View toggle
+  // View toggle — month / year / student
   let view='month';
   const toggleRow=el('div');
   toggleRow.style.cssText='display:flex;gap:8px;padding:0 16px 12px';
   toggleRow.innerHTML=`
-<button id="inc-month-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--pink);background:var(--pink);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">${lang==='th'?'รายเดือน':'By month'}</button>
-<button id="inc-year-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">${lang==='th'?'รายปี':'By year'}</button>`;
+<button id="inc-month-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--pink);background:var(--pink);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'รายเดือน':'By month'}</button>
+<button id="inc-year-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'รายปี':'By year'}</button>
+<button id="inc-student-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'รายคน':'By student'}</button>`;
   container.appendChild(toggleRow);
 
   const listBody=el('div');
@@ -1889,22 +1890,20 @@ function renderIncomeTab(container,students){
 
   function setView(v){
     view=v;
-    const mBtn=$('inc-month-btn'),yBtn=$('inc-year-btn');
-    mBtn.style.background=v==='month'?'var(--pink)':'#fff';
-    mBtn.style.color=v==='month'?'#fff':'var(--grey)';
-    mBtn.style.borderColor=v==='month'?'var(--pink)':'var(--grey-m)';
-    yBtn.style.background=v==='year'?'var(--pink)':'#fff';
-    yBtn.style.color=v==='year'?'#fff':'var(--grey)';
-    yBtn.style.borderColor=v==='year'?'var(--pink)':'var(--grey-m)';
-    renderIncomeList(listBody,v,months,years);
+    const mBtn=$('inc-month-btn'),yBtn=$('inc-year-btn'),sBtn=$('inc-student-btn');
+    [mBtn,yBtn,sBtn].forEach(b=>{b.style.background='#fff';b.style.color='var(--grey)';b.style.borderColor='var(--grey-m)';});
+    const active=v==='month'?mBtn:v==='year'?yBtn:sBtn;
+    active.style.background='var(--pink)';active.style.color='#fff';active.style.borderColor='var(--pink)';
+    renderIncomeList(listBody,v,months,years,students);
   }
 
   $('inc-month-btn').onclick=()=>setView('month');
   $('inc-year-btn').onclick=()=>setView('year');
+  $('inc-student-btn').onclick=()=>setView('student');
   setView('month');
 }
 
-function renderIncomeList(container,view,months,years){
+function renderIncomeList(container,view,months,years,students){
   container.innerHTML='';
   if(view==='month'){
     months.forEach(m=>{
@@ -1923,27 +1922,34 @@ function renderIncomeList(container,view,months,years){
 </div>`).join('')}</div>`;
       container.appendChild(card);
     });
-  }else{
+  }else if(view==='year'){
     years.forEach(yr=>{
       const card=el('div','card');
       card.style.margin='0 16px 10px';
-      // Monthly breakdown within year
       const monthRows=Object.entries(yr.months).sort((a,b)=>b[0]>a[0]?1:-1).map(([mon,data])=>{
         const label=new Date(mon+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'long'});
-        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px">
-<span style="color:var(--grey)">${label}</span>
-<div style="display:flex;align-items:center;gap:10px">
-  <span style="font-size:11px;color:var(--grey)">${data.entries.length} ${lang==='th'?'รายการ':'pmts'}</span>
-  <span style="font-weight:600;color:var(--pink)">฿${data.total.toLocaleString()}</span>
-</div>
-</div>`;
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey)">'+label+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--grey)">'+data.entries.length+' '+( lang==='th'?'รายการ':'pmts')+'</span><span style="font-weight:600;color:var(--pink)">฿'+data.total.toLocaleString()+'</span></div></div>';
       }).join('');
-      card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
-<div style="font-size:18px;font-weight:600">${yr.year}</div>
-<div style="font-size:18px;font-weight:600;color:var(--pink)">฿${yr.total.toLocaleString()}</div>
-</div>
-<div style="font-size:11px;color:var(--grey);margin-bottom:8px">${yr.entries.length} ${lang==='th'?'รายการ':'payments'}</div>
-${monthRows}`;
+      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><div style="font-size:18px;font-weight:600">'+yr.year+'</div><div style="font-size:18px;font-weight:600;color:var(--pink)">฿'+yr.total.toLocaleString()+'</div></div><div style="font-size:11px;color:var(--grey);margin-bottom:8px">'+yr.entries.length+' '+( lang==='th'?'รายการ':'payments')+'</div>'+monthRows;
+      container.appendChild(card);
+    });
+  }else if(view==='student'&&students){
+    const perStudent=students.map(st=>{
+      const fromTopups=(st.topups||[]).filter(tp=>tp.paid!==false);
+      const fromPay=st.payments||[];
+      const total=fromTopups.reduce((a,tp)=>a+(tp.price||0),0)+fromPay.reduce((a,p)=>a+(p.amount||0),0);
+      const entries=[
+        ...fromTopups.map(tp=>({date:tp.date,amount:tp.price||0,note:tp.note||'',classes:tp.classes})),
+        ...fromPay.map(p=>({date:p.date,amount:p.amount||0,note:p.note||''}))
+      ].sort((a,b)=>b.date>a.date?1:-1);
+      return{st,total,entries};
+    }).filter(s=>s.total>0).sort((a,b)=>b.total-a.total);
+    if(!perStudent.length){container.innerHTML='<div class="empty-state">'+( lang==='th'?'ยังไม่มีรายได้':'No income recorded')+'</div>';return;}
+    perStudent.forEach(({st,total,entries})=>{
+      const card=el('div','card');
+      card.style.margin='0 16px 10px';
+      const rows=entries.map(e=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey);flex-shrink:0;min-width:72px">'+fmtDate(e.date)+'</span><span style="font-weight:600;color:var(--pink);flex-shrink:0">฿'+Number(e.amount).toLocaleString()+'</span>'+(e.classes?'<span style="font-size:11px;color:var(--grey)">'+e.classes+' cls</span>':'')+( e.note?'<span style="font-size:11px;color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e.note+'</span>':'')+'</div>').join('');
+      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:14px;font-weight:600">'+( st.n||st.sym)+'</div><div style="font-size:11px;color:var(--grey)">@'+st.sym+' · '+entries.length+' '+( lang==='th'?'รายการ':'payments')+'</div></div><div style="font-size:16px;font-weight:600;color:var(--pink)">฿'+total.toLocaleString()+'</div></div>'+rows;
       container.appendChild(card);
     });
   }
