@@ -1741,6 +1741,9 @@ async function screenTeacherDash(s){
   studioWrap.style.cssText='padding:0 16px 10px;display:none';
   studioWrap.innerHTML=`<button class="btn btn-ghost btn-full" id="studio-log-btn">🏛 ${lang==='th'?'บันทึกรายได้สตูดิโอ':'Log studio income'}</button>`;
   s.appendChild(studioWrap);
+
+  // Tabs
+  const tabs=el('div','tab-row');
   tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">👥 ${lang==='th'?'นักเรียน':'Students'}</div>
 <div class="tab ${activeTab==='income'?'active':''}" data-tab="income">💰 ${lang==='th'?'รายได้':'Income'}</div>
 <div class="tab ${activeTab==='settings'?'active':''}" data-tab="settings">⚙️ ${lang==='th'?'ตั้งค่า':'Settings'}</div>`;
