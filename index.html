@@ -1553,7 +1553,7 @@ function buildMonthlyIncome(students){
       if(!month)return;
       if(!map[month])map[month]={month,total:0,entries:[]};
       map[month].total+=p.amount||0;
-      map[month].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0,date:p.date,note:p.note||''});
+      map[month].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0,date:p.date,note:p.note||'',_teacher:st._teacher||null});
     });
   });
   return Object.values(map).sort((a,b)=>b.month>a.month?1:-1).map(m=>({
@@ -1910,25 +1910,77 @@ function syncStudentCache(student,teacher){
 }
 
 function showDeductModal(student,teacher){
-  const{overlay,close}=showModal(`<div class="modal-title">📌 ${t('deductClass')}</div>
+  function openModal(){
+    const hist=[...(student.h||[])].sort();
+    const histHTML=hist.length?`
+<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
+<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">${lang==='th'?'ประวัติคลาสทั้งหมด':'All class dates'} (${hist.length})</div>
+<div style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto">
+${hist.map((d,i)=>`<div style="display:flex;align-items:center;gap:6px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:5px 8px">
+<span style="color:var(--grey);flex-shrink:0;min-width:18px;font-size:10px">#${i+1}</span>
+<input data-idx="${i}" type="date" value="${d}" style="flex:1;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--text);cursor:pointer">
+<button data-del="${i}" style="background:none;border:1px solid #fca5a5;border-radius:10px;font-size:10px;padding:1px 6px;cursor:pointer;color:#b91c1c;font-family:inherit;flex-shrink:0">✕</button>
+</div>`).join('')}
+</div></div>`:'';
+
+    const{modal,close}=showModal(`<div class="modal-title">📌 ${t('deductClass')}</div>
 <div class="input-group"><label class="input-label">${t('deductDate')}</label>
 <input class="input" id="d-date" type="date" value="${todayISO()}"></div>
-<button class="btn btn-primary btn-full" id="d-ok">${t('confirm')}</button>`);
-  $('d-ok').onclick=async()=>{
-    const date=$('d-date').value||todayISO();
-    $('d-ok').disabled=true;
-    try{
-      const newC=(student.c||0)-1, newU=(student.u||0)+1;
-      const newH=[...(student.h||[]),date];
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,u:newU,h:newH});
-      student.c=newC;student.u=newU;student.h=newH;
-      const students=C.get('students_'+teacher.id)||[];
-      const idx=students.findIndex(s=>s.id===student.id);
-      if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
-      close();toast('✅ Deducted');
-      render(s2=>screenTeacherDash(s2));
-    }catch(e){toast('Error: '+e.message);$('d-ok').disabled=false;}
-  };
+<button class="btn btn-primary btn-full" id="d-ok">${t('confirm')}</button>
+<div id="d-err" class="alert alert-err mt-8" style="display:none"></div>
+${histHTML}`);
+
+    // Add new class
+    $('d-ok').onclick=async()=>{
+      const date=$('d-date').value||todayISO();
+      $('d-ok').disabled=true;
+      try{
+        const newH=[...(student.h||[]),date].sort();
+        const newC=(student.c||0)-1, newU=(student.u||0)+1;
+        await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,u:newU,h:newH});
+        student.c=newC;student.u=newU;student.h=newH;
+        syncStudentCache(student,teacher);
+        close();toast('✅ Deducted');
+        render(s2=>screenTeacherDash(s2));
+      }catch(e){toast('Error: '+e.message);$('d-ok').disabled=false;}
+    };
+
+    // Edit existing date inline
+    modal.querySelectorAll('[data-idx]').forEach(inp=>{
+      inp.onchange=async()=>{
+        const idx=parseInt(inp.dataset.idx);
+        const newH=[...(student.h||[])];
+        newH[idx]=inp.value;
+        newH.sort();
+        try{
+          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{h:newH});
+          student.h=newH;
+          syncStudentCache(student,teacher);
+          toast('✅ '+t('saveDone'));
+          close();showDeductModal(student,teacher);
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+
+    // Delete a date
+    modal.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick=async()=>{
+        const idx=parseInt(btn.dataset.del);
+        const removed=(student.h||[])[idx];
+        if(!confirm(`${lang==='th'?'ลบวันที่':'Delete date'} ${fmtDate(removed)}?`))return;
+        const newH=(student.h||[]).filter((_,i)=>i!==idx).sort();
+        const newC=(student.c||0)+1, newU=Math.max(0,(student.u||0)-1);
+        try{
+          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,u:newU,h:newH});
+          student.c=newC;student.u=newU;student.h=newH;
+          syncStudentCache(student,teacher);
+          toast(lang==='th'?'ลบแล้ว':'Deleted');
+          close();showDeductModal(student,teacher);
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+  }
+  openModal();
 }
 
 function showTopupModal(student,teacher){
@@ -2530,7 +2582,7 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
     <span style="font-weight:600;color:var(--pink)">฿${m.total.toLocaleString()}</span>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:4px">
-    ${m.entries.map(e=>`<span style="font-size:11px;background:var(--grey-l);border-radius:10px;padding:2px 8px;color:var(--grey)">${e.studentName} ฿${Number(e.amount).toLocaleString()}</span>`).join('')}
+    ${m.entries.map(e=>`<span style="font-size:11px;background:var(--grey-l);border-radius:10px;padding:2px 8px;color:var(--grey)">${e.studentName}${e._teacher?' · '+( e._teacher.name||e._teacher.username):''} ฿${Number(e.amount).toLocaleString()}</span>`).join('')}
   </div>
 </div>`).join('');
           }else{
