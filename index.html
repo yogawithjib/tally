@@ -824,7 +824,12 @@ function handleLogoTap(){
   state.logoTaps=(state.logoTaps||0)+1;
   clearTimeout(state.logoTapTimer);
   if(state.logoTaps>=3){state.logoTaps=0;render(screenSuperAdminPin);}
-  else state.logoTapTimer=setTimeout(()=>{state.logoTaps=0;},800);
+  else{
+    state.logoTapTimer=setTimeout(()=>{
+      if(state.logoTaps===1)goHome();
+      state.logoTaps=0;
+    },400);
+  }
 }
 
 // Ring SVG helper
