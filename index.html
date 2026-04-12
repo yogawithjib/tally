@@ -2259,44 +2259,100 @@ async function writeStudent(teacherId,studentId,data){
 function showLogClassModal(student,teacher){
   const sessions=[...(student.h||[])].sort().reverse();
   const payments=student.payments||[];
+  const rate1=student.rate1||student.price||0;
+  const rate15=student.rate15||0;
 
-  const sessionRows=sessions.map((d,i)=>{
-    const pay=payments.slice().reverse()[i];
-    return`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:6px 10px">
-<span style="color:var(--grey);flex-shrink:0">${fmtDate(d)}</span>
-${pay?`<span style="font-weight:600;color:var(--pink)">฿${Number(pay.amount).toLocaleString()}</span>`:'<span style="color:var(--grey-m)">—</span>'}
+  function openModal(){
+    const sessionRows=sessions.map((d,i)=>{
+      const pay=[...payments].reverse()[i];
+      return`<div style="display:flex;align-items:center;gap:6px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:5px 8px">
+<input data-sess="${i}" type="date" value="${d}" style="flex:1;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--text);cursor:pointer">
+${pay?`<span style="font-weight:600;color:var(--pink);flex-shrink:0">฿${Number(pay.amount).toLocaleString()}</span>`:''}
+<button data-del-sess="${i}" style="background:none;border:1px solid #fca5a5;border-radius:10px;font-size:10px;padding:1px 6px;cursor:pointer;color:#b91c1c;font-family:inherit;flex-shrink:0">✕</button>
 </div>`;
-  }).join('');
+    }).join('');
 
-  const{close}=showModal(`<div class="modal-title">📌 ${lang==='th'?'บันทึกครั้ง':'Log class'} — ${student.n||student.sym}</div>
+    const{modal,close}=showModal(`<div class="modal-title">📌 ${lang==='th'?'บันทึกครั้ง':'Log class'} — ${student.n||student.sym}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'วันที่เรียน':'Class date'}</label>
 <input class="input" id="lc-date" type="date" value="${todayISO()}"></div>
-<div class="input-group"><label class="input-label">${lang==='th'?'ค่าเรียน (฿)':'Amount paid (฿)'}</label>
-<input class="input" id="lc-amount" type="number" min="0" placeholder="${student.price||'0'}" value="${student.price||''}"></div>
+${(rate1||rate15)?`<div class="input-group"><label class="input-label">${lang==='th'?'ระยะเวลา':'Duration'}</label>
+<div style="display:flex;gap:8px">
+${rate1?`<button id="lc-1hr" class="btn btn-primary flex-1">1 ${lang==='th'?'ชั่วโมง':'hr'}${rate1?` · ฿${rate1.toLocaleString()}`:''}</button>`:''}
+${rate15?`<button id="lc-15hr" class="btn btn-ghost flex-1">1.5 ${lang==='th'?'ชั่วโมง':'hr'}${rate15?` · ฿${rate15.toLocaleString()}`:''}</button>`:''}
+</div></div>`:''}
+<div class="input-group"><label class="input-label">${lang==='th'?'ค่าเรียน (฿)':'Amount (฿)'}</label>
+<input class="input" id="lc-amount" type="number" min="0" value="${rate1||student.price||''}"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ (ไม่จำเป็น)':'Note (optional)'}</label>
 <input class="input" id="lc-note" placeholder="${lang==='th'?'เช่น โอน KBank':'e.g. cash'}"></div>
 <button class="btn btn-primary btn-full mt-8" id="lc-save">📌 ${lang==='th'?'บันทึก':'Log'}</button>
 <div id="lc-err" class="alert alert-err mt-8" style="display:none"></div>
 ${sessions.length?`<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
 <div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">${lang==='th'?'ประวัติทั้งหมด':'History'} (${sessions.length})</div>
-<div style="display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto">${sessionRows}</div>
-</div>`:''}`)  ;
+<div style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto">${sessionRows}</div>
+</div>`:''}`);
 
-  $('lc-save').onclick=async()=>{
-    const date=$('lc-date').value||todayISO();
-    const amount=parseFloat($('lc-amount').value)||0;
-    const note=$('lc-note').value.trim();
-    $('lc-save').disabled=true;
-    const newH=[...(student.h||[]),date].sort();
-    const newPay=[...(student.payments||[]),{date,amount,note,ts:new Date().toISOString()}];
-    try{
-      await writeStudent(teacher.id,student.id,{h:newH,payments:newPay,u:(student.u||0)+1});
-      student.h=newH;student.payments=newPay;student.u=(student.u||0)+1;
-      syncStudentCache(student,teacher);
-      close();toast(`✅ ${lang==='th'?'บันทึกแล้ว':'Logged'}${amount?` · ฿${amount.toLocaleString()}`:''}`);;
-      render(s2=>screenTeacherDash(s2));
-    }catch(e){$('lc-err').style.display='';$('lc-err').textContent='Error: '+e.message;$('lc-save').disabled=false;}
-  };
+    // Duration buttons — auto-fill price
+    if(rate1)modal.querySelector('#lc-1hr')?.addEventListener('click',()=>{
+      $('lc-amount').value=rate1;
+      modal.querySelector('#lc-1hr').className='btn btn-primary flex-1';
+      if(rate15)modal.querySelector('#lc-15hr').className='btn btn-ghost flex-1';
+    });
+    if(rate15)modal.querySelector('#lc-15hr')?.addEventListener('click',()=>{
+      $('lc-amount').value=rate15;
+      modal.querySelector('#lc-15hr').className='btn btn-primary flex-1';
+      if(rate1)modal.querySelector('#lc-1hr').className='btn btn-ghost flex-1';
+    });
+
+    // Save new class
+    $('lc-save').onclick=async()=>{
+      const date=$('lc-date').value||todayISO();
+      const amount=parseFloat($('lc-amount').value)||0;
+      const note=$('lc-note').value.trim();
+      $('lc-save').disabled=true;
+      const newH=[...(student.h||[]),date].sort();
+      const newPay=[...(student.payments||[]),{date,amount,note,ts:new Date().toISOString()}];
+      try{
+        await writeStudent(teacher.id,student.id,{h:newH,payments:newPay,u:(student.u||0)+1});
+        student.h=newH;student.payments=newPay;student.u=(student.u||0)+1;
+        syncStudentCache(student,teacher);
+        close();toast(`✅ ${lang==='th'?'บันทึกแล้ว':'Logged'}${amount?` · ฿${amount.toLocaleString()}`:''}`);;
+        render(s2=>screenTeacherDash(s2));
+      }catch(e){$('lc-err').style.display='';$('lc-err').textContent='Error: '+e.message;$('lc-save').disabled=false;}
+    };
+
+    // Edit session date inline
+    modal.querySelectorAll('[data-sess]').forEach(inp=>{
+      inp.onchange=async()=>{
+        const i=parseInt(inp.dataset.sess);
+        const newH=[...(student.h||[])];
+        newH[sessions.length-1-i]=inp.value; // sessions is reversed
+        newH.sort();
+        try{
+          await writeStudent(teacher.id,student.id,{h:newH});
+          student.h=newH;syncStudentCache(student,teacher);
+          toast('✅ '+t('saveDone'));close();openModal();
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+
+    // Delete session
+    modal.querySelectorAll('[data-del-sess]').forEach(btn=>{
+      btn.onclick=async()=>{
+        const i=parseInt(btn.dataset.delSess);
+        const realIdx=student.h.indexOf(sessions[i]);
+        if(!confirm(`${lang==='th'?'ลบวันที่':'Delete'} ${fmtDate(sessions[i])}?`))return;
+        const newH=student.h.filter((_,idx)=>idx!==realIdx).sort();
+        const newPay=[...payments];newPay.splice(payments.length-1-i,1);
+        try{
+          await writeStudent(teacher.id,student.id,{h:newH,payments:newPay,u:Math.max(0,(student.u||0)-1)});
+          student.h=newH;student.payments=newPay;student.u=Math.max(0,(student.u||0)-1);
+          syncStudentCache(student,teacher);
+          toast(lang==='th'?'ลบแล้ว':'Deleted');close();openModal();
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+  }
+  openModal();
 }
 
 function showDeductModal(student,teacher){
@@ -2460,12 +2516,23 @@ function showEditStudentModal(student,teacher){
     </span>
   </label>
 </div>
+<div id="e-rates-wrap" style="display:${student.perClass?'block':'none'}">
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคา 1 ชั่วโมง (฿)':'1 hr rate (฿)'}</label>
+<input class="input" id="e-rate1" type="number" value="${student.rate1||''}" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคา 1.5 ชั่วโมง (฿)':'1.5 hr rate (฿)'}</label>
+<input class="input" id="e-rate15" type="number" value="${student.rate15||''}" placeholder="0"></div>
+</div>
 <div class="input-group"><label class="input-label">${t('studentPin')}</label>
 <input class="input" id="e-pin" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
 <button class="btn btn-primary btn-full mt-8" id="e-ok">${t('save')}</button>
 <div id="e-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
   const cb=$('e-perclass'),track=$('e-perclass-track'),thumb=$('e-perclass-thumb');
-  const updateToggle=()=>{track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';thumb.style.left=cb.checked?'23px':'3px';};
+  const updateToggle=()=>{
+    track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';
+    thumb.style.left=cb.checked?'23px':'3px';
+    $('e-rates-wrap').style.display=cb.checked?'block':'none';
+  };
   cb.onchange=updateToggle;
   track.onclick=()=>{cb.checked=!cb.checked;updateToggle();};
   $('e-ok').onclick=async()=>{
@@ -2474,9 +2541,11 @@ function showEditStudentModal(student,teacher){
     const price=parseFloat($('e-price').value)||0;
     const pinRaw=$('e-pin').value;
     const perClass=cb.checked;
+    const rate1=parseFloat($('e-rate1')?.value)||0;
+    const rate15=parseFloat($('e-rate15')?.value)||0;
     if(!sym){$('e-err').style.display='';$('e-err').textContent='Username required';return;}
     $('e-ok').disabled=true;
-    const upd={n:name,sym,price,perClass};
+    const upd={n:name,sym,price,perClass,rate1,rate15};
     if(pinRaw.length===4){upd.pin=await hashPin(pinRaw);}
     else if(pinRaw.length>0&&pinRaw.length<4){$('e-err').style.display='';$('e-err').textContent='PIN must be 4 digits';$('e-ok').disabled=false;return;}
     try{
