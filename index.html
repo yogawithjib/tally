@@ -1731,16 +1731,52 @@ function renderStats(container,students){
 <div class="stat-chip"><div class="stat-num" style="${remaining<0?'color:#b91c1c':''}">${remaining}</div><div class="stat-lbl">${remaining<0?t('debt'):t('statsLeft')}</div></div>`;
 }
 
-// ─── Income helpers ────────────────────────────────────────
+// ─── Migrate legacy payments[] into topups[] ───────────────
+async function migratePaymentsToTopups(student,teacher){
+  const payments=student.payments||[];
+  if(!payments.length)return;
+  const topups=[...(student.topups||[])];
+  let changed=false;
+  payments.forEach(p=>{
+    // Find matching topup by pkgId
+    const tp=topups.find(t=>t.pkgId&&t.pkgId===p.pkgId);
+    if(tp){
+      if(!tp.note&&p.note){tp.note=p.note;changed=true;}
+      if(tp.paid===undefined){tp.paid=true;changed=true;}
+    }else{
+      // No matching topup — find closest by date
+      const close=topups.find(t=>t.date===p.date&&!t._migrated);
+      if(close){
+        close.note=close.note||p.note||'';
+        close.paid=true;
+        close._migrated=true;
+        changed=true;
+      }
+    }
+  });
+  if(changed){
+    topups.forEach(tp=>delete tp._migrated);
+    await writeStudent(teacher.id,student.id,{topups,payments:[]});
+    student.topups=topups;student.payments=[];
+    syncStudentCache(student,teacher);
+  }
+}
+
+// ─── Income helpers ─────────────────────────────────────────
 function buildMonthlyIncome(students){
   const map={};
   students.forEach(st=>{
-    (st.payments||[]).forEach(p=>{
+    const topups=[...(st.topups||[])].filter(tp=>tp.paid!==false&&tp.price);
+    // also include legacy payments
+    const legacy=(st.payments||[]);
+    [...topups.map(tp=>({date:tp.date,amount:tp.price,note:tp.note||'',studentName:st.n||st.sym||'?',_teacher:st._teacher||null})),
+     ...legacy.map(p=>({date:p.date,amount:p.amount,note:p.note||'',studentName:st.n||st.sym||'?',_teacher:st._teacher||null}))]
+    .forEach(p=>{
       const month=(p.date||'').slice(0,7);
       if(!month)return;
       if(!map[month])map[month]={month,total:0,entries:[]};
       map[month].total+=p.amount||0;
-      map[month].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0,date:p.date,note:p.note||'',_teacher:st._teacher||null});
+      map[month].entries.push(p);
     });
   });
   return Object.values(map).sort((a,b)=>b.month>a.month?1:-1).map(m=>({
@@ -1752,16 +1788,20 @@ function buildMonthlyIncome(students){
 function buildYearlyIncome(students){
   const map={};
   students.forEach(st=>{
-    (st.payments||[]).forEach(p=>{
+    const allPaid=[
+      ...(st.topups||[]).filter(tp=>tp.paid!==false&&tp.price).map(tp=>({date:tp.date,amount:tp.price})),
+      ...(st.payments||[]).map(p=>({date:p.date,amount:p.amount}))
+    ];
+    allPaid.forEach(p=>{
       const year=(p.date||'').slice(0,4);
       if(!year||year==='000')return;
       if(!map[year])map[year]={year,total:0,entries:[],months:{}};
       map[year].total+=p.amount||0;
-      map[year].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0,date:p.date,note:p.note||''});
+      map[year].entries.push(p);
       const month=(p.date||'').slice(0,7);
       if(!map[year].months[month])map[year].months[month]={total:0,entries:[]};
       map[year].months[month].total+=p.amount||0;
-      map[year].months[month].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0});
+      map[year].months[month].entries.push(p);
     });
   });
   return Object.values(map).sort((a,b)=>b.year>a.year?1:-1);
@@ -1927,27 +1967,25 @@ function buildStudentCard(student,teacher){
     card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   }else{
     const badgeCls=c<=0?'empty':c<=2?'low':'';
+    const unpaidPkg=(student.topups||[]).some(tp=>tp.paid===false);
     card.innerHTML=`<div class="student-card-top">
 <div class="student-info">
-<div class="student-name">${student.n||student.sym}</div>
+<div class="student-name">${student.n||student.sym}${unpaidPkg?` <span style="font-size:10px;background:#fef9c3;color:#854d0e;border-radius:8px;padding:1px 6px;font-weight:600">${lang==='th'?'ค้างชำระ':'Unpaid'}</span>`:''}</div>
 <div class="student-meta">@${student.sym}${last?' · '+fmtDate(last):''}</div>
 </div>
 <div class="student-badge ${badgeCls}">${c}/${tot}</div>
 </div>
-${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);margin:6px 0 2px">
-💰 ${lang==='th'?'รับเงินล่าสุด':'Last payment'}: <strong>${fmtDate(student.payments[student.payments.length-1].date)}</strong> — ฿${Number(student.payments[student.payments.length-1].amount||0).toLocaleString()}
-</div>`:''}
 <div class="student-actions">
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
-<button class="btn btn-primary btn-sm" data-action="newpkg">💰 ${lang==='th'?'แพ็กเกจใหม่':'New package'}</button>
+<button class="btn btn-primary btn-sm" data-action="newpkg">📦 ${lang==='th'?'แพ็กเกจใหม่':'New package'}</button>
 <button class="btn btn-ghost btn-sm" data-action="pkg">📦 ${lang==='th'?'แพ็กเกจ / แก้ไข':'Packages / Edit'}</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
 </div>`;
     card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
-    card.querySelector('[data-action=newpkg]').onclick=()=>showNewPackageModal(student,teacher);
-    card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student,teacher);
+    card.querySelector('[data-action=newpkg]').onclick=()=>{migratePaymentsToTopups(student,teacher);showNewPackageModal(student,teacher);};
+    card.querySelector('[data-action=pkg]').onclick=()=>{migratePaymentsToTopups(student,teacher);showStudentPackagesModal(student,teacher);};
     card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
     card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
     card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
@@ -1980,16 +2018,22 @@ function showStudentPackagesModal(student,teacher){
         const isCurrent=pkg.num===packages.length;
         const remaining=isCurrent?c:pkg.top.classes-pkg.classes.length;
         const bc=remaining<0?'#b91c1c':isCurrent?'var(--pink)':'var(--grey)';
-        const datesBadge=pkg.classes.map((d,i)=>'<span style="background:#fff;border:1px solid '+( isCurrent?'var(--pink-m)':'var(--grey-m)')+';font-size:11px;padding:2px 8px;border-radius:10px;color:var(--text)">#'+(pkg.classes.length-i)+' '+fmtDate(d)+'</span>').join('') || '<span style="font-size:12px;color:var(--grey)">'+( lang==='th'?'ยังไม่มีคลาส':'No classes yet')+'</span>';
-        return '<div style="background:'+( isCurrent?'var(--pink-l)':'var(--grey-l)')+';border-radius:var(--r-xs);padding:12px 14px;margin-bottom:8px;'+( isCurrent?'border-left:3px solid var(--pink);':'')+'">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div>'+
-          '<span style="font-size:13px;font-weight:600">'+( isCurrent?(lang==='th'?'แพ็กเกจปัจจุบัน':'Current'):(lang==='th'?'แพ็กเกจที่':'Pkg ')+pkg.num)+'</span>'+
-          '<span style="font-size:11px;color:var(--grey);margin-left:6px">'+fmtDate(pkg.top.date)+'</span></div>'+
-          '<div style="display:flex;align-items:center;gap:6px">'+
-          '<span style="font-size:12px;font-weight:600;color:'+bc+'">'+pkg.classes.length+'/'+pkg.top.classes+(pkg.top.price?' · ฿'+Number(pkg.top.price).toLocaleString():'')+( isCurrent?' · '+remaining+' '+( lang==='th'?'เหลือ':'left'):'')+'</span>'+
-          '<button data-edit-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid var(--grey-m);border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:var(--grey);font-family:inherit">✏️</button>'+
-          '<button data-del-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid #fca5a5;border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:#b91c1c;font-family:inherit">🗑</button>'+
-          '</div></div><div style="display:flex;flex-wrap:wrap;gap:4px">'+datesBadge+'</div></div>';
+        const isPaid=pkg.top.paid!==false;
+        const datesBadge=pkg.classes.map((d,i)=>'<span style="background:#fff;border:1px solid '+(isCurrent?'var(--pink-m)':'var(--grey-m)')+';font-size:11px;padding:2px 8px;border-radius:10px;color:var(--text)">#'+(pkg.classes.length-i)+' '+fmtDate(d)+'</span>').join('') || '<span style="font-size:12px;color:var(--grey)">'+(lang==='th'?'ยังไม่มีคลาส':'No classes yet')+'</span>';
+        return '<div style="background:'+(isCurrent?'var(--pink-l)':'var(--grey-l)')+';border-radius:var(--r-xs);padding:12px 14px;margin-bottom:8px;'+(isCurrent?'border-left:3px solid var(--pink);':'')+'">'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:13px;font-weight:600">'+(isCurrent?(lang==='th'?'แพ็กเกจปัจจุบัน':'Current'):(lang==='th'?'แพ็กเกจที่':'Pkg ')+pkg.num)+'</span>'
+          +'<span style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;background:'+(isPaid?'#dcfce7':'#fef9c3')+';color:'+(isPaid?'#166534':'#854d0e')+'">'+(isPaid?(lang==='th'?'ชำระแล้ว':'Paid'):(lang==='th'?'ยังไม่ชำระ':'Unpaid'))+'</span>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<span style="font-size:12px;font-weight:600;color:'+bc+'">'+pkg.classes.length+'/'+pkg.top.classes+(pkg.top.price?' · ฿'+Number(pkg.top.price).toLocaleString():'')+(isCurrent?' · '+remaining+' '+(lang==='th'?'เหลือ':'left'):'')+'</span>'
+          +'<button data-edit-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid var(--grey-m);border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:var(--grey);font-family:inherit">✏️</button>'
+          +'<button data-del-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid #fca5a5;border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:#b91c1c;font-family:inherit">🗑</button>'
+          +'</div></div>'
+          +(pkg.top.note?'<div style="font-size:11px;color:var(--grey);margin-bottom:4px">'+pkg.top.note+'</div>':'')
+          +'<div style="font-size:11px;color:var(--grey);margin-bottom:4px">'+fmtDate(pkg.top.date)+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:4px">'+datesBadge+'</div></div>';
       }).join('');
     }
 
@@ -2029,41 +2073,58 @@ function showStudentPackagesModal(student,teacher){
 }
 
 function showEditPackageModal(student,teacher,idx,pkg,onDone){
-  // idx is position in date-sorted display; find real index in raw array by pkgId
   const realIdx=pkg.pkgId
     ?student.topups.findIndex(tp=>tp.pkgId===pkg.pkgId)
     :student.topups.findIndex(tp=>tp.date===pkg.date&&tp.classes===pkg.classes);
   const safeIdx=realIdx>=0?realIdx:idx;
-
-  // Display number = position in date-sorted list + 1
   const sortedTopups=[...(student.topups||[])].sort((a,b)=>a.date>b.date?1:-1);
   const displayNum=sortedTopups.findIndex(tp=>(tp.pkgId&&tp.pkgId===pkg.pkgId)||(tp.date===pkg.date&&tp.classes===pkg.classes))+1;
+  const isPaid=pkg.paid!==false;
 
-  const{close}=showModal('<div class="modal-title">✏️ '+( lang==='th'?'แก้ไขแพ็กเกจ':'Edit package')+' #'+displayNum+'</div>'+
-    '<div class="input-group"><label class="input-label">'+( lang==='th'?'วันที่เติม':'Date')+'</label><input class="input" id="ep-date" type="date" value="'+( pkg.date||todayISO())+'"></div>'+
-    '<div class="input-group"><label class="input-label">'+( lang==='th'?'จำนวนคลาส':'Number of classes')+'</label><input class="input" id="ep-cls" type="number" min="1" value="'+pkg.classes+'"></div>'+
-    '<div class="input-group"><label class="input-label">'+t('price')+' (฿)</label><input class="input" id="ep-price" type="number" value="'+( pkg.price||'')+'"></div>'+
-    '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-ghost flex-1" id="ep-cancel">'+t('cancel')+'</button><button class="btn btn-primary flex-1" id="ep-save">'+t('save')+'</button></div>'+
-    '<div id="ep-err" class="alert alert-err mt-8" style="display:none"></div>');
+  const{modal,close}=showModal(`<div class="modal-title">✏️ ${lang==='th'?'แก้ไขแพ็กเกจ':'Edit package'} #${displayNum}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่ซื้อ':'Purchase date'}</label>
+<input class="input" id="ep-date" type="date" value="${pkg.date||todayISO()}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนคลาส':'Classes'}</label>
+<input class="input" id="ep-cls" type="number" min="1" value="${pkg.classes}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคา (฿)':'Price (฿)'}</label>
+<input class="input" id="ep-price" type="number" value="${pkg.price||''}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ':'Note'}</label>
+<input class="input" id="ep-note" value="${pkg.note||''}"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:14px">
+  <div><div style="font-size:13px;font-weight:600">${lang==='th'?'รับเงินแล้ว':'Paid'}</div></div>
+  <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;cursor:pointer">
+    <input type="checkbox" id="ep-paid" ${isPaid?'checked':''} style="opacity:0;width:0;height:0">
+    <span id="ep-paid-track" style="position:absolute;inset:0;border-radius:12px;background:${isPaid?'var(--pink)':'var(--grey-m)'};transition:.2s">
+      <span id="ep-paid-thumb" style="position:absolute;top:3px;left:${isPaid?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s"></span>
+    </span>
+  </label>
+</div>
+<div style="display:flex;gap:8px"><button class="btn btn-ghost flex-1" id="ep-cancel">${t('cancel')}</button><button class="btn btn-primary flex-1" id="ep-save">${t('save')}</button></div>
+<div id="ep-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  const cb=modal.querySelector('#ep-paid'),track=modal.querySelector('#ep-paid-track'),thumb=modal.querySelector('#ep-paid-thumb');
+  const upd=()=>{track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';thumb.style.left=cb.checked?'23px':'3px';};
+  cb.onchange=upd;track.onclick=()=>{cb.checked=!cb.checked;upd();};
 
   $('ep-cancel').onclick=()=>{close();onDone();};
   $('ep-save').onclick=async()=>{
     const date=$('ep-date').value||pkg.date;
     const classes=parseInt($('ep-cls').value)||pkg.classes;
-    const price=parseFloat($('ep-price').value)||pkg.price||0;
+    const price=parseFloat($('ep-price').value)||0;
+    const note=$('ep-note').value.trim();
+    const paid=cb.checked;
     if(classes<1){$('ep-err').style.display='';$('ep-err').textContent=lang==='th'?'จำนวนคลาสต้องมากกว่า 0':'Classes must be at least 1';return;}
     $('ep-save').disabled=true;
     const newTopups=[...(student.topups||[])];
-    newTopups[safeIdx]={...pkg,date,classes,price};
+    newTopups[safeIdx]={...pkg,date,classes,price,note,paid};
     const newT=newTopups.reduce((a,tp)=>a+tp.classes,0);
     const diff=classes-pkg.classes;
     const newC=(student.c||0)+diff;
     try{
-      await writeStudent(teacher.id,student.id,{topups:newTopups,t:newT,c:newC});
-      student.topups=newTopups;student.t=newT;student.c=newC;
+      await writeStudent(teacher.id,student.id,{topups:newTopups,t:newT,c:newC,price});
+      student.topups=newTopups;student.t=newT;student.c=newC;student.price=price;
       syncStudentCache(student,teacher);
-      toast(t('saveDone'));
-      close();onDone();
+      toast(t('saveDone'));close();onDone();
     }catch(e){$('ep-err').style.display='';$('ep-err').textContent='Error: '+e.message;$('ep-save').disabled=false;}
   };
 }
@@ -2313,87 +2374,71 @@ ${histHTML}`);
 }
 
 function showNewPackageModal(student,teacher){
-  const{close}=showModal(`<div class="modal-title">💰 ${lang==='th'?'แพ็กเกจใหม่':'New package'}</div>
+  const{modal,close}=showModal(`<div class="modal-title">📦 ${lang==='th'?'แพ็กเกจใหม่':'New package'} — ${student.n||student.sym}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'วันที่ซื้อ':'Purchase date'}</label>
 <input class="input" id="np-date" type="date" value="${todayISO()}"></div>
-<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนคลาส':'Number of classes'}</label>
-<input class="input" id="np-n" type="number" min="1" value="10" placeholder="10"></div>
-<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนเงินที่รับ (฿)':'Amount received (฿)'}</label>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนคลาส':'Classes'}</label>
+<input class="input" id="np-n" type="number" min="1" value="${student.price?'10':'10'}" placeholder="10"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ราคา (฿)':'Price (฿)'}</label>
 <input class="input" id="np-price" type="number" min="0" value="${student.price||''}" placeholder="0"></div>
-<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ (ไม่จำเป็น)':'Note (optional)'}</label>
-<input class="input" id="np-note" placeholder="${lang==='th'?'เช่น โอน KBank':'e.g. via KBank'}"></div>
-<button class="btn btn-primary btn-full mt-8" id="np-ok">💰 ${lang==='th'?'บันทึก':'Save'}</button>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ':'Note'}</label>
+<input class="input" id="np-note" placeholder="${lang==='th'?'เช่น โอน KBank':'e.g. KBank transfer'}"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:14px">
+  <div>
+    <div style="font-size:13px;font-weight:600">${lang==='th'?'รับเงินแล้ว':'Paid'}</div>
+    <div style="font-size:11px;color:var(--grey);margin-top:2px">${lang==='th'?'นักเรียนชำระแล้ว':'Student has paid'}</div>
+  </div>
+  <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;cursor:pointer">
+    <input type="checkbox" id="np-paid" checked style="opacity:0;width:0;height:0">
+    <span id="np-paid-track" style="position:absolute;inset:0;border-radius:12px;background:var(--pink);transition:.2s">
+      <span id="np-paid-thumb" style="position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s"></span>
+    </span>
+  </label>
+</div>
+<button class="btn btn-primary btn-full" id="np-ok">📦 ${lang==='th'?'บันทึก':'Save'}</button>
 <div id="np-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  const cb=modal.querySelector('#np-paid'),track=modal.querySelector('#np-paid-track'),thumb=modal.querySelector('#np-paid-thumb');
+  const upd=()=>{track.style.background=cb.checked?'var(--pink)':'var(--grey-m)';thumb.style.left=cb.checked?'23px':'3px';};
+  cb.onchange=upd; track.onclick=()=>{cb.checked=!cb.checked;upd();};
 
   $('np-ok').onclick=async()=>{
     const date=$('np-date').value||todayISO();
     const n=parseInt($('np-n').value)||0;
     const price=parseFloat($('np-price').value)||0;
     const note=$('np-note').value.trim();
-    if(!n){$('np-err').style.display='';$('np-err').textContent=lang==='th'?'กรุณาใส่จำนวนคลาส':'Please enter number of classes';return;}
+    const paid=cb.checked;
+    if(!n){$('np-err').style.display='';$('np-err').textContent=lang==='th'?'กรุณาใส่จำนวนคลาส':'Enter number of classes';return;}
     $('np-ok').disabled=true;
     try{
-      const newC=(student.c||0)+n, newT=(student.t||0)+n;
       const pkgId='pkg_'+Date.now();
-      // Topup record
-      const newTopup={date,classes:n,price,pkgId};
+      const newC=(student.c||0)+n, newT=(student.t||0)+n;
+      const newTopup={date,classes:n,price,note,paid,pkgId};
       const newTopups=[...(student.topups||[]),newTopup];
-      // Payment record
-      const newPayment={date,amount:price,note,ts:new Date().toISOString(),pkgId};
-      const newPayments=[...(student.payments||[]),newPayment];
-      await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups,payments:newPayments});
-      student.c=newC;student.t=newT;student.price=price;
-      student.topups=newTopups;student.payments=newPayments;
+      await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups});
+      student.c=newC;student.t=newT;student.price=price;student.topups=newTopups;
       syncStudentCache(student,teacher);
-      close();toast(`✅ ${lang==='th'?'บันทึกแล้ว':'Saved'} · ${n} ${lang==='th'?'คลาส':'classes'}${price?` · ฿${price.toLocaleString()}`:''}`);
-      // Show quick edit prompt
+      close();
       setTimeout(()=>{
-        const{close:closeEdit}=showModal(`<div class="modal-title">✅ ${lang==='th'?'บันทึกแล้ว':'Package saved!'}</div>
-<div style="font-size:13px;color:var(--grey);margin-bottom:16px">${lang==='th'?`${n} คลาส · ฿${price.toLocaleString()} · ${fmtDate(date)}`:`${n} classes · ฿${price.toLocaleString()} · ${fmtDate(date)}`}</div>
+        const{close:c2}=showModal(`<div class="modal-title">✅ ${lang==='th'?'บันทึกแล้ว':'Saved!'}</div>
+<div style="font-size:13px;color:var(--grey);margin-bottom:16px">${n} ${lang==='th'?'คลาส':'classes'}${price?` · ฿${price.toLocaleString()}`:''}${paid?'':` · <span style="color:#f59e0b">${lang==='th'?'ยังไม่ได้ชำระ':'Unpaid'}</span>`}</div>
 <div style="display:flex;gap:8px">
-<button class="btn btn-ghost flex-1" id="np-done">${lang==='th'?'เสร็จแล้ว':'Done'}</button>
+<button class="btn btn-ghost flex-1" id="np-done">${lang==='th'?'เสร็จ':'Done'}</button>
 <button class="btn btn-primary flex-1" id="np-edit">✏️ ${lang==='th'?'แก้ไข':'Edit'}</button>
 </div>`);
-        $('np-done').onclick=()=>{closeEdit();render(s2=>screenTeacherDash(s2));};
+        $('np-done').onclick=()=>{c2();render(s2=>screenTeacherDash(s2));};
         $('np-edit').onclick=()=>{
-          closeEdit();
-          const pkgIdx=(student.topups||[]).length-1;
-          showEditPackageModal(student,teacher,pkgIdx,student.topups[pkgIdx],()=>render(s2=>screenTeacherDash(s2)));
+          c2();
+          const lastPkg=student.topups[student.topups.length-1];
+          showEditPackageModal(student,teacher,student.topups.length-1,lastPkg,()=>render(s2=>screenTeacherDash(s2)));
         };
-      },300);
+      },200);
     }catch(e){$('np-err').style.display='';$('np-err').textContent='Error: '+e.message;$('np-ok').disabled=false;}
   };
 }
 
-function showTopupModal(student,teacher){
-  const{overlay,close}=showModal(`<div class="modal-title">✨ ${t('topupClasses')}</div>
-<div class="input-group"><label class="input-label">${lang==='th'?'วันที่ซื้อแพ็กเกจ':'Purchase date'}</label>
-<input class="input" id="tu-date" type="date" value="${todayISO()}"></div>
-<div class="input-group"><label class="input-label">${t('numClasses')}</label>
-<input class="input" id="tu-n" type="number" min="1" value="10" placeholder="10"></div>
-<div class="input-group"><label class="input-label">${t('price')} (฿)</label>
-<input class="input" id="tu-price" type="number" min="0" value="${student.price||''}" placeholder="0"></div>
-<button class="btn btn-primary btn-full" id="tu-ok">${t('confirm')}</button>`);
-  $('tu-ok').onclick=async()=>{
-    const n=parseInt($('tu-n').value)||0;
-    const price=parseFloat($('tu-price').value)||student.price||0;
-    const date=$('tu-date').value||todayISO();
-    if(!n)return;
-    $('tu-ok').disabled=true;
-    try{
-      const newC=(student.c||0)+n, newT=(student.t||0)+n;
-      const newTopup={date,classes:n,price,pkgId:'pkg_'+Date.now()};
-      const newTopups=[...(student.topups||[]),newTopup];
-      await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups});
-      student.c=newC;student.t=newT;student.price=price;student.topups=newTopups;
-      const students=C.get('students_'+teacher.id)||[];
-      const idx=students.findIndex(s=>s.id===student.id);
-      if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
-      close();toast('✅ Topped up');
-      render(s2=>screenTeacherDash(s2));
-    }catch(e){toast('Error: '+e.message);$('tu-ok').disabled=false;}
-  };
-}
+function showTopupModal(student,teacher){showNewPackageModal(student,teacher);}
+
 
 function showEditStudentModal(student,teacher){
   const{overlay,close}=showModal(`<div class="modal-title">✏️ ${t('edit')}</div>
