@@ -778,7 +778,13 @@ function makeHeader({back,logout,title,onBack,onLogout,showSessionInfo}={}){
   const h=el('div','hdr');
   const left=el('div','hdr-logo');
   left.dataset.logoTap='1';
-  left.innerHTML=`<div class="app-name"><span class="tally">TALLY</span><span class="byline">by <span class="script">Yoga with Jib</span></span></div>`;
+  left.innerHTML=`<div style="display:flex;align-items:center;gap:10px">
+<span style="font-family:'FabfeltScript',cursive;color:#fb2a7b;font-size:24px;line-height:1;border-right:1px solid #eee;padding-right:10px">Yoga with Jib</span>
+<div>
+  <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#1a1a1a;letter-spacing:.12em;line-height:1">TALLY</div>
+  <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:300;color:#bbb;margin-top:2px;letter-spacing:.03em">class tracker</div>
+</div>
+</div>`;
   left.addEventListener('click',handleLogoTap);
   
   const right=el('div','hdr-right');
