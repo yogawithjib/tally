@@ -1157,7 +1157,7 @@ function buildMotivationalCard(hist){
   const sorted=[...hist].sort();
   const total=sorted.length;
 
-  // Streak — count consecutive weeks with at least 1 class
+  // Streak
   function getWeekKey(dateStr){
     const d=new Date(dateStr);
     const jan1=new Date(d.getFullYear(),0,1);
@@ -1166,35 +1166,77 @@ function buildMotivationalCard(hist){
   const weeks=[...new Set(sorted.map(getWeekKey))];
   let streak=1;
   for(let i=weeks.length-1;i>0;i--){
-    const [y1,w1]=weeks[i].split('-W').map(Number);
-    const [y2,w2]=weeks[i-1].split('-W').map(Number);
-    const diff=(y1-y2)*52+(w1-w2);
-    if(diff===1)streak++;
-    else break;
+    const[y1,w1]=weeks[i].split('-W').map(Number);
+    const[y2,w2]=weeks[i-1].split('-W').map(Number);
+    if((y1-y2)*52+(w1-w2)===1)streak++;else break;
   }
 
   // Milestones
   const MILESTONES=[
-    {n:5,   emoji:'🌱', en:'5 classes!',          th:'5 ครั้งแล้ว!'},
-    {n:10,  emoji:'🌿', en:'10 classes!',         th:'10 ครั้งแล้ว!'},
-    {n:20,  emoji:'🌸', en:'20 classes!',         th:'20 ครั้งแล้ว!'},
-    {n:30,  emoji:'🌺', en:'30 classes!',         th:'30 ครั้งแล้ว!'},
-    {n:50,  emoji:'🦋', en:'50 classes!',         th:'50 ครั้งแล้ว!'},
-    {n:75,  emoji:'🌻', en:'75 classes!',         th:'75 ครั้งแล้ว!'},
-    {n:100, emoji:'🏆', en:'100 classes!',        th:'100 ครั้งแล้ว!'},
-    {n:150, emoji:'✨', en:'150 classes!',        th:'150 ครั้งแล้ว!'},
-    {n:200, emoji:'🧘', en:'200 classes — legend!',th:'200 ครั้ง — สุดยอด!'},
+    {n:5,emoji:'🌱',en:'5 classes!',th:'5 ครั้งแล้ว!'},
+    {n:10,emoji:'🌿',en:'10 classes!',th:'10 ครั้งแล้ว!'},
+    {n:20,emoji:'🌸',en:'20 classes!',th:'20 ครั้งแล้ว!'},
+    {n:30,emoji:'🌺',en:'30 classes!',th:'30 ครั้งแล้ว!'},
+    {n:50,emoji:'🦋',en:'50 classes!',th:'50 ครั้งแล้ว!'},
+    {n:75,emoji:'🌻',en:'75 classes!',th:'75 ครั้งแล้ว!'},
+    {n:100,emoji:'🏆',en:'100 classes!',th:'100 ครั้งแล้ว!'},
+    {n:150,emoji:'✨',en:'150 classes!',th:'150 ครั้งแล้ว!'},
+    {n:200,emoji:'🧘',en:'200 classes — legend!',th:'200 ครั้ง — สุดยอด!'},
   ];
   const reached=MILESTONES.filter(m=>total>=m.n);
   const current=reached[reached.length-1]||null;
   const next=MILESTONES.find(m=>total<m.n)||null;
   const justHit=current&&current.n===total;
 
+  // Heatmap — last 15 weeks (105 days)
+  const classSet=new Set(sorted);
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  // find Monday 15 weeks ago
+  const dayOfWeek=today.getDay()||7; // 1=Mon..7=Sun
+  const startDate=new Date(today);
+  startDate.setDate(today.getDate()-(dayOfWeek-1)-14*7);
+
+  const heatCells=[];
+  const monthLabels=[];
+  let lastMonth=-1;
+  for(let i=0;i<105;i++){
+    const d=new Date(startDate);
+    d.setDate(startDate.getDate()+i);
+    const iso=d.toISOString().slice(0,10);
+    const count=classSet.has(iso)?1:0;
+    const isFuture=d>today;
+    const mon=d.getMonth();
+    if(mon!==lastMonth){monthLabels.push({col:Math.floor(i/7),label:d.toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'short'})});lastMonth=mon;}
+    heatCells.push({iso,count,isFuture,dow:d.getDay()||7});
+  }
+
+  // Build SVG heatmap
+  const cellSize=12,gap=2,cols=15,rows=7;
+  const w=cols*(cellSize+gap),h=rows*(cellSize+gap)+18;
+  const dayLabels=['M','','W','','F','','S'];
+
+  const svgCells=heatCells.map((c,i)=>{
+    const col=Math.floor(i/7);
+    const row=(i%7);
+    const x=col*(cellSize+gap);
+    const y=row*(cellSize+gap)+16;
+    const fill=c.isFuture?'none':c.count>0?'#fb2a7b':'#e8e8e8';
+    const stroke=c.isFuture?'#efefef':'none';
+    return`<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="1"/>`;
+  }).join('');
+
+  const svgMonths=monthLabels.map(m=>`<text x="${m.col*(cellSize+gap)}" y="10" font-size="8" fill="#aaa" font-family="inherit">${m.label}</text>`).join('');
+  const svgDays=dayLabels.map((d,i)=>`<text x="-2" y="${i*(cellSize+gap)+16+9}" font-size="7.5" fill="#bbb" text-anchor="end" font-family="inherit">${d}</text>`).join('');
+
+  const heatmapSVG=`<svg viewBox="-14 0 ${w+14} ${h}" width="100%" style="display:block;max-width:${w+14}px;margin:0 auto">
+${svgMonths}${svgDays}${svgCells}
+</svg>`;
+
   const card=el('div','card');
   card.style.cssText='margin:0 16px 14px;background:var(--pink-l);border:1.5px solid var(--pink-m)';
 
-  // Streak display
-  const streakBar=`<div style="display:flex;align-items:center;gap:10px">
+  const streakBar=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
 <div style="font-size:26px">${streak>=4?'🔥':streak>=2?'⚡':'💧'}</div>
 <div>
   <div style="font-size:15px;font-weight:600">${streak} ${lang==='th'?'สัปดาห์ติดต่อกัน':'week streak'}</div>
@@ -1202,29 +1244,30 @@ function buildMotivationalCard(hist){
 </div>
 </div>`;
 
-  // Milestone display
-  const milestoneBar=current?`<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--pink-m)">
-<div style="font-size:26px">${current.emoji}</div>
+  const milestoneBar=current?`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--pink-m)">
+<div style="font-size:22px">${current.emoji}</div>
 <div style="flex:1">
-  <div style="font-size:14px;font-weight:600;color:var(--pink)">${lang==='th'?current.th:current.en} ${justHit?'🎉':''}</div>
+  <div style="font-size:13px;font-weight:600;color:var(--pink)">${lang==='th'?current.th:current.en}${justHit?' 🎉':''}</div>
   ${next?`<div style="margin-top:4px">
-    <div style="height:5px;background:var(--pink-m);border-radius:3px;overflow:hidden">
-      <div style="height:100%;width:${Math.round(((total-current.n)/(next.n-current.n))*100)}%;background:var(--pink);border-radius:3px;transition:width .6s ease"></div>
+    <div style="height:4px;background:var(--pink-m);border-radius:2px;overflow:hidden">
+      <div style="height:100%;width:${Math.round(((total-current.n)/(next.n-current.n))*100)}%;background:var(--pink);border-radius:2px"></div>
     </div>
-    <div style="font-size:10px;color:var(--grey);margin-top:3px">${next.n-total} ${lang==='th'?'ครั้งถึง':'to go until'} ${next.emoji} ${next.n}</div>
-  </div>`:'<div style="font-size:11px;color:var(--pink);margin-top:2px">'+( lang==='th'?'สุดยอดมาก! 🙏':'Amazing dedication! 🙏')+'</div>'}
+    <div style="font-size:10px;color:var(--grey);margin-top:2px">${next.n-total} ${lang==='th'?'ครั้งถึง':'to'} ${next.emoji}</div>
+  </div>`:'<div style="font-size:11px;color:var(--pink);margin-top:2px">'+(lang==='th'?'สุดยอดมาก! 🙏':'Amazing dedication! 🙏')+'</div>'}
 </div>
-</div>`:next?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--pink-m)">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:12px">
-  <span style="color:var(--grey)">${lang==='th'?'เป้าหมายแรก':'First milestone'} ${next.emoji} ${next.n}</span>
-  <span style="color:var(--pink);font-weight:600">${total}/${next.n}</span>
+</div>`:next?`<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--pink-m)">
+<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--grey);margin-bottom:3px">
+  <span>${lang==='th'?'เป้าหมายแรก':'First milestone'} ${next.emoji} ${next.n}</span>
+  <span>${total}/${next.n}</span>
 </div>
-<div style="height:5px;background:var(--pink-m);border-radius:3px;overflow:hidden">
-  <div style="height:100%;width:${Math.round((total/next.n)*100)}%;background:var(--pink);border-radius:3px"></div>
+<div style="height:4px;background:var(--pink-m);border-radius:2px;overflow:hidden">
+  <div style="height:100%;width:${Math.round((total/next.n)*100)}%;background:var(--pink);border-radius:2px"></div>
 </div>
 </div>`:'';
 
-  card.innerHTML=streakBar+milestoneBar;
+  const heatLabel=`<div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">${lang==='th'?'ปฏิทินการฝึก':'Practice calendar'}</div>`;
+
+  card.innerHTML=streakBar+milestoneBar+heatLabel+heatmapSVG;
   return card;
 }
 
