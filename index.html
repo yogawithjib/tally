@@ -1199,31 +1199,79 @@ async function screenTopUp(s){
     }
   }catch(e){$('bank-info').innerHTML='<div class="text-grey text-sm">—</div>';}
   
-  $('notify-btn').onclick=async()=>{
-    const bank=C.get('bank_'+teacher.id)||{};
+  $('notify-btn').onclick=()=>{
     const contact=C.get('contact_'+teacher.id)||{};
-    const toEmail=contact.email||'';
-    const studentName=student.n||student.sym||'';
-    const pkg=student.price?`฿${student.price.toLocaleString()}`:'—';
-    const dateStr=new Date().toLocaleDateString(lang==='th'?'th-TH':'en-GB',{day:'numeric',month:'long',year:'numeric'});
+    const nd=$('notify-err');
 
-    const subject=encodeURIComponent(
-      lang==='th'
-        ?`แจ้งโอนเงิน — ${studentName}`
-        :`Payment notification — ${studentName}`
-    );
-    const body=encodeURIComponent(
-      lang==='th'
-        ?`สวัสดีค่ะ\n\nหนู ${studentName} ได้โอนเงินค่าแพ็กเกจ ${pkg} แล้วนะคะ\nวันที่: ${dateStr}\n\nรบกวนตรวจสอบและเติมคลาสให้ด้วยนะคะ 🙏`
-        :`Hi,\n\nI (${studentName}) have transferred payment for the ${pkg} package.\nDate: ${dateStr}\n\nPlease check and top up my classes. Thank you! 🙏`
-    );
-
-    if(!toEmail){
-      toast(lang==='th'?'ไม่พบอีเมลครู กรุณาติดต่อครูโดยตรง':'No teacher email found — please contact your teacher directly');
+    if(!contact.phone&&!contact.line&&!contact.email){
+      nd.style.display='';nd.className='alert alert-err';
+      nd.textContent=lang==='th'?'ไม่พบข้อมูลติดต่อครู':'No contact info found';
       return;
     }
 
-    window.location.href=`mailto:${toEmail}?subject=${subject}&body=${body}`;
+    function maskVal(val,type){
+      if(!val)return'';
+      if(type==='email'){
+        const[u,d]=val.split('@');
+        return u.slice(0,2)+'•'.repeat(Math.max(2,u.length-2))+'@'+d;
+      }
+      return val.slice(0,2)+'•'.repeat(Math.max(2,val.length-4))+val.slice(-2);
+    }
+
+    function contactRow(icon,val,type){
+      if(!val)return'';
+      const masked=maskVal(val,type);
+      const id=`cr-${type}`;
+      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0">
+  <span style="font-size:18px;width:24px;text-align:center">${icon}</span>
+  <span id="${id}-val" style="flex:1;font-size:13px;font-weight:600;letter-spacing:.02em;word-break:break-all">${masked}</span>
+  <button id="${id}-show" style="background:none;border:1px solid #ddd;border-radius:20px;font-size:11px;padding:3px 9px;cursor:pointer;color:#888;font-family:inherit;white-space:nowrap;flex-shrink:0">${lang==='th'?'แสดง':'Show'}</button>
+  <button id="${id}-copy" style="background:#fb2a7b;color:#fff;border:none;border-radius:20px;font-size:11px;padding:3px 9px;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">📋</button>
+</div>`;
+    }
+
+    nd.style.display='';nd.className='alert alert-info';
+    nd.style.padding='12px 14px';
+    nd.innerHTML=`<div style="font-size:12px;font-weight:600;color:#d91f65;margin-bottom:4px">${lang==='th'?'ข้อมูลติดต่อครู':'Contact your teacher'}</div>
+${contactRow('📞',contact.phone,'phone')}
+${contactRow('💬',contact.line,'line')}
+${contactRow('✉️',contact.email,'email')}`;
+
+    function setupRow(type,val){
+      if(!val)return;
+      const masked=maskVal(val,type);
+      let revealed=false;
+      const valEl=nd.querySelector(`#cr-${type}-val`);
+      const showBtn=nd.querySelector(`#cr-${type}-show`);
+      const copyBtn=nd.querySelector(`#cr-${type}-copy`);
+      if(!valEl||!showBtn||!copyBtn)return;
+
+      showBtn.onclick=()=>{
+        revealed=!revealed;
+        valEl.textContent=revealed?val:masked;
+        showBtn.textContent=revealed?(lang==='th'?'ซ่อน':'Hide'):(lang==='th'?'แสดง':'Show');
+        showBtn.style.borderColor=revealed?'#fb2a7b':'#ddd';
+        showBtn.style.color=revealed?'#fb2a7b':'#888';
+      };
+
+      copyBtn.onclick=()=>{
+        const doCopy=()=>{
+          navigator.clipboard.writeText(val).catch(()=>{
+            const ta=document.createElement('textarea');ta.value=val;
+            ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);
+            ta.select();document.execCommand('copy');document.body.removeChild(ta);
+          });
+        };
+        doCopy();
+        const orig=copyBtn.textContent;
+        copyBtn.textContent='✅';copyBtn.style.background='#22c55e';
+        setTimeout(()=>{copyBtn.textContent=orig;copyBtn.style.background='#fb2a7b';},2000);
+      };
+    }
+
+    setupRow('phone',contact.phone);
+    setupRow('line',contact.line);
+    setupRow('email',contact.email);
   };
 }
 
