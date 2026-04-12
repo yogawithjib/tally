@@ -2074,7 +2074,7 @@ function showLogPaymentModal(student,teacher){
   const topups=[...(student.topups||[])].sort((a,b)=>a.date>b.date?1:-1);
 
   function pkgOpts(selId){
-    return'<option value="">''+(lang==='th'?'— ไม่ระบุแพ็กเกจ —':'— No package —')+'</option>'
+    return'<option value="">'+(lang==='th'?'— ไม่ระบุแพ็กเกจ —':'— No package —')+'</option>'
       +topups.map((tp,i)=>'<option value="'+( tp.pkgId||String(i))+'" '+((tp.pkgId||String(i))===selId?'selected':'')+'>'+
         (lang==='th'?'แพ็กเกจที่':'Pkg ')+( i+1)+' · '+fmtDate(tp.date)+' · '+tp.classes+' '+( lang==='th'?'คลาส':'cls')+( tp.price?' · ฿'+Number(tp.price).toLocaleString():'')+
       '</option>').join('');
@@ -2149,7 +2149,7 @@ function showLogPaymentModal(student,teacher){
 function showEditPaymentModal(student,teacher,idx,p){
   const topups=[...(student.topups||[])].sort((a,b)=>a.date>b.date?1:-1);
   function pkgOpts(selId){
-    return'<option value="">''+(lang==='th'?'— ไม่ระบุแพ็กเกจ —':'— No package —')+'</option>'
+    return'<option value="">'+(lang==='th'?'— ไม่ระบุแพ็กเกจ —':'— No package —')+'</option>'
       +topups.map((tp,i)=>'<option value="'+( tp.pkgId||String(i))+'" '+((tp.pkgId||String(i))===selId?'selected':'')+'>'+
         (lang==='th'?'แพ็กเกจที่':'Pkg ')+( i+1)+' · '+fmtDate(tp.date)+' · '+tp.classes+' '+( lang==='th'?'คลาส':'cls')+( tp.price?' · ฿'+Number(tp.price).toLocaleString():'')+
       '</option>').join('');
