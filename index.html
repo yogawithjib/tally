@@ -1192,7 +1192,35 @@ function buildMotivationalCard(hist){
   const next=MILESTONES.find(m=>total<m.n)||null;
   const justHit=current&&current.n===total;
 
-  // Heatmap — last 15 weeks (105 days)
+  // Monthly stats
+  const now=new Date();
+  const thisMonth=now.getFullYear()+'-'+(String(now.getMonth()+1).padStart(2,'0'));
+  const thisYear=String(now.getFullYear());
+  const monthCountMap={};
+  sorted.forEach(d=>{
+    const m=d.slice(0,7);
+    monthCountMap[m]=(monthCountMap[m]||0)+1;
+  });
+  const thisMonthCount=monthCountMap[thisMonth]||0;
+  const thisYearCount=sorted.filter(d=>d.startsWith(thisYear)).length;
+  const bestMonthEntry=Object.entries(monthCountMap).sort((a,b)=>b[1]-a[1])[0];
+  const bestMonthLabel=bestMonthEntry?new Date(bestMonthEntry[0]+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'short'}):'—';
+  const bestMonthCount=bestMonthEntry?bestMonthEntry[1]:0;
+
+  const statsChips=`<div style="display:flex;gap:8px;margin-bottom:10px">
+<div style="background:#fff;border:1px solid var(--pink-m);border-radius:8px;padding:8px 10px;flex:1;text-align:center">
+  <div style="font-size:18px;font-weight:600;color:var(--pink);line-height:1">${thisMonthCount}</div>
+  <div style="font-size:10px;color:var(--grey);margin-top:2px">${lang==='th'?'เดือนนี้':'This month'}</div>
+</div>
+<div style="background:#fff;border:1px solid var(--pink-m);border-radius:8px;padding:8px 10px;flex:1;text-align:center">
+  <div style="font-size:18px;font-weight:600;color:var(--pink);line-height:1">${thisYearCount}</div>
+  <div style="font-size:10px;color:var(--grey);margin-top:2px">${lang==='th'?'ปีนี้':'This year'}</div>
+</div>
+<div style="background:#fff;border:1px solid var(--pink-m);border-radius:8px;padding:8px 10px;flex:1;text-align:center">
+  <div style="font-size:15px;font-weight:600;color:var(--pink);line-height:1">${bestMonthLabel}</div>
+  <div style="font-size:10px;color:var(--grey);margin-top:2px">${lang==='th'?`ดีที่สุด (${bestMonthCount})`:`Best (${bestMonthCount})`}</div>
+</div>
+</div>`;
   const classSet=new Set(sorted);
   const today=new Date();
   today.setHours(0,0,0,0);
@@ -1271,7 +1299,7 @@ ${svgMonths}${svgDays}${svgCells}
 
   const heatLabel=`<div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">${lang==='th'?'ปฏิทินการฝึก':'Practice calendar'}</div>`;
 
-  card.innerHTML=streakBar+milestoneBar+heatLabel+heatmapSVG;
+  card.innerHTML=streakBar+milestoneBar+statsChips+heatLabel+heatmapSVG;
   return card;
 }
 
