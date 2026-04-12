@@ -1422,9 +1422,13 @@ function buildStudentCard(student,teacher){
 </div>
 <div class="student-badge ${badgeCls}">${c}/${tot}</div>
 </div>
+${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);margin:6px 0 2px">
+💰 ${lang==='th'?'รับเงินล่าสุด':'Last payment'}: <strong>${fmtDate((student.payments[student.payments.length-1].date))}</strong> — ฿${Number(student.payments[student.payments.length-1].amount||0).toLocaleString()}
+</div>`:''}
 <div class="student-actions">
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
 <button class="btn btn-ghost btn-sm" data-action="topup">✨ ${t('topupClasses')}</button>
+<button class="btn btn-ghost btn-sm" data-action="pay">💰 ${lang==='th'?'บันทึกเงิน':'Log payment'}</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
@@ -1432,10 +1436,55 @@ function buildStudentCard(student,teacher){
   
   card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
   card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
+  card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
   card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
   card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
   card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   return card;
+}
+
+function showLogPaymentModal(student,teacher){
+  const existing=student.payments||[];
+  const histHTML=existing.length
+    ?`<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
+<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">${lang==='th'?'ประวัติรับเงิน':'Payment history'}</div>
+<div style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto">
+${[...existing].reverse().map(p=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:6px 10px">
+<span style="color:var(--grey);flex-shrink:0">${fmtDate(p.date)}</span>
+<span style="font-weight:600;color:var(--pink)">฿${Number(p.amount||0).toLocaleString()}</span>
+${p.note?`<span style="color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.note}</span>`:''}
+</div>`).join('')}
+</div></div>`:'';
+
+  const{close}=showModal(`<div class="modal-title">💰 ${lang==='th'?'บันทึกรับเงิน':'Log payment'} — ${student.n||student.sym}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่โอน':'Transfer date'}</label>
+<input class="input" id="pay-date" type="date" value="${todayISO()}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนเงิน (฿)':'Amount (฿)'}</label>
+<input class="input" id="pay-amount" type="number" min="0" placeholder="${student.price||0}" value="${student.price||''}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ (ไม่จำเป็น)':'Note (optional)'}</label>
+<input class="input" id="pay-note" type="text" placeholder="${lang==='th'?'เช่น โอนผ่าน KBank':'e.g. via KBank'}"></div>
+<button class="btn btn-primary btn-full mt-8" id="pay-save">💰 ${lang==='th'?'บันทึก':'Save payment'}</button>
+<div id="pay-err" class="alert alert-err mt-8" style="display:none"></div>
+${histHTML}`);
+
+  $('pay-save').onclick=async()=>{
+    const date=$('pay-date').value||todayISO();
+    const amount=parseFloat($('pay-amount').value)||0;
+    const note=$('pay-note').value.trim();
+    if(!amount){$('pay-err').style.display='';$('pay-err').textContent=lang==='th'?'กรุณาใส่จำนวนเงิน':'Please enter an amount';return;}
+    $('pay-save').disabled=true;
+    const newPayment={date,amount,note,ts:new Date().toISOString()};
+    const newPayments=[...existing,newPayment];
+    try{
+      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
+      student.payments=newPayments;
+      const students=C.get('students_'+teacher.id)||[];
+      const idx=students.findIndex(s=>s.id===student.id);
+      if(idx>=0){students[idx].payments=newPayments;C.set('students_'+teacher.id,students);}
+      close();toast(`✅ ฿${amount.toLocaleString()} ${lang==='th'?'บันทึกแล้ว':'logged'}`);
+      render(s2=>screenTeacherDash(s2));
+    }catch(e){$('pay-err').style.display='';$('pay-err').textContent='Error: '+e.message;$('pay-save').disabled=false;}
+  };
 }
 
 function showDeductModal(student,teacher){
@@ -1988,12 +2037,14 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
       // Wire up download buttons
       // 1. All students
       $('dl-students').onclick=()=>{
-        const rows=[['Teacher','Teacher Email','Student Name','Username','Sold','Used','Remaining','Package ฿','Last Class','Has PIN','All Class Dates']];
+        const rows=[['Teacher','Teacher Email','Student Name','Username','Sold','Used','Remaining','Package ฿','Last Class','Has PIN','All Class Dates','Payment Dates','Payment Amounts','Total Paid ฿']];
         for(const b of teacherBreakdown){
           const students=C.get('students_'+b.teacher.id)||[];
           for(const st of students){
             const hist=(st.h||[]);
+            const payments=(st.payments||[]);
             const last=hist.slice(-1)[0]||'';
+            const totalPaid=payments.reduce((a,p)=>a+(p.amount||0),0);
             rows.push([
               b.teacher.name||b.teacher.username,
               b.teacher.username,
@@ -2002,6 +2053,9 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
               st.price||0,last,
               st.pin?'yes':'no',
               hist.join(' | '),
+              payments.map(p=>p.date).join(' | '),
+              payments.map(p=>p.amount).join(' | '),
+              totalPaid,
             ]);
           }
         }
