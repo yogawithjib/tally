@@ -1927,7 +1927,7 @@ function renderIncomeTab(container,students,teacher){
     [mBtn,yBtn,sBtn].forEach(b=>{b.style.background='#fff';b.style.color='var(--grey)';b.style.borderColor='var(--grey-m)';});
     const active=v==='month'?mBtn:v==='year'?yBtn:sBtn;
     active.style.background='var(--pink)';active.style.color='#fff';active.style.borderColor='var(--pink)';
-    renderIncomeList(listBody,v,months,years,students);
+    renderIncomeList(listBody,v,months,years,students,teacher);
   }
 
   $('inc-month-btn').onclick=()=>setView('month');
@@ -1936,7 +1936,7 @@ function renderIncomeTab(container,students,teacher){
   setView('month');
 }
 
-function renderIncomeList(container,view,months,years,students){
+function renderIncomeList(container,view,months,years,students,teacher){
   container.innerHTML='';
   if(view==='month'){
     months.forEach(m=>{
@@ -2000,12 +2000,41 @@ function renderIncomeList(container,view,months,years,students){
         container.appendChild(card);
       });
     }
+
+    // Studio logs in By source
+    const studioLogs=(teacher?.studioLogs||[]).sort((a,b)=>b.month>a.month?1:-1);
+    if(studioLogs.length){
+      const stLbl=el('div','section-title');
+      stLbl.textContent=`🏛 ${lang==='th'?'สตูดิโอ':'Studios'}`;
+      container.appendChild(stLbl);
+      studioLogs.forEach(log=>{
+        const card=el('div','card');
+        card.style.margin='0 16px 8px';
+        const isPaid=log.paid;
+        card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+  <div style="font-weight:600;font-size:13px">${log.studioName||'Studio'}</div>
+  <div style="font-size:11px;color:var(--grey)">${new Date(log.month+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'long',year:'numeric'})} · ${log.classes} ${lang==='th'?'คลาส':'classes'}</div>
+</div>
+<div style="display:flex;align-items:center;gap:6px">
+  <span style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;background:${isPaid?'#dcfce7':'#fef9c3'};color:${isPaid?'#166534':'#854d0e'}">${isPaid?(lang==='th'?'ชำระแล้ว':'Paid'):(lang==='th'?'ค้างรับ':'Unpaid')}</span>
+  <span style="font-weight:600;color:var(--pink)">฿${Number(log.net||0).toLocaleString()}</span>
+</div>
+</div>`;
+        container.appendChild(card);
+      });
+    }
   }
 }
 
 async function renderTabBody(container,teacher,tab,students){
   container.innerHTML='';
   if(tab==='students'){
+    // Section header
+    const studentsHdr=el('div','section-title');
+    studentsHdr.innerHTML=`👯‍♀️ ${lang==='th'?'นักเรียน':'Students'}`;
+    container.appendChild(studentsHdr);
+
     const addRow=el('div');
     addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
@@ -2514,11 +2543,11 @@ ${sessions.length?`<div style="margin-top:14px;border-top:1px solid var(--grey-m
   openModal();
 }
 
-function showLogStudioModal(teacher){
+function showLogStudioModal(teacher,preSelectIdx=0){
   const studios=teacher.studios||[];
   if(!studios.length){toast(lang==='th'?'กรุณาเพิ่มสตูดิโอก่อน':'Add a studio first in Settings');return;}
 
-  const studioOpts=studios.map((s,i)=>`<option value="${i}">${s.name} · ฿${Number(s.rate||0).toLocaleString()}/class · ${s.tax||0}% tax</option>`).join('');
+  const studioOpts=studios.map((s,i)=>`<option value="${i}" ${i===preSelectIdx?'selected':''}>${s.name} · ฿${Number(s.rate||0).toLocaleString()}/class · ${s.tax||0}% tax</option>`).join('');
   const nowYM=new Date().toISOString().slice(0,7);
 
   const{modal,close}=showModal(`<div class="modal-title">🏛 ${lang==='th'?'บันทึกรายได้สตูดิโอ':'Log studio income'}</div>
@@ -3147,6 +3176,7 @@ function renderStudioSettings(container,teacher){
     card.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
 <span style="font-weight:600;font-size:14px">${studio.name}</span>
 <div style="display:flex;gap:6px">
+<button data-log-studio="${i}" class="btn btn-primary btn-sm">📌 ${lang==='th'?'บันทึก':'Log'}</button>
 <button data-edit-studio="${i}" class="btn btn-ghost btn-sm">✏️</button>
 <button data-del-studio="${i}" class="btn btn-danger btn-sm">🗑</button>
 </div>
@@ -3161,6 +3191,13 @@ function renderStudioSettings(container,teacher){
   addBtn.textContent=`+ ${lang==='th'?'เพิ่มสตูดิโอ':'Add studio'}`;
   container.appendChild(addBtn);
   addBtn.onclick=()=>showAddStudioModal(teacher,()=>{renderStudioSettings(container,teacher);});
+
+  container.querySelectorAll('[data-log-studio]').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=parseInt(btn.dataset.logStudio);
+      showLogStudioModal(teacher,i);
+    };
+  });
 
   container.querySelectorAll('[data-edit-studio]').forEach(btn=>{
     btn.onclick=()=>{
@@ -3183,7 +3220,7 @@ function renderStudioSettings(container,teacher){
 function showAddStudioModal(teacher,onDone,editIdx=null,existing=null){
   const{close}=showModal(`<div class="modal-title">${editIdx!==null?'✏️ '+( lang==='th'?'แก้ไขสตูดิโอ':'Edit studio'):'🏛 '+( lang==='th'?'เพิ่มสตูดิโอ':'Add studio')}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'ชื่อสตูดิโอ':'Studio name'}</label>
-<input class="input" id="st-name" value="${existing?.name||''}" placeholder="${lang==='th'?'เช่น YogaWorks Thonglor':'e.g. YogaWorks Thonglor'}"></div>
+<input class="input" id="st-name" value="${existing?.name||''}" placeholder="${lang==='th'?'เช่น โยคะริมคลอง 🧘':'e.g. Ouch & Om'}"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'ราคาต่อคลาส (฿)':'Rate per class (฿)'}</label>
 <input class="input" id="st-rate" type="number" value="${existing?.rate||''}" placeholder="0"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'หัก ณ ที่จ่าย (%) — ใส่ 0 ถ้าไม่มี':'Withholding tax (%) — 0 if none'}</label>
