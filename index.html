@@ -1214,11 +1214,47 @@ async function screenTopUp(s){
 function renderBankInfo(container,bank){
   if(!container)return;
   if(!bank||(!bank.bank&&!bank.num)){container.innerHTML=`<div class="text-grey text-sm">—</div>`;return;}
+  const masked=bank.num?bank.num.replace(/\d(?=\d{4})/g,'•'):'—';
   container.innerHTML=`<div class="bank-display">
 <div class="bank-row"><span class="bank-label">${t('bank')}</span><span class="bank-value">${bank.bank||'—'}</span></div>
 <div class="bank-row"><span class="bank-label">${t('accName')}</span><span class="bank-value">${bank.name||'—'}</span></div>
-<div class="bank-row"><span class="bank-label">${t('accNum')}</span><span class="bank-value" style="letter-spacing:.05em">${bank.num||'—'}</span></div>
+<div class="bank-row" style="align-items:center">
+  <span class="bank-label">${t('accNum')}</span>
+  <span style="display:flex;align-items:center;gap:8px">
+    <span id="acc-num-display" style="font-weight:600;letter-spacing:.05em;font-family:monospace">${masked}</span>
+    <button id="acc-unmask-btn" style="background:none;border:1.5px solid var(--grey-m);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--grey);cursor:pointer;font-family:inherit">👁 ${lang==='th'?'ดู':'Show'}</button>
+    <button id="acc-copy-btn" style="background:none;border:1.5px solid var(--grey-m);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--grey);cursor:pointer;font-family:inherit">📋 ${lang==='th'?'คัดลอก':'Copy'}</button>
+  </span>
+</div>
 </div>`;
+
+  let unmasked=false;
+  const display=container.querySelector('#acc-num-display');
+  const unmaskBtn=container.querySelector('#acc-unmask-btn');
+  const copyBtn=container.querySelector('#acc-copy-btn');
+
+  unmaskBtn.onclick=()=>{
+    unmasked=!unmasked;
+    display.textContent=unmasked?(bank.num||'—'):masked;
+    unmaskBtn.textContent=unmasked?`🙈 ${lang==='th'?'ซ่อน':'Hide'}`:`👁 ${lang==='th'?'ดู':'Show'}`;
+  };
+
+  copyBtn.onclick=()=>{
+    navigator.clipboard.writeText(bank.num||'').then(()=>{
+      copyBtn.textContent=`✅ ${lang==='th'?'คัดลอกแล้ว':'Copied!'}`;
+      setTimeout(()=>{copyBtn.textContent=`📋 ${lang==='th'?'คัดลอก':'Copy'}`;},2000);
+    }).catch(()=>{
+      // fallback for older browsers
+      const ta=document.createElement('textarea');
+      ta.value=bank.num||'';
+      ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      copyBtn.textContent=`✅ ${lang==='th'?'คัดลอกแล้ว':'Copied!'}`;
+      setTimeout(()=>{copyBtn.textContent=`📋 ${lang==='th'?'คัดลอก':'Copy'}`;},2000);
+    });
+  };
 }
 
 function renderContactInfo(container,contact){
