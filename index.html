@@ -3179,7 +3179,11 @@ async function screenSuperAdmin(s){
         const tSold=students.reduce((a,st)=>a+(st.t||0),0);
         const tUsed=students.reduce((a,st)=>a+(st.u||0),0);
         const tRem=students.reduce((a,st)=>a+(st.c||0),0);
-        const tRev=students.reduce((a,st)=>a+(st.price||0),0);
+        const tRev=students.reduce((a,st)=>{
+          const fromTopups=(st.topups||[]).filter(tp=>tp.paid!==false).reduce((s,tp)=>s+(tp.price||0),0);
+          const fromPayments=(st.payments||[]).reduce((s,p)=>s+(p.amount||0),0);
+          return a+fromTopups+fromPayments;
+        },0);
         totalStudents+=students.length;
         totalSold+=tSold;
         totalUsed+=tUsed;
@@ -3231,7 +3235,7 @@ async function screenSuperAdmin(s){
   <div class="stat-chip"><div class="stat-num">${visitCount.toLocaleString()}</div><div class="stat-lbl">👀 ${lang==='th'?'ผู้เยี่ยมชม':'Visits'}</div></div>
 </div>
 ${totalRevenue>0?`<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;font-size:13px">
-  <span style="color:var(--grey)">${lang==='th'?'มูลค่าแพ็กเกจรวม':'Total package value'}</span>
+  <span style="color:var(--grey)">${lang==='th'?'รายได้รวมทั้งหมด':'Total income recorded'}</span>
   <span style="font-weight:600;float:right">฿${totalRevenue.toLocaleString()}</span>
 </div>`:''}
 ${locationHTML?`<div style="background:#fff;border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;box-shadow:var(--sh-s)">
