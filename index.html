@@ -1475,6 +1475,7 @@ async function screenTeacherDash(s){
   // Tabs
   const tabs=el('div','tab-row');
   tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">👥 ${lang==='th'?'นักเรียน':'Students'}</div>
+<div class="tab ${activeTab==='income'?'active':''}" data-tab="income">💰 ${lang==='th'?'รายได้':'Income'}</div>
 <div class="tab ${activeTab==='settings'?'active':''}" data-tab="settings">⚙️ ${lang==='th'?'ตั้งค่า':'Settings'}</div>`;
   s.appendChild(tabs);
   
@@ -1514,15 +1515,78 @@ function renderStats(container,students){
 <div class="stat-chip"><div class="stat-num" style="${remaining<0?'color:#b91c1c':''}">${remaining}</div><div class="stat-lbl">${remaining<0?t('debt'):t('statsLeft')}</div></div>`;
 }
 
+// ─── Income helpers ────────────────────────────────────────
+function buildMonthlyIncome(students){
+  // Returns [{month:'2025-04', label:'Apr 2025', total, entries:[{studentName, amount, date, note}]}]
+  const map={};
+  students.forEach(st=>{
+    (st.payments||[]).forEach(p=>{
+      const month=(p.date||'').slice(0,7);
+      if(!month)return;
+      if(!map[month])map[month]={month,total:0,entries:[]};
+      map[month].total+=p.amount||0;
+      map[month].entries.push({studentName:st.n||st.sym||'?',amount:p.amount||0,date:p.date,note:p.note||''});
+    });
+  });
+  return Object.values(map).sort((a,b)=>b.month>a.month?1:-1).map(m=>({
+    ...m,
+    label:new Date(m.month+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'long',year:'numeric'}),
+  }));
+}
+
+function renderIncomeTab(container,students){
+  const months=buildMonthlyIncome(students);
+  const allPayments=students.flatMap(st=>(st.payments||[]).map(p=>({...p,studentName:st.n||st.sym})));
+  const grandTotal=allPayments.reduce((a,p)=>a+(p.amount||0),0);
+
+  if(!months.length){
+    container.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีการบันทึกรายได้':'No income recorded yet'}<br><span style="font-size:12px;color:var(--grey)">💰 ${lang==='th'?'ใช้ปุ่ม "บันทึกเงิน" ในการ์ดนักเรียน':'Use "Log payment" on student cards'}</span></div>`;
+    return;
+  }
+
+  // Grand total chip
+  const tot=el('div','card');
+  tot.style.cssText='margin:0 16px 14px;background:var(--pink-l);border:1.5px solid var(--pink-m)';
+  tot.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+  <div style="font-size:12px;color:var(--grey);margin-bottom:2px">${lang==='th'?'รายได้รวมทั้งหมด':'Total income recorded'}</div>
+  <div style="font-size:22px;font-weight:600;color:var(--pink)">฿${grandTotal.toLocaleString()}</div>
+</div>
+<div style="text-align:right">
+  <div style="font-size:12px;color:var(--grey)">${months.length} ${lang==='th'?'เดือน':'months'}</div>
+  <div style="font-size:12px;color:var(--grey)">${allPayments.length} ${lang==='th'?'รายการ':'payments'}</div>
+</div>
+</div>`;
+  container.appendChild(tot);
+
+  months.forEach(m=>{
+    const card=el('div','card');
+    card.style.margin='0 16px 10px';
+    const rowsHTML=m.entries.sort((a,b)=>b.date>a.date?1:-1).map(e=>`
+<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--grey-l);font-size:12px">
+  <span style="color:var(--grey);flex-shrink:0;min-width:72px">${fmtDate(e.date)}</span>
+  <span style="flex:1;font-weight:500">${e.studentName}</span>
+  <span style="font-weight:600;color:var(--pink);flex-shrink:0">฿${Number(e.amount).toLocaleString()}</span>
+  ${e.note?`<span style="color:var(--grey);font-size:11px;flex-shrink:0">${e.note}</span>`:''}
+</div>`).join('');
+
+    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+<div style="font-size:14px;font-weight:600">${m.label}</div>
+<div style="font-size:16px;font-weight:600;color:var(--pink)">฿${m.total.toLocaleString()}</div>
+</div>
+<div>${rowsHTML}</div>`;
+    container.appendChild(card);
+  });
+}
+
 async function renderTabBody(container,teacher,tab,students){
   container.innerHTML='';
   if(tab==='students'){
-    // Add button
     const addRow=el('div');
     addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
     $('add-student-btn').onclick=()=>showAddStudentModal(teacher);
-    
+
     if(!students)students=await getStudents(teacher.id);
     if(!students.length){
       container.appendChild(el('div','empty-state',t('noStudents')));return;
@@ -1530,6 +1594,11 @@ async function renderTabBody(container,teacher,tab,students){
     const grid=el('div','student-grid');
     students.forEach(student=>grid.appendChild(buildStudentCard(student,teacher)));
     container.appendChild(grid);
+
+  }else if(tab==='income'){
+    if(!students)students=await getStudents(teacher.id);
+    renderIncomeTab(container,students);
+
   }else{
     renderSettingsTab(container,teacher);
   }
@@ -2215,7 +2284,33 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
   <button class="btn btn-ghost btn-sm" id="dl-students">⬇ ${lang==='th'?'นักเรียนทั้งหมด':'All students'} .csv</button>
   <button class="btn btn-ghost btn-sm" id="dl-signups">⬇ ${lang==='th'?'ใบสมัคร':'Signups'} .csv</button>
   <button class="btn btn-ghost btn-sm" id="dl-summary">⬇ ${lang==='th'?'สรุปครู':'Teacher summary'} .csv</button>
+  <button class="btn btn-ghost btn-sm" id="dl-income">⬇ ${lang==='th'?'รายได้':'Income'} .csv</button>
 </div>`;
+
+      // Monthly income section
+      const allStudentsFlat=teacherBreakdown.flatMap(b=>(C.get('students_'+b.teacher.id)||[]).map(st=>({...st,_teacher:b.teacher})));
+      const superMonths=buildMonthlyIncome(allStudentsFlat);
+      const superTotal=allStudentsFlat.flatMap(st=>st.payments||[]).reduce((a,p)=>a+(p.amount||0),0);
+
+      if(superMonths.length){
+        const incomeDiv=el('div');
+        incomeDiv.style.cssText='padding:0 16px';
+        incomeDiv.innerHTML=`<div class="section-title" style="padding:10px 0 6px;font-size:11px">💰 ${lang==='th'?'รายได้รวมตามเดือน':'Income by month'}</div>
+<div style="background:var(--pink-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+  <span style="font-size:12px;color:var(--grey)">${lang==='th'?'รายได้รวมทั้งหมด':'Grand total'}</span>
+  <span style="font-weight:600;font-size:16px;color:var(--pink)">฿${superTotal.toLocaleString()}</span>
+</div>
+${superMonths.map(m=>`<div style="background:#fff;border-radius:var(--r-xs);padding:8px 12px;margin-bottom:6px;box-shadow:var(--sh-s)">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+    <span style="font-size:13px;font-weight:600">${m.label}</span>
+    <span style="font-weight:600;color:var(--pink)">฿${m.total.toLocaleString()}</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px">
+    ${m.entries.map(e=>`<span style="font-size:11px;background:var(--grey-l);border-radius:10px;padding:2px 8px;color:var(--grey)">${e.studentName} ฿${Number(e.amount).toLocaleString()}</span>`).join('')}
+  </div>
+</div>`).join('')}`;
+        statsDiv.appendChild(incomeDiv);
+      }
 
       // Wire up download buttons
       // 1. All students
@@ -2261,6 +2356,26 @@ ${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;f
           rows.push([b.teacher.name||'',b.teacher.username||'',b.teacher.location||'',b.students,b.sold,b.used,b.rem,b.rev,b.teacher.yearStarted||'']);
         }
         downloadCSV(rows,`teacher_summary_${todayISO()}.csv`);
+      };
+
+      // 4. Income by month
+      $('dl-income').onclick=()=>{
+        const allStudentsFlat2=teacherBreakdown.flatMap(b=>(C.get('students_'+b.teacher.id)||[]).map(st=>({...st,_teacher:b.teacher})));
+        const rows=[['Month','Teacher','Student','Amount ฿','Date','Note']];
+        allStudentsFlat2.forEach(st=>{
+          (st.payments||[]).forEach(p=>{
+            rows.push([
+              (p.date||'').slice(0,7),
+              st._teacher?.name||st._teacher?.username||'',
+              st.n||st.sym||'',
+              p.amount||0,
+              p.date||'',
+              p.note||'',
+            ]);
+          });
+        });
+        rows.sort((a,b)=>b[0]>a[0]?1:-1);
+        downloadCSV(rows,`income_${todayISO()}.csv`);
       };
 
     }catch(e){console.warn('admin stats',e);statsDiv.innerHTML=`<div class="alert alert-err" style="margin:0 0 10px">Stats error: ${e.message}</div>`;}
