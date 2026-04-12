@@ -1737,7 +1737,7 @@ async function screenTeacherDash(s){
   
   // Tabs
   const tabs=el('div','tab-row');
-  tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">📋 ${lang==='th'?'แหล่ง':'Sources'}</div>
+  tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">📋 ${lang==='th'?'ชื่อ':'Names'}</div>
 <div class="tab ${activeTab==='income'?'active':''}" data-tab="income">💰 ${lang==='th'?'รายได้':'Income'}</div>
 <div class="tab ${activeTab==='settings'?'active':''}" data-tab="settings">⚙️ ${lang==='th'?'ตั้งค่า':'Settings'}</div>`;
   s.appendChild(tabs);
@@ -1907,7 +1907,7 @@ function renderIncomeTab(container,students,teacher){
   toggleRow.innerHTML=`
 <button id="inc-month-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--pink);background:var(--pink);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'รายเดือน':'By month'}</button>
 <button id="inc-year-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'รายปี':'By year'}</button>
-<button id="inc-student-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'แยกแหล่ง':'By source'}</button>`;
+<button id="inc-student-btn" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;color:var(--grey);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">${lang==='th'?'แยกชื่อ':'By name'}</button>`;
   container.appendChild(toggleRow);
 
   const listBody=el('div');
@@ -3350,13 +3350,13 @@ function renderStudioSettings(container,teacher){
 function showAddStudioModal(teacher,onDone,editIdx=null,existing=null){
   const{close}=showModal(`<div class="modal-title">${editIdx!==null?'✏️ '+(lang==='th'?'แก้ไขสตูดิโอ':'Edit studio'):'🏛 '+(lang==='th'?'เพิ่มสตูดิโอ':'Add studio')}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'ชื่อสตูดิโอ':'Studio name'}</label>
-<input class="input" id="st-name" value="${existing?.name||''}" placeholder="${lang==='th'?'เช่น โยคะริมคลอง 🧘':'e.g. Ouch & Om'}"></div>
+<input class="input" id="st-name" value="${existing?.name||''}" placeholder="${lang==='th'?'เช่น ใครไม่โอ สตูดิโอ':'e.g. Ouch & Om'}"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'ราคาต่อคลาส (฿)':'Rate per class (฿)'}</label>
 <input class="input" id="st-rate" type="number" value="${existing?.rate||''}" placeholder="0"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'หัก ณ ที่จ่าย (%) — ใส่ 0 ถ้าไม่มี':'Withholding tax (%) — 0 if none'}</label>
 <input class="input" id="st-tax" type="number" min="0" max="100" value="${existing?.tax??3}" placeholder="3"></div>
-<div class="input-group"><label class="input-label">${lang==='th'?'วันเริ่มรอบบัญชี (ไม่จำเป็น)':'Pay cycle start day (optional)'}</label>
-<input class="input" id="st-cycle" type="number" min="1" max="28" value="${existing?.cycleDay||''}" placeholder="${lang==='th'?'เช่น 25 (25 ม.ค. – 24 ก.พ.)':'e.g. 25 (25 Jan – 24 Feb)'}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันเริ่มรอบบัญชี (ไม่จำเป็นต้องใส่)':'Pay cycle start day (optional)'}</label>
+<input class="input" id="st-cycle" type="number" min="1" max="28" value="${existing?.cycleDay||''}" placeholder="${lang==='th'?'เช่น 27 (27 ม.ค. – 26 ก.พ.)':'e.g. 25 (25 Jan – 24 Feb)'}"></div>
 <button class="btn btn-primary btn-full mt-8" id="st-save">${t('save')}</button>
 <div id="st-err" class="alert alert-err mt-8" style="display:none"></div>`);
 
