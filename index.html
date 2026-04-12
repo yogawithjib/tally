@@ -2410,8 +2410,8 @@ ${sessions.length?`<div style="margin-top:14px;border-top:1px solid var(--grey-m
         setTimeout(()=>{
           const{close:c2}=showModal(`<div class="modal-title">✅ ${lang==='th'?'บันทึกแล้ว':'Logged'}${amount?` · ฿${amount.toLocaleString()}`:''}</div>
 <div style="display:flex;gap:8px;margin-top:4px">
-<button class="btn btn-ghost flex-1" id="lc-done">${lang==='th'?'เสร็จ':'Done'}</button>
-<button class="btn btn-primary flex-1" id="lc-line">💬 LINE</button>
+<button class="btn btn-primary flex-1" id="lc-done">${lang==='th'?'ชำระแล้ว':'Paid'}</button>
+<button class="btn btn-ghost flex-1" id="lc-line">💬 ${lang==='th'?'ส่งข้อความ':'Message student'}</button>
 </div>`);
           $('lc-done').onclick=()=>{c2();render(s2=>screenTeacherDash(s2));};
           $('lc-line').onclick=()=>{showCopyMessageModal(teacher,student.n||student.sym,'class',1,amount);};
