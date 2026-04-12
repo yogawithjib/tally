@@ -1844,8 +1844,16 @@ function buildYearlyIncome(students){
 function renderIncomeTab(container,students){
   const months=buildMonthlyIncome(students);
   const years=buildYearlyIncome(students);
-  const allPayments=students.flatMap(st=>(st.payments||[]).map(p=>({...p,studentName:st.n||st.sym})));
-  const grandTotal=allPayments.reduce((a,p)=>a+(p.amount||0),0);
+
+  // Grand total from topups (paid) + legacy payments
+  const grandTotal=students.reduce((a,st)=>{
+    const fromTopups=(st.topups||[]).filter(tp=>tp.paid!==false).reduce((s,tp)=>s+(tp.price||0),0);
+    const fromPayments=(st.payments||[]).reduce((s,p)=>s+(p.amount||0),0);
+    return a+fromTopups+fromPayments;
+  },0);
+  const totalPmts=students.reduce((a,st)=>{
+    return a+(st.topups||[]).filter(tp=>tp.paid!==false).length+(st.payments||[]).length;
+  },0);
 
   if(!months.length){
     container.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีการบันทึกรายได้':'No income recorded yet'}<br><span style="font-size:12px;color:var(--grey)">💰 ${lang==='th'?'ใช้ปุ่ม "บันทึกเงิน" ในการ์ดนักเรียน':'Use "Log payment" on student cards'}</span></div>`;
@@ -1862,7 +1870,7 @@ function renderIncomeTab(container,students){
 </div>
 <div style="text-align:right">
   <div style="font-size:12px;color:var(--grey)">${years.length} ${lang==='th'?'ปี':'yr'} · ${months.length} ${lang==='th'?'เดือน':'mo'}</div>
-  <div style="font-size:12px;color:var(--grey)">${allPayments.length} ${lang==='th'?'รายการ':'payments'}</div>
+  <div style="font-size:12px;color:var(--grey)">${totalPmts} ${lang==='th'?'รายการ':'payments'}</div>
 </div>
 </div>`;
   container.appendChild(tot);
