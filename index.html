@@ -1984,7 +1984,8 @@ function renderIncomeList(container,view,months,years,students,teacher){
     if(perStudent.length){
       const lbl=el('div','section-title');lbl.textContent='👥 '+(lang==='th'?'นักเรียน':'Students');container.appendChild(lbl);
       perStudent.forEach(({st,total,entries})=>{
-        const card=el('div','card');card.style.margin='0 16px 10px;cursor:pointer';
+        const card=el('div','card');card.style.margin='0 16px 10px';
+        const rows=entries.map(e=>'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--grey-l);font-size:12px"><span style="color:var(--grey);flex-shrink:0;min-width:72px">'+fmtDate(e.date)+'</span><span style="font-weight:600;color:var(--pink);flex-shrink:0">฿'+Number(e.amount).toLocaleString()+'</span>'+(e.classes?'<span style="font-size:11px;color:var(--grey)">'+e.classes+' cls</span>':'')+(e.note?'<span style="font-size:11px;color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e.note+'</span>':'')+'</div>').join('');
         const hdr='<div style="display:flex;justify-content:space-between;align-items:center" data-toggle-src><div><div style="font-size:14px;font-weight:600">'+(st.n||st.sym)+'</div><div style="font-size:11px;color:var(--grey)">@'+st.sym+' · '+entries.length+' '+(lang==='th'?'รายการ':'payments')+'</div></div><div style="display:flex;align-items:center;gap:8px"><div style="font-size:16px;font-weight:600;color:var(--pink)">฿'+total.toLocaleString()+'</div><span style="font-size:11px;color:var(--grey)">▼</span></div></div>';
         const rowsHTML='<div class="src-rows" style="margin-top:8px">'+rows+'</div>';
         card.innerHTML=hdr+rowsHTML;
