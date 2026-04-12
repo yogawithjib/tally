@@ -235,7 +235,7 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 // CONFIG
 // ═══════════════════════════════════════════════════════════
 const FB_CFG={apiKey:'AIzaSyANdDXBBSYXwU61jBZBIrudOubV3rLJiYQ',authDomain:'tally-679b9.firebaseapp.com',projectId:'tally-679b9'};
-const GAS='https://script.google.com/macros/s/AKfycbwWvPWlOE49u8tCUzflc-djPAG579QPlJNaU8WIej6TpVGAo_KrZdAdlvOV2ewvynAPXA/exec';
+const GAS='https://script.google.com/macros/s/AKfycbx1VmC69f9Zn80E7GD2LYbJqLgzRyk9aA69pXVz4jQPehNL1kGZ87gg7ofOYk4YcMYw/exec';
 const SALT='yj_yoga_2026_salt';
 const SESSION_MS=10*60*1000;
 const MAX_ATT=5, LOCK_MS=30000;
@@ -2319,6 +2319,9 @@ async function screenSuperAdmin(s){
   </a>`;
   s.appendChild(libLink);
 
+  // Guidebook
+  s.appendChild(buildAdminGuidebook());
+
   s.appendChild(el('div','version',VER));
 
   // Load global stats + initial tab
@@ -2998,6 +3001,134 @@ function downloadCSV(rows,filename){
   const a=document.createElement('a');
   a.href=url;a.download=filename;a.click();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADMIN GUIDEBOOK
+// ═══════════════════════════════════════════════════════════
+function buildAdminGuidebook(){
+  const GUIDE={
+    teachers:{
+      icon:'👩‍🏫', label:'Teachers',
+      content:`<b>Approve a signup</b><br>
+Pending tab → tap ✅ Approve → set emoji, optionally override password → Done. Teacher can now log in with their email + PIN.<br><br>
+<b>Create directly</b><br>
+➕ tab → fill name, email (= their username), emoji, PIN, location → Save.<br><br>
+<b>Reset a teacher's PIN</b><br>
+Teachers tab → 🔑 Reset PIN → enter new 4-digit PIN. No need to know their old one.<br><br>
+<b>Delete a teacher</b><br>
+Teachers tab → 🗑 → confirm. This deletes the teacher <em>and all their students</em>. Cannot be undone.<br><br>
+<b>Reject an application</b><br>
+Pending tab → ✕ Reject. The signup is marked rejected but data stays in Firebase.`
+    },
+    students:{
+      icon:'👥', label:'Students',
+      content:`<b>Add a student</b><br>
+Teacher dashboard → Students tab → + Add Student → fill name, username, classes, price.<br><br>
+<b>Deduct a class</b><br>
+Student card → 📌 Deduct → pick date → Confirm.<br><br>
+<b>Top up a package</b><br>
+Student card → ✨ Add classes → number of classes + price → Confirm. This creates a new package record used for history grouping.<br><br>
+<b>Log a payment</b><br>
+Student card → 💰 Log payment → date, amount, note. Edit or delete past payments using ✏️ and 🗑 in the same modal.<br><br>
+<b>Reset a student's PIN</b><br>
+Student card → 🔑 PIN → enter new PIN, or tap "Clear PIN" to let them set their own on next login.`
+    },
+    security:{
+      icon:'🔑', label:'Security',
+      content:`<b>Your super admin PIN</b><br>
+6 digits. Change it inside the dashboard (🔑 Change PIN button). Stored as SHA-256 hash in Firebase — nobody can read the actual digits.<br><br>
+<b>Forgot your PIN?</b><br>
+Go to Firebase Console → Firestore → system → admin → delete the <code>pin</code> field. The app falls back to <code>000000</code>. Log in and set a new PIN immediately.<br><br>
+<b>Teacher/student PINs</b><br>
+Teachers use a 4-digit PIN. Students set theirs on first login. You can reset any PIN from the admin dashboard without knowing the old one.<br><br>
+<b>Brute-force protection</b><br>
+5 wrong attempts locks a student/teacher out for 30 seconds. Super admin has no lockout (you removed it).`
+    },
+    data:{
+      icon:'📊', label:'Data & CSV',
+      content:`<b>Download data</b><br>
+Stats section → four CSV buttons:<br>
+• <b>All students</b> — every student across all teachers with classes, payments, dates<br>
+• <b>Signups</b> — all applications (pending, approved, rejected)<br>
+• <b>Teacher summary</b> — one row per teacher with totals<br>
+• <b>Income</b> — every payment logged, sorted by month<br><br>
+<b>Files open correctly in Excel</b><br>
+CSVs include a UTF-8 BOM so Thai characters display without importing manually.<br><br>
+<b>Income tracking</b><br>
+Teachers log payments per student. Income tab in the teacher dashboard and the monthly income section in super admin both use this data. Nothing is automatic — teachers must log it manually.`
+    },
+    firebase:{
+      icon:'🔥', label:'Firebase & annual tasks',
+      content:`<b>⚠️ Firebase rules expire January 2027</b><br>
+Every year (or before expiry) you must renew the Firestore security rules:<br>
+1. Go to <a href="https://console.firebase.google.com/project/tally-679b9/firestore/rules" target="_blank" style="color:#fb2a7b">Firebase Console → Firestore → Rules</a><br>
+2. Extend the <code>allow read, write: if request.time < timestamp.date(YEAR, 1, 1);</code> date to the next year<br>
+3. Click Publish<br><br>
+<b>Firebase project</b><br>
+Project ID: <code>tally-679b9</code><br>
+API key: stored in the app code (public, safe — protected by rules)<br><br>
+<b>GitHub Pages</b><br>
+Push <code>index.html</code> to the <code>main</code> branch of <code>yogawithjib/tally</code>. Changes go live within ~60 seconds.<br><br>
+<b>GAS (Google Apps Script)</b><br>
+Still used for: video CSV on home screen, signup email to you. If videos stop showing, the GAS deployment may have expired — redeploy at <a href="${GAS}" target="_blank" style="color:#fb2a7b">your GAS URL</a>.<br><br>
+<b>Visit counter</b><br>
+Stored in <code>system/stats.visits</code> in Firestore. Increments on every home screen load.`
+    },
+    easter:{
+      icon:'🥚', label:'Easter eggs',
+      content:`Hidden features (don't tell anyone!):<br><br>
+✨ <b>Triple-tap the sparkle</b> on the home screen → emoji rain + Namaste toast<br><br>
+💍 <b>Hold the ring</b> on the student card for 2 seconds → plays a singing bowl sound<br><br>
+🐯 <b>Triple-tap the logo</b> anywhere → opens the super admin PIN screen<br><br>
+👁 <b>Single tap the logo</b> → goes back to the home screen (logs out)`
+    }
+  };
+
+  const wrap=el('div');
+  wrap.style.cssText='margin:20px 16px 8px';
+
+  const title=el('div');
+  title.innerHTML=`<div style="font-size:15px;font-weight:600;margin-bottom:12px">📖 ${lang==='th'?'คู่มือผู้ดูแลระบบ':'Admin Guidebook'}</div>`;
+  wrap.appendChild(title);
+
+  // Tab row
+  const tabRow=el('div');
+  tabRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px';
+  Object.entries(GUIDE).forEach(([key,g])=>{
+    const btn=el('button');
+    btn.dataset.guideKey=key;
+    btn.style.cssText='font-size:11px;padding:5px 11px;border-radius:20px;border:1.5px solid var(--grey-m);background:#fff;cursor:pointer;font-family:inherit;color:var(--grey);transition:.12s';
+    btn.innerHTML=`${g.icon} ${g.label}`;
+    tabRow.appendChild(btn);
+  });
+  wrap.appendChild(tabRow);
+
+  // Content box
+  const contentBox=el('div');
+  contentBox.style.cssText='background:#fff;border-radius:var(--r-s);padding:14px 16px;font-size:12px;color:#555;line-height:1.9;box-shadow:var(--sh-s);min-height:80px';
+  wrap.appendChild(contentBox);
+
+  // Activate first tab
+  let activeKey='teachers';
+  function activate(key){
+    activeKey=key;
+    tabRow.querySelectorAll('button').forEach(btn=>{
+      const isActive=btn.dataset.guideKey===key;
+      btn.style.borderColor=isActive?'var(--pink)':'var(--grey-m)';
+      btn.style.color=isActive?'var(--pink)':'var(--grey)';
+      btn.style.background=isActive?'var(--pink-l)':'#fff';
+      btn.style.fontWeight=isActive?'600':'400';
+    });
+    contentBox.innerHTML=GUIDE[key].content;
+  }
+
+  tabRow.querySelectorAll('button').forEach(btn=>{
+    btn.onclick=()=>activate(btn.dataset.guideKey);
+  });
+  activate('teachers');
+
+  return wrap;
 }
 
 // ═══════════════════════════════════════════════════════════
