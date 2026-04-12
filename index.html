@@ -1131,19 +1131,17 @@ async function screenStudentCard(s){
   state._curFn=screenStudentCard;
   const{student,teacher}=state.user;
   s.appendChild(makeHeader({logout:true,onLogout:doLogout}));
-  
+
   // refresh student data
   if(fbReady){
-    try{
-      const fresh=await fbRead(`teachers/${teacher.id}/students/${student.id}`);
-      if(fresh){Object.assign(student,fresh);}
-    }catch{}
+    try{const fresh=await fbRead(`teachers/${teacher.id}/students/${student.id}`);if(fresh)Object.assign(student,fresh);}catch{}
   }
-  
+
   const c=student.c??0, tot=student.t??0, used=student.u??0;
   const hist=student.h||[];
+  const payments=student.payments||[];
   const lastDate=hist.length?hist[hist.length-1]:null;
-  
+
   const card=el('div','card');
   card.innerHTML=`<div class="text-center">
 <div style="font-size:28px">${teacher.emoji||'🧘'}</div>
@@ -1156,25 +1154,149 @@ ${ringHTML(c,tot)}
 <div class="text-center"><div class="stat-num">${used}</div><div class="text-xs text-grey">${t('used')}</div></div>
 <div class="text-center"><div class="stat-num" style="${c<0?'color:#b91c1c':''}">${c}</div><div class="text-xs text-grey">${t('remaining')}</div></div>
 </div>
-${lastDate?`<div class="text-center text-xs text-grey mt-4">${t('lastClass')}: ${fmtDate(lastDate)}</div>`:''}`;
-  
-  if(student.price)card.innerHTML+=`<div class="text-center text-xs text-grey mt-4">${t('package')}: ฿${student.price.toLocaleString()}</div>`;
+${lastDate?`<div class="text-center text-xs text-grey mt-4">${t('lastClass')}: ${fmtDate(lastDate)}</div>`:''}
+${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}: ฿${student.price.toLocaleString()}</div>`:''}`;
   s.appendChild(card);
-  
+
   // Top up button
   const tu=el('div');
   tu.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-secondary btn-full" id="topup-btn">💳 ${t('topup')}</button></div>`;
   s.appendChild(tu);
   $('topup-btn').onclick=()=>render(s2=>screenTopUp(s2));
-  
-  // History
-  if(hist.length){
-    s.appendChild(el('div','section-title',`📅 ${t('history')}`));
-    const hCard=el('div','card');
-    hCard.innerHTML=`<div class="history-list">${[...hist].reverse().slice(0,10).map(d=>`<div class="history-item"><div class="history-dot"></div><span>${fmtDate(d)}</span></div>`).join('')}</div>`;
-    s.appendChild(hCard);
+
+  // Tabs — packages / classes / payments
+  const hasPay=payments.length>0;
+  let activeTab='packages';
+
+  const tabs=el('div','tab-row');
+  tabs.innerHTML=`
+<div class="tab active" data-tab="packages">📦 ${lang==='th'?'แพ็กเกจ':'Packages'}</div>
+<div class="tab" data-tab="classes">📅 ${lang==='th'?'คลาส':'Classes'}</div>
+${hasPay?`<div class="tab" data-tab="payments">💰 ${lang==='th'?'การชำระ':'Payments'}</div>`:''}`;
+  s.appendChild(tabs);
+
+  const tabBody=el('div');
+  s.appendChild(tabBody);
+
+  function renderStudentTab(tab){
+    tabBody.innerHTML='';
+    tabs.querySelectorAll('.tab').forEach(t2=>t2.classList.toggle('active',t2.dataset.tab===tab));
+
+    if(tab==='packages'){
+      const sortedClasses=[...hist].sort();
+      const topups=student.topups||[];
+
+      if(!sortedClasses.length&&!topups.length){
+        tabBody.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีข้อมูล':'No data yet'}</div>`;return;
+      }
+
+      // Build packages from topups using class count slicing
+      // topups = [{date, classes, price}, ...] in chronological order
+      // Assign first topups[0].classes dates to pkg 1, next topups[1].classes to pkg 2, etc.
+      const packages=[];
+      let classIdx=0;
+      topups.forEach((top,i)=>{
+        const pkgClasses=sortedClasses.slice(classIdx,classIdx+top.classes);
+        classIdx+=top.classes;
+        packages.push({top,classes:pkgClasses,num:i+1});
+      });
+
+      // Current package = remaining classes not yet assigned (or all if no topups)
+      const assignedCount=topups.reduce((a,tp)=>a+tp.classes,0);
+      const currentClasses=sortedClasses.slice(classIdx);
+
+      // If no topups recorded, fall back to showing all classes as one block
+      if(!topups.length){
+        const cur=el('div','card');
+        cur.style.borderLeft='3px solid var(--pink)';
+        cur.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+<div class="bold" style="font-size:14px">${lang==='th'?'แพ็กเกจปัจจุบัน':'Current package'}</div>
+<span class="pill pill-pink">${c} ${lang==='th'?'คลาสเหลือ':'left'}</span>
+</div>
+<div style="display:flex;gap:16px;font-size:13px;color:var(--grey);margin-bottom:${sortedClasses.length?'10px':'0'}">
+<span>📌 ${lang==='th'?'ใช้ไป':'Used'}: <strong style="color:var(--text)">${sortedClasses.length}</strong></span>
+${student.price?`<span>฿ <strong style="color:var(--text)">${student.price.toLocaleString()}</strong></span>`:''}
+</div>
+${sortedClasses.length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${sortedClasses.map(d=>`<span style="background:var(--pink-l);color:var(--pink);font-size:11px;padding:3px 8px;border-radius:10px">${fmtDate(d)}</span>`).join('')}</div>`:''}`;
+        tabBody.appendChild(cur);
+        return;
+      }
+
+      // Show current (latest) package first
+      const latestPkg=packages[packages.length-1];
+      const cur=el('div','card');
+      cur.style.borderLeft='3px solid var(--pink)';
+      cur.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+<div>
+  <div class="bold" style="font-size:14px">${lang==='th'?'แพ็กเกจปัจจุบัน':'Current package'}</div>
+  ${latestPkg?`<div style="font-size:11px;color:var(--grey);margin-top:2px">${lang==='th'?'เริ่ม':'Started'} ${fmtDate(latestPkg.top.date)} · ${latestPkg.top.classes} ${lang==='th'?'คลาส':'classes'}</div>`:''}
+</div>
+<span class="pill pill-pink">${c} ${lang==='th'?'เหลือ':'left'}</span>
+</div>
+<div style="display:flex;gap:16px;font-size:13px;color:var(--grey);margin-bottom:${(latestPkg?.classes||[]).length?'10px':'0'}">
+<span>📌 ${lang==='th'?'ใช้ไป':'Used'}: <strong style="color:var(--text)">${(latestPkg?.classes||[]).length}</strong>/${latestPkg?.top.classes||0}</span>
+${latestPkg?.top.price?`<span>฿ <strong style="color:var(--text)">${Number(latestPkg.top.price).toLocaleString()}</strong></span>`:''}
+</div>
+${(latestPkg?.classes||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${latestPkg.classes.map(d=>`<span style="background:var(--pink-l);color:var(--pink);font-size:11px;padding:3px 8px;border-radius:10px">${fmtDate(d)}</span>`).join('')}</div>`:''}`;
+      tabBody.appendChild(cur);
+
+      // Past packages (reverse order, skip latest)
+      const past=packages.slice(0,-1).reverse();
+      if(past.length){
+        const pastTitle=el('div','section-title');
+        pastTitle.textContent=lang==='th'?'แพ็กเกจก่อนหน้า':'Previous packages';
+        tabBody.appendChild(pastTitle);
+        past.forEach(pkg=>{
+          const pkgCard=el('div','card');
+          pkgCard.style.opacity='.8';
+          pkgCard.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+<div class="bold" style="font-size:13px">${lang==='th'?'แพ็กเกจที่':'Package'} ${pkg.num}</div>
+<span style="font-size:11px;color:var(--grey)">${fmtDate(pkg.top.date)} · ${pkg.top.classes} ${lang==='th'?'คลาส':'classes'}</span>
+</div>
+<div style="display:flex;gap:16px;font-size:12px;color:var(--grey);margin-bottom:${pkg.classes.length?'8px':'0'}">
+<span>📌 ${lang==='th'?'ใช้':'Used'}: <strong style="color:var(--text)">${pkg.classes.length}/${pkg.top.classes}</strong></span>
+${pkg.top.price?`<span>฿ <strong style="color:var(--text)">${Number(pkg.top.price).toLocaleString()}</strong></span>`:''}
+</div>
+${pkg.classes.length?`<div style="display:flex;flex-wrap:wrap;gap:4px">${pkg.classes.map(d=>`<span style="background:var(--grey-l);color:var(--grey);font-size:11px;padding:2px 7px;border-radius:10px">${fmtDate(d)}</span>`).join('')}</div>`:''}`;
+          tabBody.appendChild(pkgCard);
+        });
+      }
+
+    }else if(tab==='classes'){
+      if(!hist.length){tabBody.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีประวัติ':'No classes yet'}</div>`;return;}
+      const hCard=el('div','card');
+      hCard.innerHTML=`<div style="font-size:12px;color:var(--grey);margin-bottom:10px">${lang==='th'?'คลาสทั้งหมด':'All classes'} (${hist.length})</div>
+<div class="history-list">${[...hist].reverse().map((d,i)=>`<div class="history-item">
+<div class="history-dot"></div>
+<span style="flex:1">${fmtDate(d)}</span>
+<span style="font-size:11px;color:var(--grey)">#${hist.length-i}</span>
+</div>`).join('')}</div>`;
+      tabBody.appendChild(hCard);
+
+    }else if(tab==='payments'){
+      if(!payments.length){tabBody.innerHTML=`<div class="empty-state">${lang==='th'?'ยังไม่มีการชำระ':'No payments recorded'}</div>`;return;}
+      const pCard=el('div','card');
+      const total=payments.reduce((a,p)=>a+(p.amount||0),0);
+      pCard.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--grey-m)">
+<span style="font-size:13px;color:var(--grey)">${lang==='th'?'ยอดรวม':'Total paid'}</span>
+<span class="bold" style="font-size:16px;color:var(--pink)">฿${total.toLocaleString()}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+${[...payments].reverse().map(p=>`<div style="display:flex;align-items:center;gap:10px;font-size:13px">
+<span style="color:var(--grey);flex-shrink:0;min-width:80px">${fmtDate(p.date)}</span>
+<span class="bold" style="color:var(--pink)">฿${Number(p.amount||0).toLocaleString()}</span>
+${p.note?`<span style="color:var(--grey);font-size:12px">${p.note}</span>`:''}
+</div>`).join('')}
+</div>`;
+      tabBody.appendChild(pCard);
+    }
   }
-  
+
+  tabs.querySelectorAll('.tab').forEach(tab=>{
+    tab.onclick=()=>{activeTab=tab.dataset.tab;renderStudentTab(activeTab);};
+  });
+
+  renderStudentTab(activeTab);
   s.appendChild(el('div','version',VER));
 }
 
@@ -1528,8 +1650,10 @@ function showTopupModal(student,teacher){
     $('tu-ok').disabled=true;
     try{
       const newC=(student.c||0)+n, newT=(student.t||0)+n;
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,t:newT,price});
-      student.c=newC;student.t=newT;student.price=price;
+      const newTopup={date:todayISO(),classes:n,price};
+      const newTopups=[...(student.topups||[]),newTopup];
+      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,t:newT,price,topups:newTopups});
+      student.c=newC;student.t=newT;student.price=price;student.topups=newTopups;
       const students=C.get('students_'+teacher.id)||[];
       const idx=students.findIndex(s=>s.id===student.id);
       if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
