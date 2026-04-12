@@ -1556,6 +1556,7 @@ ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);ma
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
 <button class="btn btn-ghost btn-sm" data-action="topup">✨ ${t('topupClasses')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pay">💰 ${lang==='th'?'บันทึกเงิน':'Log payment'}</button>
+<button class="btn btn-ghost btn-sm" data-action="pkg">📦 ${lang==='th'?'แพ็กเกจ':'Packages'}</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
@@ -1564,10 +1565,63 @@ ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);ma
   card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
   card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
   card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
+  card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student);
   card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
   card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
   card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   return card;
+}
+
+function showStudentPackagesModal(student){
+  const hist=student.h||[];
+  const topups=student.topups||[];
+  const sortedClasses=[...hist].sort();
+  const c=student.c??0;
+
+  function pkgHTML(){
+    if(!topups.length&&!sortedClasses.length)
+      return`<div style="color:var(--grey);font-size:13px;text-align:center;padding:12px 0">${lang==='th'?'ยังไม่มีข้อมูล':'No data yet'}</div>`;
+
+    const packages=[];
+    let idx=0;
+    topups.forEach((top,i)=>{
+      const pkgClasses=sortedClasses.slice(idx,idx+top.classes);
+      idx+=top.classes;
+      packages.push({top,classes:pkgClasses,num:i+1});
+    });
+
+    if(!topups.length){
+      return`<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:10px">
+<div style="font-size:13px;font-weight:600;margin-bottom:6px">${lang==='th'?'คลาสทั้งหมด':'All classes'} (${sortedClasses.length})</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px">${sortedClasses.map(d=>`<span style="background:#fff;border:1px solid var(--grey-m);font-size:11px;padding:2px 8px;border-radius:10px">${fmtDate(d)}</span>`).join('')||'—'}</div>
+</div>`;
+    }
+
+    return[...packages].reverse().map(pkg=>{
+      const isCurrent=pkg.num===packages.length;
+      const remaining=isCurrent?c:pkg.top.classes-pkg.classes.length;
+      const badgeColor=remaining<0?'#b91c1c':isCurrent?'var(--pink)':'var(--grey)';
+      return`<div style="background:${isCurrent?'var(--pink-l)':'var(--grey-l)'};border-radius:var(--r-xs);padding:12px 14px;margin-bottom:8px;${isCurrent?'border-left:3px solid var(--pink)':''}">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+  <div>
+    <span style="font-size:13px;font-weight:600">${isCurrent?(lang==='th'?'แพ็กเกจปัจจุบัน':'Current'):`${lang==='th'?'แพ็กเกจที่':'Pkg'} ${pkg.num}`}</span>
+    <span style="font-size:11px;color:var(--grey);margin-left:6px">${fmtDate(pkg.top.date)}</span>
+  </div>
+  <span style="font-size:12px;font-weight:600;color:${badgeColor}">${pkg.classes.length}/${pkg.top.classes} ${lang==='th'?'คลาส':'cls'}${isCurrent?` · ${remaining} ${lang==='th'?'เหลือ':'left'}`:''}${pkg.top.price?` · ฿${Number(pkg.top.price).toLocaleString()}`:''}
+  </span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px">
+${pkg.classes.map((d,i)=>`<span style="background:#fff;border:1px solid ${isCurrent?'var(--pink-m)':'var(--grey-m)'};font-size:11px;padding:2px 8px;border-radius:10px;color:var(--text)">#${pkg.classes.length-i} ${fmtDate(d)}</span>`).join('')||`<span style="font-size:12px;color:var(--grey)">${lang==='th'?'ยังไม่มีคลาส':'No classes yet'}</span>`}
+</div>
+</div>`;
+    }).join('');
+  }
+
+  showModal(`<div class="modal-title">📦 ${student.n||student.sym}</div>
+<div style="font-size:12px;color:var(--grey);margin-bottom:12px">
+${lang==='th'?'รวม':'Total'}: ${hist.length} ${lang==='th'?'คลาส':'classes'} · ${lang==='th'?'เหลือ':'Remaining'}: ${c}
+</div>
+<div style="max-height:60vh;overflow-y:auto">${pkgHTML()}</div>`);
 }
 
 function showLogPaymentModal(student,teacher){
