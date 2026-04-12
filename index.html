@@ -1200,14 +1200,30 @@ async function screenTopUp(s){
   }catch(e){$('bank-info').innerHTML='<div class="text-grey text-sm">—</div>';}
   
   $('notify-btn').onclick=async()=>{
-    const btn=$('notify-btn'),nd=$('notify-err');
-    btn.disabled=true;
     const bank=C.get('bank_'+teacher.id)||{};
     const contact=C.get('contact_'+teacher.id)||{};
-    await sendNotification(teacher.id,teacher.name||teacher.username,student.n||student.sym,student.price||'—');
-    btn.disabled=false;
-    nd.style.display='';nd.textContent=t('notifySent');
-    toast(t('notifySent'));
+    const toEmail=contact.email||'';
+    const studentName=student.n||student.sym||'';
+    const pkg=student.price?`฿${student.price.toLocaleString()}`:'—';
+    const dateStr=new Date().toLocaleDateString(lang==='th'?'th-TH':'en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+    const subject=encodeURIComponent(
+      lang==='th'
+        ?`แจ้งโอนเงิน — ${studentName}`
+        :`Payment notification — ${studentName}`
+    );
+    const body=encodeURIComponent(
+      lang==='th'
+        ?`สวัสดีค่ะ\n\nหนู ${studentName} ได้โอนเงินค่าแพ็กเกจ ${pkg} แล้วนะคะ\nวันที่: ${dateStr}\n\nรบกวนตรวจสอบและเติมคลาสให้ด้วยนะคะ 🙏`
+        :`Hi,\n\nI (${studentName}) have transferred payment for the ${pkg} package.\nDate: ${dateStr}\n\nPlease check and top up my classes. Thank you! 🙏`
+    );
+
+    if(!toEmail){
+      toast(lang==='th'?'ไม่พบอีเมลครู กรุณาติดต่อครูโดยตรง':'No teacher email found — please contact your teacher directly');
+      return;
+    }
+
+    window.location.href=`mailto:${toEmail}?subject=${subject}&body=${body}`;
   };
 }
 
