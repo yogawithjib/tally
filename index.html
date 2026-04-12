@@ -821,6 +821,12 @@ function goHome(){
   localStorage.removeItem('tally_session');
   render(screenHome);
 }
+function goHomeKeepSession(){
+  // Go to home screen but keep session alive — no PIN needed on return
+  state.screen='home';
+  clearTimeout(sessionTimer);
+  render(screenHome);
+}
 function doLogout(){
   state.user=null;state.screen='home';state.teacherTab='students';state.adminTab='pending';
   clearTimeout(sessionTimer);
@@ -834,7 +840,7 @@ function handleLogoTap(){
   if(state.logoTaps>=3){state.logoTaps=0;render(screenSuperAdminPin);}
   else{
     state.logoTapTimer=setTimeout(()=>{
-      if(state.logoTaps===1)goHome();
+      if(state.logoTaps===1)goHomeKeepSession();
       state.logoTaps=0;
     },400);
   }
@@ -913,7 +919,16 @@ async function screenHome(s){
 <div style="font-size:12px;color:var(--grey)">${sub}</div>`;
     card.addEventListener('mouseenter',()=>{card.style.borderColor='var(--pink)';card.style.borderStyle='solid';card.style.background='var(--pink-l)';});
     card.addEventListener('mouseleave',()=>{card.style.borderColor='var(--pink)';card.style.borderStyle='dotted';card.style.background='var(--white)';});
-    card.addEventListener('click',()=>render(s2=>screenUsernameEntry(s2,role)));
+    card.addEventListener('click',()=>{
+      // If session active for this role, skip PIN and go straight in
+      if(state.user&&role==='student'&&state.user.type==='student'){
+        render(s2=>screenStudentCard(s2));
+      }else if(state.user&&role==='teacher'&&state.user.type==='teacher'){
+        render(s2=>screenTeacherDash(s2));
+      }else{
+        render(s2=>screenUsernameEntry(s2,role));
+      }
+    });
     return card;
   };
 
