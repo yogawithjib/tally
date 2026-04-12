@@ -1100,7 +1100,7 @@ ${pinPadHTML('s')}
       else if(pin===firstPin){
         const hashed=await hashPin(pin);
         try{
-          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{pin:hashed});
+          await writeStudent(teacher.id,student.id,{pin:hashed});
           const students=C.get('students_'+teacher.id)||[];
           const idx=students.findIndex(st=>st.id===student.id);
           if(idx>=0){students[idx].pin=hashed;C.set('students_'+teacher.id,students);}
@@ -1692,8 +1692,13 @@ async function renderTabBody(container,teacher,tab,students){
     if(!students.length){
       container.appendChild(el('div','empty-state',t('noStudents')));return;
     }
+    const sorted=[...students].sort((a,b)=>{
+      const ta=a.updatedAt||a.h?.slice(-1)[0]||'';
+      const tb=b.updatedAt||b.h?.slice(-1)[0]||'';
+      return tb>ta?1:-1;
+    });
     const grid=el('div','student-grid');
-    students.forEach(student=>grid.appendChild(buildStudentCard(student,teacher)));
+    sorted.forEach(student=>grid.appendChild(buildStudentCard(student,teacher)));
     container.appendChild(grid);
 
   }else if(tab==='income'){
@@ -1833,7 +1838,7 @@ ${histHTML}`);
       $('pay-save').disabled=true;
       const newPayments=[...existing,{date,amount,note,ts:new Date().toISOString()}];
       try{
-        await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
+        await writeStudent(teacher.id,student.id,{payments:newPayments});
         student.payments=newPayments;
         syncStudentCache(student,teacher);
         close();toast(`✅ ฿${amount.toLocaleString()} ${lang==='th'?'บันทึกแล้ว':'logged'}`);
@@ -1856,7 +1861,7 @@ ${histHTML}`);
         if(!confirm(`${lang==='th'?'ลบรายการนี้?':'Delete this payment?'} ฿${existing[idx].amount}`))return;
         const newPayments=existing.filter((_,i)=>i!==idx);
         try{
-          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
+          await writeStudent(teacher.id,student.id,{payments:newPayments});
           student.payments=newPayments;
           existing.splice(idx,1);
           syncStudentCache(student,teacher);
@@ -1894,7 +1899,7 @@ function showEditPaymentModal(student,teacher,idx,p){
     const payments=[...(student.payments||[])];
     payments[idx]={...p,date,amount,note};
     try{
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments});
+      await writeStudent(teacher.id,student.id,{payments});
       student.payments=payments;
       syncStudentCache(student,teacher);
       close();toast(t('saveDone'));
@@ -1907,6 +1912,12 @@ function syncStudentCache(student,teacher){
   const students=C.get('students_'+teacher.id)||[];
   const idx=students.findIndex(s=>s.id===student.id);
   if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
+}
+
+async function writeStudent(teacherId,studentId,data){
+  const stamped={...data,updatedAt:new Date().toISOString()};
+  await fbWrite(`teachers/${teacherId}/students/${studentId}`,stamped);
+  return stamped;
 }
 
 function showDeductModal(student,teacher){
@@ -1937,7 +1948,7 @@ ${histHTML}`);
       try{
         const newH=[...(student.h||[]),date].sort();
         const newC=(student.c||0)-1, newU=(student.u||0)+1;
-        await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,u:newU,h:newH});
+        await writeStudent(teacher.id,student.id,{c:newC,u:newU,h:newH});
         student.c=newC;student.u=newU;student.h=newH;
         syncStudentCache(student,teacher);
         close();toast('✅ Deducted');
@@ -1953,7 +1964,7 @@ ${histHTML}`);
         newH[idx]=inp.value;
         newH.sort();
         try{
-          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{h:newH});
+          await writeStudent(teacher.id,student.id,{h:newH});
           student.h=newH;
           syncStudentCache(student,teacher);
           toast('✅ '+t('saveDone'));
@@ -1971,7 +1982,7 @@ ${histHTML}`);
         const newH=(student.h||[]).filter((_,i)=>i!==idx).sort();
         const newC=(student.c||0)+1, newU=Math.max(0,(student.u||0)-1);
         try{
-          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,u:newU,h:newH});
+          await writeStudent(teacher.id,student.id,{c:newC,u:newU,h:newH});
           student.c=newC;student.u=newU;student.h=newH;
           syncStudentCache(student,teacher);
           toast(lang==='th'?'ลบแล้ว':'Deleted');
@@ -1999,7 +2010,7 @@ function showTopupModal(student,teacher){
       const newC=(student.c||0)+n, newT=(student.t||0)+n;
       const newTopup={date:todayISO(),classes:n,price};
       const newTopups=[...(student.topups||[]),newTopup];
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{c:newC,t:newT,price,topups:newTopups});
+      await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups});
       student.c=newC;student.t=newT;student.price=price;student.topups=newTopups;
       const students=C.get('students_'+teacher.id)||[];
       const idx=students.findIndex(s=>s.id===student.id);
@@ -2033,7 +2044,7 @@ function showEditStudentModal(student,teacher){
     if(pinRaw.length===4){upd.pin=await hashPin(pinRaw);}
     else if(pinRaw.length>0&&pinRaw.length<4){$('e-err').style.display='';$('e-err').textContent='PIN must be 4 digits';$('e-ok').disabled=false;return;}
     try{
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,upd);
+      await writeStudent(teacher.id,student.id,upd);
       Object.assign(student,upd);
       const students=C.get('students_'+teacher.id)||[];
       const idx=students.findIndex(s=>s.id===student.id);
@@ -2087,7 +2098,7 @@ function showAddStudentModal(teacher){
     if(existing.find(s=>s.sym===sym)){$('a-err').style.display='';$('a-err').textContent='Username already exists';return;}
     $('a-ok').disabled=true;
     const newId='s_'+Date.now();
-    const data={n:name,sym,c,t:c,u:0,h:[],price,pin:null};
+    const data={n:name,sym,c,t:c,u:0,h:[],price,pin:null,updatedAt:new Date().toISOString()};
     try{
       await fbWrite(`teachers/${teacher.id}/students/${newId}`,data,false);
       const students=[...existing,{id:newId,...data}];
@@ -3152,7 +3163,7 @@ function showResetStudentPinModal(student,teacher){
 
   async function doReset(newHash){
     try{
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{pin:newHash});
+      await writeStudent(teacher.id,student.id,{pin:newHash});
       student.pin=newHash;
       const students=C.get('students_'+teacher.id)||[];
       const idx=students.findIndex(s=>s.id===student.id);
