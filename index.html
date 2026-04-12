@@ -1695,18 +1695,24 @@ ${lang==='th'?'รวม':'Total'}: ${hist.length} ${lang==='th'?'คลาส':
 
 function showLogPaymentModal(student,teacher){
   const existing=student.payments||[];
-  const histHTML=existing.length
-    ?`<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
+
+  function openModal(){
+    const histHTML=existing.length
+      ?`<div style="margin-top:14px;border-top:1px solid var(--grey-m);padding-top:12px">
 <div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">${lang==='th'?'ประวัติรับเงิน':'Payment history'}</div>
-<div style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto">
-${[...existing].reverse().map(p=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:6px 10px">
+<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto">
+${[...existing].reverse().map((p,ri)=>{
+  const i=existing.length-1-ri;
+  return`<div style="display:flex;align-items:center;gap:6px;font-size:12px;background:var(--grey-l);border-radius:6px;padding:6px 10px">
 <span style="color:var(--grey);flex-shrink:0">${fmtDate(p.date)}</span>
 <span style="font-weight:600;color:var(--pink)">฿${Number(p.amount||0).toLocaleString()}</span>
-${p.note?`<span style="color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.note}</span>`:''}
-</div>`).join('')}
+${p.note?`<span style="color:var(--grey);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.note}</span>`:'<span style="flex:1"></span>'}
+<button data-edit="${i}" style="background:none;border:1px solid var(--grey-m);border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:var(--grey);font-family:inherit;flex-shrink:0">✏️</button>
+<button data-del="${i}" style="background:none;border:1px solid #fca5a5;border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:#b91c1c;font-family:inherit;flex-shrink:0">🗑</button>
+</div>`;}).join('')}
 </div></div>`:'';
 
-  const{close}=showModal(`<div class="modal-title">💰 ${lang==='th'?'บันทึกรับเงิน':'Log payment'} — ${student.n||student.sym}</div>
+    const{modal,close}=showModal(`<div class="modal-title">💰 ${lang==='th'?'บันทึกรับเงิน':'Log payment'} — ${student.n||student.sym}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'วันที่โอน':'Transfer date'}</label>
 <input class="input" id="pay-date" type="date" value="${todayISO()}"></div>
 <div class="input-group"><label class="input-label">${lang==='th'?'จำนวนเงิน (฿)':'Amount (฿)'}</label>
@@ -1717,24 +1723,89 @@ ${p.note?`<span style="color:var(--grey);flex:1;overflow:hidden;text-overflow:el
 <div id="pay-err" class="alert alert-err mt-8" style="display:none"></div>
 ${histHTML}`);
 
-  $('pay-save').onclick=async()=>{
-    const date=$('pay-date').value||todayISO();
-    const amount=parseFloat($('pay-amount').value)||0;
-    const note=$('pay-note').value.trim();
-    if(!amount){$('pay-err').style.display='';$('pay-err').textContent=lang==='th'?'กรุณาใส่จำนวนเงิน':'Please enter an amount';return;}
-    $('pay-save').disabled=true;
-    const newPayment={date,amount,note,ts:new Date().toISOString()};
-    const newPayments=[...existing,newPayment];
+    // Save new payment
+    $('pay-save').onclick=async()=>{
+      const date=$('pay-date').value||todayISO();
+      const amount=parseFloat($('pay-amount').value)||0;
+      const note=$('pay-note').value.trim();
+      if(!amount){$('pay-err').style.display='';$('pay-err').textContent=lang==='th'?'กรุณาใส่จำนวนเงิน':'Please enter an amount';return;}
+      $('pay-save').disabled=true;
+      const newPayments=[...existing,{date,amount,note,ts:new Date().toISOString()}];
+      try{
+        await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
+        student.payments=newPayments;
+        syncStudentCache(student,teacher);
+        close();toast(`✅ ฿${amount.toLocaleString()} ${lang==='th'?'บันทึกแล้ว':'logged'}`);
+        render(s2=>screenTeacherDash(s2));
+      }catch(e){$('pay-err').style.display='';$('pay-err').textContent='Error: '+e.message;$('pay-save').disabled=false;}
+    };
+
+    // Edit / delete existing payments
+    modal.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.onclick=()=>{
+        const idx=parseInt(btn.dataset.edit);
+        const p=existing[idx];
+        close();
+        showEditPaymentModal(student,teacher,idx,p);
+      };
+    });
+    modal.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick=async()=>{
+        const idx=parseInt(btn.dataset.del);
+        if(!confirm(`${lang==='th'?'ลบรายการนี้?':'Delete this payment?'} ฿${existing[idx].amount}`))return;
+        const newPayments=existing.filter((_,i)=>i!==idx);
+        try{
+          await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
+          student.payments=newPayments;
+          existing.splice(idx,1);
+          syncStudentCache(student,teacher);
+          close();toast(lang==='th'?'ลบแล้ว':'Deleted');
+          showLogPaymentModal(student,teacher);
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+  }
+
+  openModal();
+}
+
+function showEditPaymentModal(student,teacher,idx,p){
+  const{close}=showModal(`<div class="modal-title">✏️ ${lang==='th'?'แก้ไขการรับเงิน':'Edit payment'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่โอน':'Transfer date'}</label>
+<input class="input" id="ep-date" type="date" value="${p.date||todayISO()}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนเงิน (฿)':'Amount (฿)'}</label>
+<input class="input" id="ep-amount" type="number" min="0" value="${p.amount||''}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ':'Note'}</label>
+<input class="input" id="ep-note" type="text" value="${p.note||''}"></div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn btn-ghost flex-1" id="ep-cancel">${t('cancel')}</button>
+<button class="btn btn-primary flex-1" id="ep-save">${t('save')}</button>
+</div>
+<div id="ep-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('ep-cancel').onclick=()=>{close();showLogPaymentModal(student,teacher);};
+  $('ep-save').onclick=async()=>{
+    const date=$('ep-date').value||p.date;
+    const amount=parseFloat($('ep-amount').value)||0;
+    const note=$('ep-note').value.trim();
+    if(!amount){$('ep-err').style.display='';$('ep-err').textContent=lang==='th'?'กรุณาใส่จำนวนเงิน':'Please enter an amount';return;}
+    $('ep-save').disabled=true;
+    const payments=[...(student.payments||[])];
+    payments[idx]={...p,date,amount,note};
     try{
-      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments:newPayments});
-      student.payments=newPayments;
-      const students=C.get('students_'+teacher.id)||[];
-      const idx=students.findIndex(s=>s.id===student.id);
-      if(idx>=0){students[idx].payments=newPayments;C.set('students_'+teacher.id,students);}
-      close();toast(`✅ ฿${amount.toLocaleString()} ${lang==='th'?'บันทึกแล้ว':'logged'}`);
-      render(s2=>screenTeacherDash(s2));
-    }catch(e){$('pay-err').style.display='';$('pay-err').textContent='Error: '+e.message;$('pay-save').disabled=false;}
+      await fbWrite(`teachers/${teacher.id}/students/${student.id}`,{payments});
+      student.payments=payments;
+      syncStudentCache(student,teacher);
+      close();toast(t('saveDone'));
+      showLogPaymentModal(student,teacher);
+    }catch(e){$('ep-err').style.display='';$('ep-err').textContent='Error: '+e.message;$('ep-save').disabled=false;}
   };
+}
+
+function syncStudentCache(student,teacher){
+  const students=C.get('students_'+teacher.id)||[];
+  const idx=students.findIndex(s=>s.id===student.id);
+  if(idx>=0){students[idx]=student;C.set('students_'+teacher.id,students);}
 }
 
 function showDeductModal(student,teacher){
