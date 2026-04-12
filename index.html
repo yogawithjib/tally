@@ -1740,64 +1740,111 @@ ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);ma
   card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
   card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
   card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
-  card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student);
+  card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student,teacher);
   card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
   card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
   card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   return card;
 }
 
-function showStudentPackagesModal(student){
+function showStudentPackagesModal(student,teacher){
   const hist=student.h||[];
   const topups=student.topups||[];
   const sortedClasses=[...hist].sort();
   const c=student.c??0;
 
-  function pkgHTML(){
-    if(!topups.length&&!sortedClasses.length)
-      return`<div style="color:var(--grey);font-size:13px;text-align:center;padding:12px 0">${lang==='th'?'ยังไม่มีข้อมูล':'No data yet'}</div>`;
-
+  function openModal(){
     const packages=[];
-    let idx=0;
+    let classIdx=0;
     topups.forEach((top,i)=>{
-      const pkgClasses=sortedClasses.slice(idx,idx+top.classes);
-      idx+=top.classes;
-      packages.push({top,classes:pkgClasses,num:i+1});
+      const pkgClasses=sortedClasses.slice(classIdx,classIdx+top.classes);
+      classIdx+=top.classes;
+      packages.push({top,classes:pkgClasses,num:i+1,topIdx:i});
     });
 
-    if(!topups.length){
-      return`<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:10px">
-<div style="font-size:13px;font-weight:600;margin-bottom:6px">${lang==='th'?'คลาสทั้งหมด':'All classes'} (${sortedClasses.length})</div>
-<div style="display:flex;flex-wrap:wrap;gap:4px">${sortedClasses.map(d=>`<span style="background:#fff;border:1px solid var(--grey-m);font-size:11px;padding:2px 8px;border-radius:10px">${fmtDate(d)}</span>`).join('')||'—'}</div>
-</div>`;
+    function pkgHTML(){
+      if(!topups.length&&!sortedClasses.length)
+        return'<div style="color:var(--grey);font-size:13px;text-align:center;padding:12px 0">'+( lang==='th'?'ยังไม่มีข้อมูล':'No data yet')+'</div>';
+      if(!topups.length){
+        return'<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:10px"><div style="font-size:13px;font-weight:600;margin-bottom:6px">'+( lang==='th'?'คลาสทั้งหมด':'All classes')+' ('+sortedClasses.length+')</div><div style="display:flex;flex-wrap:wrap;gap:4px">'+sortedClasses.map(d=>'<span style="background:#fff;border:1px solid var(--grey-m);font-size:11px;padding:2px 8px;border-radius:10px">'+fmtDate(d)+'</span>').join('')+'</div></div>';
+      }
+      return [...packages].reverse().map(pkg=>{
+        const isCurrent=pkg.num===packages.length;
+        const remaining=isCurrent?c:pkg.top.classes-pkg.classes.length;
+        const bc=remaining<0?'#b91c1c':isCurrent?'var(--pink)':'var(--grey)';
+        const datesBadge=pkg.classes.map((d,i)=>'<span style="background:#fff;border:1px solid '+( isCurrent?'var(--pink-m)':'var(--grey-m)')+';font-size:11px;padding:2px 8px;border-radius:10px;color:var(--text)">#'+(pkg.classes.length-i)+' '+fmtDate(d)+'</span>').join('') || '<span style="font-size:12px;color:var(--grey)">'+( lang==='th'?'ยังไม่มีคลาส':'No classes yet')+'</span>';
+        return '<div style="background:'+( isCurrent?'var(--pink-l)':'var(--grey-l)')+';border-radius:var(--r-xs);padding:12px 14px;margin-bottom:8px;'+( isCurrent?'border-left:3px solid var(--pink);':'')+'">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div>'+
+          '<span style="font-size:13px;font-weight:600">'+( isCurrent?(lang==='th'?'แพ็กเกจปัจจุบัน':'Current'):(lang==='th'?'แพ็กเกจที่':'Pkg ')+pkg.num)+'</span>'+
+          '<span style="font-size:11px;color:var(--grey);margin-left:6px">'+fmtDate(pkg.top.date)+'</span></div>'+
+          '<div style="display:flex;align-items:center;gap:6px">'+
+          '<span style="font-size:12px;font-weight:600;color:'+bc+'">'+pkg.classes.length+'/'+pkg.top.classes+(pkg.top.price?' · ฿'+Number(pkg.top.price).toLocaleString():'')+( isCurrent?' · '+remaining+' '+( lang==='th'?'เหลือ':'left'):'')+'</span>'+
+          '<button data-edit-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid var(--grey-m);border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:var(--grey);font-family:inherit">✏️</button>'+
+          '<button data-del-pkg="'+pkg.topIdx+'" style="background:none;border:1px solid #fca5a5;border-radius:12px;font-size:10px;padding:2px 7px;cursor:pointer;color:#b91c1c;font-family:inherit">🗑</button>'+
+          '</div></div><div style="display:flex;flex-wrap:wrap;gap:4px">'+datesBadge+'</div></div>';
+      }).join('');
     }
 
-    return[...packages].reverse().map(pkg=>{
-      const isCurrent=pkg.num===packages.length;
-      const remaining=isCurrent?c:pkg.top.classes-pkg.classes.length;
-      const badgeColor=remaining<0?'#b91c1c':isCurrent?'var(--pink)':'var(--grey)';
-      return`<div style="background:${isCurrent?'var(--pink-l)':'var(--grey-l)'};border-radius:var(--r-xs);padding:12px 14px;margin-bottom:8px;${isCurrent?'border-left:3px solid var(--pink)':''}">
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-  <div>
-    <span style="font-size:13px;font-weight:600">${isCurrent?(lang==='th'?'แพ็กเกจปัจจุบัน':'Current'):`${lang==='th'?'แพ็กเกจที่':'Pkg'} ${pkg.num}`}</span>
-    <span style="font-size:11px;color:var(--grey);margin-left:6px">${fmtDate(pkg.top.date)}</span>
-  </div>
-  <span style="font-size:12px;font-weight:600;color:${badgeColor}">${pkg.classes.length}/${pkg.top.classes} ${lang==='th'?'คลาส':'cls'}${isCurrent?` · ${remaining} ${lang==='th'?'เหลือ':'left'}`:''}${pkg.top.price?` · ฿${Number(pkg.top.price).toLocaleString()}`:''}
-  </span>
-</div>
-<div style="display:flex;flex-wrap:wrap;gap:4px">
-${pkg.classes.map((d,i)=>`<span style="background:#fff;border:1px solid ${isCurrent?'var(--pink-m)':'var(--grey-m)'};font-size:11px;padding:2px 8px;border-radius:10px;color:var(--text)">#${pkg.classes.length-i} ${fmtDate(d)}</span>`).join('')||`<span style="font-size:12px;color:var(--grey)">${lang==='th'?'ยังไม่มีคลาส':'No classes yet'}</span>`}
-</div>
-</div>`;
-    }).join('');
-  }
+    const{modal,close}=showModal('<div class="modal-title">📦 '+( student.n||student.sym)+'</div><div style="font-size:12px;color:var(--grey);margin-bottom:12px">'+( lang==='th'?'รวม':'Total')+': '+hist.length+' '+( lang==='th'?'คลาส':'classes')+' · '+( lang==='th'?'เหลือ':'Remaining')+': '+c+'</div><div style="max-height:60vh;overflow-y:auto">'+pkgHTML()+'</div>');
 
-  showModal(`<div class="modal-title">📦 ${student.n||student.sym}</div>
-<div style="font-size:12px;color:var(--grey);margin-bottom:12px">
-${lang==='th'?'รวม':'Total'}: ${hist.length} ${lang==='th'?'คลาส':'classes'} · ${lang==='th'?'เหลือ':'Remaining'}: ${c}
-</div>
-<div style="max-height:60vh;overflow-y:auto">${pkgHTML()}</div>`);
+    modal.querySelectorAll('[data-edit-pkg]').forEach(btn=>{
+      btn.onclick=()=>{
+        const i=parseInt(btn.dataset.editPkg);
+        close();
+        showEditPackageModal(student,teacher,i,topups[i],openModal);
+      };
+    });
+
+    modal.querySelectorAll('[data-del-pkg]').forEach(btn=>{
+      btn.onclick=async()=>{
+        const i=parseInt(btn.dataset.delPkg);
+        if(!confirm((lang==='th'?'ลบแพ็กเกจนี้?':'Delete this package?')+' ('+topups[i].classes+' '+( lang==='th'?'คลาส':'classes')+')'))return;
+        const newTopups=topups.filter((_,ti)=>ti!==i);
+        const newT=newTopups.reduce((a,tp)=>a+tp.classes,0);
+        const newC=newT-(student.u||0);
+        try{
+          await writeStudent(teacher.id,student.id,{topups:newTopups,t:newT,c:newC});
+          student.topups=newTopups;student.t=newT;student.c=newC;
+          syncStudentCache(student,teacher);
+          toast(lang==='th'?'ลบแล้ว':'Deleted');
+          close();openModal();
+        }catch(e){toast('Error: '+e.message);}
+      };
+    });
+  }
+  openModal();
 }
+
+function showEditPackageModal(student,teacher,idx,pkg,onDone){
+  const{close}=showModal('<div class="modal-title">✏️ '+( lang==='th'?'แก้ไขแพ็กเกจ':'Edit package')+' #'+(idx+1)+'</div>'+
+    '<div class="input-group"><label class="input-label">'+( lang==='th'?'วันที่เติม':'Date')+'</label><input class="input" id="ep-date" type="date" value="'+( pkg.date||todayISO())+'"></div>'+
+    '<div class="input-group"><label class="input-label">'+( lang==='th'?'จำนวนคลาส':'Number of classes')+'</label><input class="input" id="ep-cls" type="number" min="1" value="'+pkg.classes+'"></div>'+
+    '<div class="input-group"><label class="input-label">'+t('price')+' (฿)</label><input class="input" id="ep-price" type="number" value="'+( pkg.price||'')+'"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-ghost flex-1" id="ep-cancel">'+t('cancel')+'</button><button class="btn btn-primary flex-1" id="ep-save">'+t('save')+'</button></div>'+
+    '<div id="ep-err" class="alert alert-err mt-8" style="display:none"></div>');
+
+  $('ep-cancel').onclick=()=>{close();onDone();};
+  $('ep-save').onclick=async()=>{
+    const date=$('ep-date').value||pkg.date;
+    const classes=parseInt($('ep-cls').value)||pkg.classes;
+    const price=parseFloat($('ep-price').value)||pkg.price||0;
+    if(classes<1){$('ep-err').style.display='';$('ep-err').textContent=lang==='th'?'จำนวนคลาสต้องมากกว่า 0':'Classes must be at least 1';return;}
+    $('ep-save').disabled=true;
+    const newTopups=[...(student.topups||[])];
+    newTopups[idx]={...pkg,date,classes,price};
+    const newT=newTopups.reduce((a,tp)=>a+tp.classes,0);
+    const diff=classes-pkg.classes;
+    const newC=(student.c||0)+diff;
+    try{
+      await writeStudent(teacher.id,student.id,{topups:newTopups,t:newT,c:newC});
+      student.topups=newTopups;student.t=newT;student.c=newC;
+      syncStudentCache(student,teacher);
+      toast(t('saveDone'));
+      close();onDone();
+    }catch(e){$('ep-err').style.display='';$('ep-err').textContent='Error: '+e.message;$('ep-save').disabled=false;}
+  };
+}
+
 
 function showLogPaymentModal(student,teacher){
   const existing=student.payments||[];
