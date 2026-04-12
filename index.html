@@ -3008,7 +3008,7 @@ function showAddStudentModal(teacher){
 }
 
 async function renderSettingsTab(container,teacher){
-  container.innerHTML=`<div class="section-title">🏦 ${t('saveBank')}</div>`;
+  container.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px"><span class="section-title" style="margin:0">🏦 ${t('saveBank')}</span><button id="copy-bank-btn" class="btn btn-ghost btn-sm">📋 ${lang==='th'?'คัดลอก':'Copy bank'}</button></div>`;
   
   const bankCard=el('div','card');
   const cachedBank=C.get('bank_'+teacher.id)||{};
@@ -3052,7 +3052,29 @@ ${['กสิกรไทย (KBank)','ไทยพาณิชย์ (SCB)','�
     });
   });
   container.appendChild(bankCard);
-  
+
+  // Copy bank button
+  function getBankText(){
+    const bank=C.get('bank_'+teacher.id)||{};
+    const nameInp=bankCard.querySelector('#s-acc-name');
+    const numInp=bankCard.querySelector('#s-acc-num');
+    const name=nameInp?.dataset.real||bank.name||'';
+    const num=numInp?.dataset.real||bank.num||'';
+    const b=bank.bank||document.querySelector('#s-bank')?.value||'';
+    return[b?(lang==='th'?'ธนาคาร':'Bank')+': '+b:'',num?(lang==='th'?'เลขบัญชี':'Account')+': '+num:'',name?(lang==='th'?'ชื่อบัญชี':'Name')+': '+name:''].filter(Boolean).join('\n');
+  }
+  function getContactText(){
+    const ct=C.get('contact_'+teacher.id)||{};
+    return[ct.phone?(lang==='th'?'โทร':'Phone')+': '+ct.phone:'',ct.line?'LINE: '+ct.line:'',ct.email?(lang==='th'?'อีเมล':'Email')+': '+ct.email:''].filter(Boolean).join('\n');
+  }
+  function doCopy(txt,btn){
+    if(!txt)return;
+    navigator.clipboard?.writeText(txt).catch(()=>{});
+    const orig=btn.textContent;btn.textContent='✅ '+(lang==='th'?'คัดลอกแล้ว':'Copied!');
+    setTimeout(()=>{btn.textContent=orig;},2000);
+  }
+  document.querySelector('#copy-bank-btn').onclick=()=>doCopy(getBankText(),document.querySelector('#copy-bank-btn'));
+
   if(fbReady){
     try{
       const bank=await fbRead(`banks/${teacher.id}`);
@@ -3100,7 +3122,9 @@ ${pinPadHTML('savebank')}
   };
   
   // Contact
-  const ctTitle=el('div','section-title');ctTitle.textContent=`📞 ${t('saveContact')}`;
+  const ctTitle=el('div');
+  ctTitle.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0 16px 8px';
+  ctTitle.innerHTML=`<span class="section-title" style="margin:0">📞 ${t('saveContact')}</span><button id="copy-contact-btn" class="btn btn-ghost btn-sm">📋 ${lang==='th'?'คัดลอก':'Copy contact'}</button>`;
   container.appendChild(ctTitle);
   const ct=el('div','card');
   const cachedContact=C.get('contact_'+teacher.id)||{};
@@ -3159,7 +3183,19 @@ ${pinPadHTML('savebank')}
     }catch(e){toast('Error: '+e.message);}
     $('save-ct-btn').disabled=false;
   };
-  
+
+  document.querySelector('#copy-contact-btn').onclick=()=>doCopy(getContactText(),document.querySelector('#copy-contact-btn'));
+
+  // Copy all button
+  const copyAllWrap=el('div');
+  copyAllWrap.style.cssText='padding:0 16px 12px';
+  copyAllWrap.innerHTML=`<button id="copy-all-btn" class="btn btn-primary btn-full">📋 ${lang==='th'?'คัดลอกทั้งหมด (ธนาคาร + ติดต่อ)':'Copy all (bank + contact)'}</button>`;
+  container.appendChild(copyAllWrap);
+  document.querySelector('#copy-all-btn').onclick=()=>{
+    const txt=[getBankText(),getContactText()].filter(Boolean).join('\n\n');
+    doCopy(txt,document.querySelector('#copy-all-btn'));
+  };
+
   container.appendChild(el('div','version',VER));
 }
 
