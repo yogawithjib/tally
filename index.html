@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>TALLY by @yogawithjib</title>
+<meta name="description" content="For students who show up and teachers who care">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -1938,16 +1939,14 @@ ${(student.payments||[]).length?`<div style="font-size:11px;color:var(--grey);ma
 </div>`:''}
 <div class="student-actions">
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
-<button class="btn btn-ghost btn-sm" data-action="topup">✨ ${t('topupClasses')}</button>
-<button class="btn btn-ghost btn-sm" data-action="pay">💰 ${lang==='th'?'บันทึกเงิน':'Log payment'}</button>
-<button class="btn btn-ghost btn-sm" data-action="pkg">📦 ${lang==='th'?'แพ็กเกจ':'Packages'}</button>
+<button class="btn btn-primary btn-sm" data-action="newpkg">💰 ${lang==='th'?'แพ็กเกจใหม่':'New package'}</button>
+<button class="btn btn-ghost btn-sm" data-action="pkg">📦 ${lang==='th'?'แพ็กเกจ / แก้ไข':'Packages / Edit'}</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
 </div>`;
     card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
-    card.querySelector('[data-action=topup]').onclick=()=>showTopupModal(student,teacher);
-    card.querySelector('[data-action=pay]').onclick=()=>showLogPaymentModal(student,teacher);
+    card.querySelector('[data-action=newpkg]').onclick=()=>showNewPackageModal(student,teacher);
     card.querySelector('[data-action=pkg]').onclick=()=>showStudentPackagesModal(student,teacher);
     card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
     card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
@@ -2293,8 +2292,62 @@ ${histHTML}`);
   openModal();
 }
 
+function showNewPackageModal(student,teacher){
+  const{close}=showModal(`<div class="modal-title">💰 ${lang==='th'?'แพ็กเกจใหม่':'New package'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่ซื้อ':'Purchase date'}</label>
+<input class="input" id="np-date" type="date" value="${todayISO()}"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนคลาส':'Number of classes'}</label>
+<input class="input" id="np-n" type="number" min="1" value="10" placeholder="10"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'จำนวนเงินที่รับ (฿)':'Amount received (฿)'}</label>
+<input class="input" id="np-price" type="number" min="0" value="${student.price||''}" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'หมายเหตุ (ไม่จำเป็น)':'Note (optional)'}</label>
+<input class="input" id="np-note" placeholder="${lang==='th'?'เช่น โอน KBank':'e.g. via KBank'}"></div>
+<button class="btn btn-primary btn-full mt-8" id="np-ok">💰 ${lang==='th'?'บันทึก':'Save'}</button>
+<div id="np-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('np-ok').onclick=async()=>{
+    const date=$('np-date').value||todayISO();
+    const n=parseInt($('np-n').value)||0;
+    const price=parseFloat($('np-price').value)||0;
+    const note=$('np-note').value.trim();
+    if(!n){$('np-err').style.display='';$('np-err').textContent=lang==='th'?'กรุณาใส่จำนวนคลาส':'Please enter number of classes';return;}
+    $('np-ok').disabled=true;
+    try{
+      const newC=(student.c||0)+n, newT=(student.t||0)+n;
+      // Topup record
+      const newTopup={date,classes:n,price};
+      const newTopups=[...(student.topups||[]),newTopup];
+      // Payment record
+      const newPayment={date,amount:price,note,ts:new Date().toISOString()};
+      const newPayments=[...(student.payments||[]),newPayment];
+      await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups,payments:newPayments});
+      student.c=newC;student.t=newT;student.price=price;
+      student.topups=newTopups;student.payments=newPayments;
+      syncStudentCache(student,teacher);
+      close();toast(`✅ ${lang==='th'?'บันทึกแล้ว':'Saved'} · ${n} ${lang==='th'?'คลาส':'classes'}${price?` · ฿${price.toLocaleString()}`:''}`);
+      // Show quick edit prompt
+      setTimeout(()=>{
+        const{close:closeEdit}=showModal(`<div class="modal-title">✅ ${lang==='th'?'บันทึกแล้ว':'Package saved!'}</div>
+<div style="font-size:13px;color:var(--grey);margin-bottom:16px">${lang==='th'?`${n} คลาส · ฿${price.toLocaleString()} · ${fmtDate(date)}`:`${n} classes · ฿${price.toLocaleString()} · ${fmtDate(date)}`}</div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-ghost flex-1" id="np-done">${lang==='th'?'เสร็จแล้ว':'Done'}</button>
+<button class="btn btn-primary flex-1" id="np-edit">✏️ ${lang==='th'?'แก้ไข':'Edit'}</button>
+</div>`);
+        $('np-done').onclick=()=>{closeEdit();render(s2=>screenTeacherDash(s2));};
+        $('np-edit').onclick=()=>{
+          closeEdit();
+          const pkgIdx=(student.topups||[]).length-1;
+          showEditPackageModal(student,teacher,pkgIdx,student.topups[pkgIdx],()=>render(s2=>screenTeacherDash(s2)));
+        };
+      },300);
+    }catch(e){$('np-err').style.display='';$('np-err').textContent='Error: '+e.message;$('np-ok').disabled=false;}
+  };
+}
+
 function showTopupModal(student,teacher){
   const{overlay,close}=showModal(`<div class="modal-title">✨ ${t('topupClasses')}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่ซื้อแพ็กเกจ':'Purchase date'}</label>
+<input class="input" id="tu-date" type="date" value="${todayISO()}"></div>
 <div class="input-group"><label class="input-label">${t('numClasses')}</label>
 <input class="input" id="tu-n" type="number" min="1" value="10" placeholder="10"></div>
 <div class="input-group"><label class="input-label">${t('price')} (฿)</label>
@@ -2303,11 +2356,12 @@ function showTopupModal(student,teacher){
   $('tu-ok').onclick=async()=>{
     const n=parseInt($('tu-n').value)||0;
     const price=parseFloat($('tu-price').value)||student.price||0;
+    const date=$('tu-date').value||todayISO();
     if(!n)return;
     $('tu-ok').disabled=true;
     try{
       const newC=(student.c||0)+n, newT=(student.t||0)+n;
-      const newTopup={date:todayISO(),classes:n,price};
+      const newTopup={date,classes:n,price};
       const newTopups=[...(student.topups||[]),newTopup];
       await writeStudent(teacher.id,student.id,{c:newC,t:newT,price,topups:newTopups});
       student.c=newC;student.t=newT;student.price=price;student.topups=newTopups;
