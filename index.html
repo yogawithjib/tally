@@ -1267,7 +1267,7 @@ function buildMotivationalCard(hist){
   for(let i=0;i<105;i++){
     const d=new Date(startDate);
     d.setDate(startDate.getDate()+i);
-    const iso=d.toISOString().slice(0,10);
+    const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     const count=classSet.has(iso)?1:0;
     const isFuture=d>today;
     const mon=d.getMonth();
@@ -4024,7 +4024,12 @@ async function screenSuperAdmin(s){
 
       // Most popular day of week
       const dayCounts=[0,0,0,0,0,0,0];
-      allDates.forEach(d=>{if(d)dayCounts[new Date(d).getDay()]++;});
+      allDates.forEach(d=>{
+        if(d){
+          const dt=new Date(d+'T12:00:00'); // noon local to avoid timezone shift
+          dayCounts[dt.getDay()]++;
+        }
+      });
       const dayNames=lang==='th'
         ?['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์']
         :['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
