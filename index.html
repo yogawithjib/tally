@@ -2112,7 +2112,7 @@ function buildStudentCard(student,teacher){
     const lastPay=(student.payments||[]).slice(-1)[0];
     card.innerHTML=`<div class="student-card-top">
 <div class="student-info">
-<div class="student-name">${student.n||student.sym}</div>
+<div class="student-name">${student.studentEmoji?student.studentEmoji+' ':''}${student.n||student.sym}</div>
 <div class="student-meta">@${student.sym}${last?' · '+fmtDate(last):''}</div>
 </div>
 <span class="pill" style="background:var(--grey-l);color:var(--grey);font-size:11px;flex-shrink:0">${lang==='th'?'รายครั้ง':'Per class'}</span>
@@ -2120,11 +2120,13 @@ function buildStudentCard(student,teacher){
 <div style="font-size:11px;color:var(--grey);margin:5px 0 2px">${lang==='th'?'เรียนไปแล้ว':'Sessions'}: <strong>${hist.length}</strong>${lastPay?` · ${lang==='th'?'จ่ายล่าสุด':'Last paid'}: ฿${Number(lastPay.amount).toLocaleString()}`:''}</div>
 <div class="student-actions">
 <button class="btn btn-primary btn-sm" data-action="logclass">📌 ${lang==='th'?'บันทึกครั้ง':'Log class'}</button>
+<button class="btn btn-ghost btn-sm" data-action="peek">👁</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
 </div>`;
     card.querySelector('[data-action=logclass]').onclick=()=>showLogClassModal(student,teacher);
+    card.querySelector('[data-action=peek]').onclick=()=>peekAsStudent(student,teacher);
     card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
     card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
     card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
@@ -2133,7 +2135,7 @@ function buildStudentCard(student,teacher){
     const unpaidPkg=(student.topups||[]).some(tp=>tp.paid===false);
     card.innerHTML=`<div class="student-card-top">
 <div class="student-info">
-<div class="student-name">${student.n||student.sym}${unpaidPkg?` <span style="font-size:10px;background:#fef9c3;color:#854d0e;border-radius:8px;padding:1px 6px;font-weight:600">${lang==='th'?'ค้างชำระ':'Unpaid'}</span>`:''}</div>
+<div class="student-name">${student.studentEmoji?student.studentEmoji+' ':''}${student.n||student.sym}${unpaidPkg?` <span style="font-size:10px;background:#fef9c3;color:#854d0e;border-radius:8px;padding:1px 6px;font-weight:600">${lang==='th'?'ค้างชำระ':'Unpaid'}</span>`:''}</div>
 <div class="student-meta">@${student.sym}${last?' · '+fmtDate(last):''}</div>
 </div>
 <div class="student-badge ${badgeCls}">${c}/${tot}</div>
@@ -2142,6 +2144,7 @@ function buildStudentCard(student,teacher){
 <button class="btn btn-ghost btn-sm" data-action="deduct">📌 ${t('deduct')}</button>
 <button class="btn btn-primary btn-sm" data-action="newpkg">📦 ${lang==='th'?'แพ็กเกจใหม่':'New Package'}</button>
 <button class="btn btn-ghost btn-sm" data-action="pkg">📦 ${lang==='th'?'ดูแพ็กเกจ':'View Package'}</button>
+<button class="btn btn-ghost btn-sm" data-action="peek">👁</button>
 <button class="btn btn-ghost btn-sm" data-action="edit">✏️ ${t('edit')}</button>
 <button class="btn btn-ghost btn-sm" data-action="pin">🔑 PIN</button>
 <button class="btn btn-danger btn-sm" data-action="del">🗑</button>
@@ -2149,11 +2152,36 @@ function buildStudentCard(student,teacher){
     card.querySelector('[data-action=deduct]').onclick=()=>showDeductModal(student,teacher);
     card.querySelector('[data-action=newpkg]').onclick=()=>{migratePaymentsToTopups(student,teacher);showNewPackageModal(student,teacher);};
     card.querySelector('[data-action=pkg]').onclick=()=>{migratePaymentsToTopups(student,teacher);showStudentPackagesModal(student,teacher);};
+    card.querySelector('[data-action=peek]').onclick=()=>peekAsStudent(student,teacher);
     card.querySelector('[data-action=edit]').onclick=()=>showEditStudentModal(student,teacher);
     card.querySelector('[data-action=pin]').onclick=()=>showResetStudentPinModal(student,teacher);
     card.querySelector('[data-action=del]').onclick=()=>confirmDeleteStudent(student,teacher);
   }
   return card;
+}
+
+function peekAsStudent(student,teacher){
+  // Save current state to return to
+  const prevUser=state.user;
+  const prevScreen=state.screen;
+  const prevFn=state._curFn;
+
+  // Switch to student view
+  state.user={type:'student',student,teacher,_peeking:true};
+  render(s=>{
+    screenStudentCard(s);
+    // Floating "back to teacher" bar
+    const bar=el('div');
+    bar.style.cssText='position:sticky;top:0;z-index:999;background:#fb2a7b;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600';
+    bar.innerHTML=`<span>👁 ${lang==='th'?'มุมมองของ':'Viewing as'} ${student.n||student.sym}</span>
+<button style="background:#fff;color:#fb2a7b;border:none;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" id="peek-back">↩ ${lang==='th'?'กลับ':'Back'}</button>`;
+    s.insertBefore(bar,s.firstChild);
+    document.querySelector('#peek-back').onclick=()=>{
+      state.user=prevUser;
+      state.screen=prevScreen;
+      render(s2=>screenTeacherDash(s2));
+    };
+  });
 }
 
 function showStudentPackagesModal(student,teacher){
