@@ -2154,34 +2154,48 @@ function renderIncomeList(container,view,months,years,students,teacher){
 async function renderTabBody(container,teacher,tab,students){
   container.innerHTML='';
   if(tab==='students'){
-    // Section header
-    const studentsHdr=el('div','section-title');
-    studentsHdr.innerHTML=`👯‍♀️ ${lang==='th'?'นักเรียน':'Students'}`;
-    container.appendChild(studentsHdr);
-
     const addRow=el('div');
     addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
     $('add-student-btn').onclick=()=>showAddStudentModal(teacher);
 
     if(!students)students=await getStudents(teacher.id);
-    if(!students.length){
-      container.appendChild(el('div','empty-state',t('noStudents')));return;
-    }
-    const sorted=[...students].sort((a,b)=>{
-      const ta=a.updatedAt||a.h?.slice(-1)[0]||'';
-      const tb=b.updatedAt||b.h?.slice(-1)[0]||'';
-      return tb>ta?1:-1;
-    });
-    const grid=el('div','student-grid');
-    sorted.forEach(student=>grid.appendChild(buildStudentCard(student,teacher)));
-    container.appendChild(grid);
 
-    // Studios section below students
-    const studioDiv=el('div');
-    studioDiv.style.cssText='margin-top:8px';
-    container.appendChild(studioDiv);
-    renderStudioSettings(studioDiv,teacher);
+    // Sort each student by most recent activity
+    const sortKey=s=>s.updatedAt||[...(s.h||[])].sort().slice(-1)[0]||'';
+    const pkgStudents=[...students].filter(s=>!s.perClass).sort((a,b)=>sortKey(b)>sortKey(a)?1:-1);
+    const perClassStudents=[...students].filter(s=>s.perClass).sort((a,b)=>sortKey(b)>sortKey(a)?1:-1);
+    const studioLogs=[...(teacher.studioLogs||[])].sort((a,b)=>b.month>a.month?1:-1);
+
+    // Most recent date per group
+    const lastPkg=pkgStudents[0]?sortKey(pkgStudents[0]):'';
+    const lastPer=perClassStudents[0]?sortKey(perClassStudents[0]):'';
+    const lastStudio=studioLogs[0]?studioLogs[0].month+'-28':''; // use month as date
+
+    // Build groups with their recency key
+    const groups=[];
+    if(pkgStudents.length)groups.push({key:lastPkg,render:()=>{
+      const hdr=el('div','section-title');hdr.innerHTML=`📦 ${lang==='th'?'นักเรียนแพ็กเกจ':'Package students'}`;container.appendChild(hdr);
+      const grid=el('div','student-grid');pkgStudents.forEach(s=>grid.appendChild(buildStudentCard(s,teacher)));container.appendChild(grid);
+    }});
+    if(perClassStudents.length)groups.push({key:lastPer,render:()=>{
+      const hdr=el('div','section-title');hdr.innerHTML=`📌 ${lang==='th'?'นักเรียนรายครั้ง':'Per-class students'}`;container.appendChild(hdr);
+      const grid=el('div','student-grid');perClassStudents.forEach(s=>grid.appendChild(buildStudentCard(s,teacher)));container.appendChild(grid);
+    }});
+    if(teacher.studios?.length)groups.push({key:lastStudio,render:()=>{
+      const studioDiv=el('div');studioDiv.style.cssText='margin-top:8px';container.appendChild(studioDiv);renderStudioSettings(studioDiv,teacher);
+    }});
+
+    if(!groups.length){container.appendChild(el('div','empty-state',t('noStudents')));return;}
+
+    // Sort groups by recency — most recent first
+    groups.sort((a,b)=>b.key>a.key?1:-1);
+    groups.forEach(g=>g.render());
+
+    // If no studios added yet, still show the add studio section at bottom
+    if(!teacher.studios?.length){
+      const studioDiv=el('div');studioDiv.style.cssText='margin-top:8px';container.appendChild(studioDiv);renderStudioSettings(studioDiv,teacher);
+    }
 
   }else if(tab==='income'){
     if(!students)students=await getStudents(teacher.id);
