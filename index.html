@@ -1706,7 +1706,10 @@ function screenTeacherPin(s,found){
 <div class="text-pink text-sm">${t('enterPin')}</div>
 </div>
 ${pinPadHTML('t')}
-<div id="pin-err" class="alert alert-err mt-8" style="display:none"></div>`;
+<div id="pin-err" class="alert alert-err mt-8" style="display:none"></div>
+<div style="text-align:center;margin-top:12px">
+<button id="forgot-pin-btn" style="background:none;border:none;color:var(--grey);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">${lang==='th'?'ลืม PIN?':'Forgot PIN?'}</button>
+</div>`;
   s.appendChild(card);
   
   const errDiv=$('pin-err');
@@ -1731,6 +1734,76 @@ ${pinPadHTML('t')}
       resetDots('t');
     }
   });
+
+  $('forgot-pin-btn').onclick=()=>showForgotPinModal(teacher);
+}
+
+function showForgotPinModal(teacher){
+  // Step 1: confirm email
+  const email=teacher.username; // username is email
+  const{modal,close}=showModal(`<div class="modal-title">🔑 ${lang==='th'?'รีเซ็ต PIN':'Reset PIN'}</div>
+<div style="font-size:13px;color:var(--grey);margin-bottom:16px">${lang==='th'?`เราจะส่งรหัส 4 หลักไปที่ ${email} นะคะ`:`We'll send a 4-digit code to ${email}`}</div>
+<button class="btn btn-primary btn-full" id="fp-send">📧 ${lang==='th'?'ส่งรหัส':'Send code'}</button>
+<div id="fp-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('fp-send').onclick=async()=>{
+    $('fp-send').disabled=true;
+    $('fp-send').textContent=lang==='th'?'กำลังส่ง...':'Sending...';
+    // Generate 4-digit code and store in Firestore with expiry
+    const code=String(Math.floor(1000+Math.random()*9000));
+    const expires=Date.now()+15*60*1000; // 15 min
+    const codeHash=await hashPin(code);
+    try{
+      await fbWrite(`teachers/${teacher.id}`,{resetCode:{hash:codeHash,expires}},true);
+      // Send via GAS
+      const gasUrl=await fbRead('system/config').then(c=>c?.gasUrl||GAS).catch(()=>GAS);
+      await fetch(gasUrl,{method:'POST',body:JSON.stringify({action:'resetPin',email,code,name:teacher.name||teacher.username})}).catch(()=>{});
+      close();
+      // Step 2: enter code
+      showResetCodeModal(teacher,codeHash,expires);
+    }catch(e){
+      $('fp-err').style.display='';$('fp-err').textContent='Error: '+e.message;
+      $('fp-send').disabled=false;$('fp-send').textContent=lang==='th'?'ส่งรหัส':'Send code';
+    }
+  };
+}
+
+function showResetCodeModal(teacher){
+  const{modal,close}=showModal(`<div class="modal-title">📧 ${lang==='th'?'ใส่รหัสที่ได้รับ':'Enter the code'}</div>
+<div style="font-size:13px;color:var(--grey);margin-bottom:16px">${lang==='th'?'กรุณาใส่รหัส 4 หลักที่ส่งไปทางอีเมลค่ะ (หมดอายุใน 15 นาที)':'Enter the 4-digit code sent to your email (expires in 15 min)'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'รหัส 4 หลัก':'4-digit code'}</label>
+<input class="input" id="rc-code" type="number" maxlength="4" placeholder="0000" autocomplete="off"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'PIN ใหม่':'New PIN'}</label>
+<input class="input" id="rc-pin" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ยืนยัน PIN ใหม่':'Confirm PIN'}</label>
+<input class="input" id="rc-confirm" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
+<button class="btn btn-primary btn-full mt-8" id="rc-save">${lang==='th'?'ตั้ง PIN ใหม่':'Set new PIN'}</button>
+<div id="rc-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('rc-save').onclick=async()=>{
+    const code=$('rc-code').value.trim();
+    const newPin=$('rc-pin').value;
+    const confirm=$('rc-confirm').value;
+    const err=msg=>{$('rc-err').style.display='';$('rc-err').textContent=msg;};
+    if(code.length!==4)return err(lang==='th'?'กรุณาใส่รหัส 4 หลัก':'Enter the 4-digit code');
+    if(newPin.length!==4)return err(lang==='th'?'PIN ใหม่ต้อง 4 หลัก':'New PIN must be 4 digits');
+    if(newPin!==confirm)return err(lang==='th'?'PIN ไม่ตรงกัน':'PINs do not match');
+    $('rc-save').disabled=true;
+    try{
+      // Verify code from Firestore
+      const fresh=await fbRead(`teachers/${teacher.id}`);
+      const rc=fresh?.resetCode;
+      if(!rc)return err(lang==='th'?'ไม่พบรหัส กรุณาลองใหม่':'No code found. Please request again.');
+      if(Date.now()>rc.expires)return err(lang==='th'?'รหัสหมดอายุแล้ว':'Code has expired');
+      const codeHash=await hashPin(code);
+      if(codeHash!==rc.hash)return err(lang==='th'?'รหัสไม่ถูกต้อง':'Incorrect code');
+      // Set new PIN and clear reset code
+      const newHashed=await hashPin(newPin);
+      await fbWrite(`teachers/${teacher.id}`,{pin:newHashed,resetCode:null},true);
+      close();toast('✅ '+(lang==='th'?'ตั้ง PIN ใหม่แล้ว ล็อกอินได้เลยค่ะ':'PIN reset! Please log in.'));
+      render(screenHome);
+    }catch(e){$('rc-err').style.display='';$('rc-err').textContent='Error: '+e.message;$('rc-save').disabled=false;}
+  };
 }
 
 // ═══════════════════════════════════════════════════════════
