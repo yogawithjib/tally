@@ -779,6 +779,7 @@ function render(screenFn){
 }
 
 function makeHeader({back,logout,title,onBack,onLogout,showSessionInfo}={}){
+  const wrap=el('div');
   const h=el('div','hdr');
   const left=el('div','hdr-logo');
   left.dataset.logoTap='1';
@@ -812,7 +813,23 @@ function makeHeader({back,logout,title,onBack,onLogout,showSessionInfo}={}){
     right.appendChild(lo);
   }
   h.appendChild(right);
-  return h;
+  wrap.appendChild(h);
+
+  // Peek bar — shown when teacher is viewing as student
+  if(state.user?._peeking){
+    const student=state.user.student;
+    const bar=el('div');
+    bar.style.cssText='background:#fb2a7b;color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600';
+    bar.innerHTML=`<span>👁 ${lang==='th'?'มุมมองของ':'Viewing as'} ${student.n||student.sym}</span>
+<button style="background:#fff;color:#fb2a7b;border:none;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" id="peek-back-btn">↩ ${lang==='th'?'กลับหน้าครู':'Back to teacher'}</button>`;
+    bar.querySelector('#peek-back-btn').onclick=()=>{
+      if(state.user._peekBack)state.user._peekBack();
+      else render(s2=>screenTeacherDash(s2));
+    };
+    wrap.appendChild(bar);
+  }
+
+  return wrap;
 }
 
 function goHome(){
@@ -2161,27 +2178,14 @@ function buildStudentCard(student,teacher){
 }
 
 function peekAsStudent(student,teacher){
-  // Save current state to return to
   const prevUser=state.user;
-  const prevScreen=state.screen;
-  const prevFn=state._curFn;
 
   // Switch to student view
-  state.user={type:'student',student,teacher,_peeking:true};
-  render(s=>{
-    screenStudentCard(s);
-    // Floating "back to teacher" bar
-    const bar=el('div');
-    bar.style.cssText='position:sticky;top:0;z-index:999;background:#fb2a7b;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600';
-    bar.innerHTML=`<span>👁 ${lang==='th'?'มุมมองของ':'Viewing as'} ${student.n||student.sym}</span>
-<button style="background:#fff;color:#fb2a7b;border:none;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" id="peek-back">↩ ${lang==='th'?'กลับ':'Back'}</button>`;
-    s.insertBefore(bar,s.firstChild);
-    document.querySelector('#peek-back').onclick=()=>{
-      state.user=prevUser;
-      state.screen=prevScreen;
-      render(s2=>screenTeacherDash(s2));
-    };
-  });
+  state.user={type:'student',student,teacher,_peeking:true,_peekTeacher:teacher,_peekBack:()=>{
+    state.user=prevUser;
+    render(s2=>screenTeacherDash(s2));
+  }};
+  render(s2=>screenStudentCard(s2));
 }
 
 function showStudentPackagesModal(student,teacher){
@@ -3693,7 +3697,7 @@ async function screenSuperAdmin(s){
 
   // Stats — placeholder while loading
   const statsDiv=el('div');statsDiv.id='adm-stats';
-  statsDiv.style.cssText='padding:0 16px 14px';
+  statsDiv.style.cssText='padding:0';
   statsDiv.innerHTML=`<div class="empty-state" style="padding:12px"><div class="loading-spin"></div></div>`;
   s.appendChild(statsDiv);
 
@@ -3815,7 +3819,7 @@ async function screenSuperAdmin(s){
       if(studentsInDebt)alerts.push({type:'err',msg:'⚠️ '+studentsInDebt+' '+(lang==='th'?'นักเรียนมียอดค้างชำระ':'student'+(studentsInDebt>1?'s':'')+' in debt')});
       if(studentsNoPin)alerts.push({type:'warn',msg:'🔓 '+studentsNoPin+' '+(lang==='th'?'นักเรียนยังไม่มี PIN':'student'+(studentsNoPin>1?'s':'')+' without PIN')});
       if(alerts.length){
-        const nb=el('div');nb.style.cssText='padding:0 16px 10px';
+        const nb=el('div');nb.style.cssText='padding:0 20px 10px';
         const alertsHTML=alerts.map(a=>'<div style="font-size:12px;color:'+(a.type==='err'?'#b91c1c':'#854d0e')+';padding:2px 0">'+a.msg+'</div>').join('');
         nb.innerHTML='<button id="notif-toggle" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fef9c3;border:1px solid #f59e0b;border-radius:var(--r-xs);padding:8px 14px;font-family:inherit;cursor:pointer;text-align:left">'+
           '<span style="font-size:11px;font-weight:600;color:#854d0e">⚡ '+(lang==='th'?'ต้องดูแล':'Needs attention')+' ('+alerts.length+')</span>'+
@@ -3832,7 +3836,7 @@ async function screenSuperAdmin(s){
       }
 
       function makeCollapsible(titleHTML,contentEl,defaultOpen){
-        const wrap=el('div');wrap.style.cssText='padding:0 16px;margin-bottom:4px';
+        const wrap=el('div');wrap.style.cssText='padding:0 20px;margin-bottom:4px';
         const hdr=el('div');hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 0;border-bottom:0.5px solid var(--grey-l)';
         hdr.innerHTML='<span style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em">'+titleHTML+'</span><span style="font-size:11px;color:var(--grey)">'+(defaultOpen?'▲':'▼')+'</span>';
         const body=el('div');body.style.display=defaultOpen?'block':'none';body.style.paddingTop='8px';
