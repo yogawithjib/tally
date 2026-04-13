@@ -1416,6 +1416,7 @@ ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}
 <button id="sc-leaderboard" class="btn btn-ghost btn-sm">🏆 ${lang==='th'?'อันดับ':'Leaderboard'}</button>
 <button id="sc-feed" class="btn btn-ghost btn-sm">📣 ${lang==='th'?'กิจกรรม':'Activity'}</button>
 <button id="sc-emoji" class="btn btn-ghost btn-sm">${student.studentEmoji||'😊'} ${lang==='th'?'เปลี่ยน':'Change'}</button>
+<button id="sc-pin" class="btn btn-ghost btn-sm">🔑 ${lang==='th'?'เปลี่ยน PIN':'Change PIN'}</button>
 </div>`;
 
   // End of card HTML done
@@ -1423,6 +1424,7 @@ ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}
   $('sc-leaderboard').onclick=()=>render(screenLeaderboard);
   $('sc-feed').onclick=()=>render(screenFeed);
   $('sc-emoji').onclick=()=>render(screenEmojiPicker);
+  $('sc-pin').onclick=()=>showStudentChangePinModal(student,teacher);
 
   // Motivational section
   const motiv=buildMotivationalCard(hist);
@@ -2186,6 +2188,41 @@ function peekAsStudent(student,teacher){
     render(s2=>screenTeacherDash(s2));
   }};
   render(s2=>screenStudentCard(s2));
+}
+
+function showStudentChangePinModal(student,teacher){
+  const{modal,close}=showModal(`<div class="modal-title">🔑 ${lang==='th'?'เปลี่ยน PIN':'Change PIN'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'PIN ปัจจุบัน':'Current PIN'}</label>
+<input class="input" id="cp-old" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'PIN ใหม่':'New PIN'}</label>
+<input class="input" id="cp-new" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'ยืนยัน PIN ใหม่':'Confirm new PIN'}</label>
+<input class="input" id="cp-confirm" type="password" maxlength="4" placeholder="————" autocomplete="off"></div>
+<button class="btn btn-primary btn-full mt-8" id="cp-save">${lang==='th'?'บันทึก':'Save'}</button>
+<div id="cp-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('cp-save').onclick=async()=>{
+    const oldPin=$('cp-old').value;
+    const newPin=$('cp-new').value;
+    const confirm=$('cp-confirm').value;
+    const err=(msg)=>{$('cp-err').style.display='';$('cp-err').textContent=msg;};
+    if(oldPin.length!==4){return err(lang==='th'?'กรุณากรอก PIN ปัจจุบัน 4 หลัก':'Enter your current 4-digit PIN');}
+    if(newPin.length!==4){return err(lang==='th'?'PIN ใหม่ต้อง 4 หลัก':'New PIN must be 4 digits');}
+    if(newPin!==confirm){return err(lang==='th'?'PIN ใหม่ไม่ตรงกัน':'PINs do not match');}
+    $('cp-save').disabled=true;
+    const oldHashed=await hashPin(oldPin);
+    if(oldHashed!==student.pin){
+      $('cp-save').disabled=false;
+      return err(lang==='th'?'PIN ปัจจุบันไม่ถูกต้อง':'Current PIN is incorrect');
+    }
+    const newHashed=await hashPin(newPin);
+    try{
+      await writeStudent(teacher.id,student.id,{pin:newHashed});
+      student.pin=newHashed;
+      syncStudentCache(student,teacher);
+      close();toast('✅ '+(lang==='th'?'เปลี่ยน PIN แล้ว':'PIN changed'));
+    }catch(e){$('cp-err').style.display='';$('cp-err').textContent='Error: '+e.message;$('cp-save').disabled=false;}
+  };
 }
 
 function showStudentPackagesModal(student,teacher){
