@@ -3913,7 +3913,6 @@ async function screenSuperAdmin(s){
 <div id="sadm-inc-list"></div>`;
 
         const incomeDiv=el('div');
-        incomeDiv.style.cssText='padding:0 16px';
         incomeDiv.appendChild(makeCollapsible('💰 '+(lang==='th'?'รายได้รวม':'Income'),incomeInner,false));
 
         function renderSuperIncomeList(v){
@@ -3989,8 +3988,7 @@ async function screenSuperAdmin(s){
 
           function renderTeacherIncome(){
             const sorted=[...teacherIncomes].sort((a,b)=>sortDir?b.total-a.total:a.total-b.total);
-            teacherIncDiv.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-<span style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em">💰 ${lang==='th'?'รายได้แยกตามครู':'Income per teacher'}</span>
+            teacherIncDiv.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px">
 <button id="sort-teacher-inc" style="background:none;border:1px solid var(--grey-m);border-radius:12px;font-size:10px;padding:2px 8px;cursor:pointer;color:var(--grey);font-family:inherit">${sortDir?'฿ ↓':'฿ ↑'}</button>
 </div>
 ${sorted.map(ti=>`
@@ -4020,7 +4018,9 @@ ${sorted.map(ti=>`
             });
           }
           renderTeacherIncome();
-          incomeDiv.appendChild(teacherIncDiv);
+          const teacherIncWrap=el('div');
+          teacherIncWrap.appendChild(teacherIncDiv);
+          incomeDiv.appendChild(makeCollapsible('💰 '+(lang==='th'?'รายได้แยกตามครู':'Income per teacher'),teacherIncWrap,false));
         }
         statsDiv.appendChild(incomeDiv);
       }
