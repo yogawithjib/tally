@@ -1187,7 +1187,7 @@ function resetDots(id){
 // SCREEN: STUDENT CARD
 // ═══════════════════════════════════════════════════════════
 // ─── Motivational card ─────────────────────────────────────
-function buildMotivationalCard(hist){
+function buildMotivationalCard(hist,student,teacher){
   if(!hist||!hist.length)return null;
 
   const sorted=[...hist].sort();
@@ -1331,7 +1331,33 @@ ${svgMonths}${svgDays}${svgCells}
 
   const heatLabel=`<div style="font-size:11px;font-weight:600;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">${lang==='th'?'ปฏิทินการฝึก':'Practice calendar'}</div>`;
 
-  card.innerHTML=streakBar+milestoneBar+statsChips+heatLabel+heatmapSVG;
+  // Log a class prompt — only for package students (not per-class), not peeking
+  let logPrompt='';
+  let requestsHTML='';
+  if(student&&teacher&&!student.perClass&&!state.user?._peeking){
+    logPrompt=`<div style="border-top:1px solid var(--pink-m);margin-top:12px;padding-top:10px;display:flex;align-items:center;justify-content:space-between">
+<span style="font-size:12px;color:var(--pink)">${lang==='th'?'มีคลาสที่ยังไม่ได้บันทึกไหมคะ?':'Have a class to add?'}</span>
+<button id="motiv-log-btn" style="background:none;border:1.5px solid var(--pink);border-radius:20px;font-size:11px;padding:4px 12px;cursor:pointer;color:var(--pink);font-family:inherit">📝 ${lang==='th'?'บันทึก':'Log it'}</button>
+</div>`;
+    // Pending/recent requests
+    const myReqs=(teacher.classRequests||[]).filter(r=>r.studentId===student.id).slice(-3).reverse();
+    if(myReqs.length){
+      requestsHTML='<div style="margin-top:8px">'+myReqs.map(r=>{
+        const statusText=r.status==='approved'?'✅':r.status==='rejected'?'📋':'⏳';
+        const statusLabel=r.status==='approved'?(lang==='th'?'อนุมัติแล้ว':'Approved'):r.status==='rejected'?(lang==='th'?'ครูตรวจสอบและปรับข้อมูลให้เรียบร้อย':'Your teacher has reviewed and updated your record'):(lang==='th'?'รอการอนุมัติ':'Pending');
+        return`<div style="display:flex;align-items:center;gap:8px;font-size:11px;padding:3px 0;color:var(--grey)">${statusText} <span>${fmtDate(r.date)}</span><span style="flex:1;font-size:10px;color:${r.status==='rejected'?'#888':r.status==='approved'?'#166534':'#854d0e'}">${statusLabel}</span></div>`;
+      }).join('')+'</div>';
+    }
+  }
+
+  card.innerHTML=streakBar+milestoneBar+statsChips+heatLabel+heatmapSVG+logPrompt+requestsHTML;
+
+  if(student&&teacher&&!student.perClass&&!state.user?._peeking){
+    setTimeout(()=>{
+      const btn=card.querySelector('#motiv-log-btn');
+      if(btn)btn.onclick=()=>showStudentClassRequestModal(student,teacher);
+    },0);
+  }
   return card;
 }
 
@@ -1418,24 +1444,10 @@ ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}
 <button id="sc-emoji" class="btn btn-ghost btn-sm">${student.studentEmoji||'😊'} ${lang==='th'?'เปลี่ยน':'Change'}</button>
 <button id="sc-pin" class="btn btn-ghost btn-sm">🔑 ${lang==='th'?'เปลี่ยน PIN':'Change PIN'}</button>
 </div>
-<div style="margin-top:10px;text-align:center">
-<button id="sc-request" class="btn btn-primary btn-sm">📝 ${lang==='th'?'ขอบันทึกคลาส':'Request class log'}</button>
-</div>
 ${(()=>{
   const myRequests=(teacher.classRequests||[]).filter(r=>r.studentId===student.id);
   if(!myRequests.length)return'';
-  return'<div style="margin-top:10px;border-top:1px solid var(--grey-l);padding-top:10px">'+
-    '<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">'+(lang==='th'?'คำขอของฉัน':'My requests')+'</div>'+
-    [...myRequests].reverse().slice(0,5).map(r=>{
-      const statusIcon=r.status==='approved'?'✅':r.status==='rejected'?'📋':'⏳';
-      const statusText=r.status==='approved'?(lang==='th'?'อนุมัติแล้ว':'Approved'):r.status==='rejected'?(lang==='th'?'ครูตรวจสอบและปรับข้อมูลให้เรียบร้อย':'Your teacher has reviewed and updated your record'):(lang==='th'?'รอการอนุมัติ':'Pending');
-      return'<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--grey-l)">'+
-        '<span style="flex-shrink:0">'+statusIcon+'</span>'+
-        '<span style="color:var(--grey);flex-shrink:0">'+fmtDate(r.date)+'</span>'+
-        '<span style="flex:1;font-size:11px;color:'+(r.status==='rejected'?'#888':r.status==='approved'?'#166534':'#854d0e')+'">'+statusText+'</span>'+
-      '</div>';
-    }).join('')+
-  '</div>';
+  return'';
 })()}
 </div>`;
 
@@ -1445,10 +1457,9 @@ ${(()=>{
   $('sc-feed').onclick=()=>render(screenFeed);
   $('sc-emoji').onclick=()=>render(screenEmojiPicker);
   $('sc-pin').onclick=()=>showStudentChangePinModal(student,teacher);
-  $('sc-request').onclick=()=>showStudentClassRequestModal(student,teacher);
 
   // Motivational section
-  const motiv=buildMotivationalCard(hist);
+  const motiv=buildMotivationalCard(hist,student,teacher);
   if(motiv)s.appendChild(motiv);
 
   // Easter egg: hold the ring for 2s → singing bowl 🎵
@@ -2360,7 +2371,7 @@ function peekAsStudent(student,teacher){
 }
 
 function showStudentClassRequestModal(student,teacher){
-  const{close}=showModal(`<div class="modal-title">📝 ${lang==='th'?'ขอบันทึกคลาส':'Request class log'}</div>
+  const{close}=showModal(`<div class="modal-title">📝 ${lang==='th'?'บันทึกคลาส':'Log a class'}</div>
 <div style="font-size:13px;color:var(--grey);margin-bottom:12px">${lang==='th'?'ส่งคำขอให้ครูอนุมัติ ก่อนหักจากแพ็กเกจนะคะ':'Send a request for your teacher to approve before deducting from your package'}</div>
 <div class="input-group"><label class="input-label">${lang==='th'?'วันที่เรียน':'Class date'}</label>
 <input class="input" id="cr-date" type="date" value="${todayISO()}"></div>
