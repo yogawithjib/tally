@@ -1458,9 +1458,20 @@ ${(()=>{
   $('sc-emoji').onclick=()=>render(screenEmojiPicker);
   $('sc-pin').onclick=()=>showStudentChangePinModal(student,teacher);
 
-  // Motivational section
-  const motiv=buildMotivationalCard(hist,student,teacher);
-  if(motiv)s.appendChild(motiv);
+  // Motivational section — build immediately, rebuild after teacher refresh
+  const motivWrap=el('div');
+  s.appendChild(motivWrap);
+  function renderMotiv(){
+    motivWrap.innerHTML='';
+    const motiv=buildMotivationalCard(hist,student,teacher);
+    if(motiv)motivWrap.appendChild(motiv);
+  }
+  renderMotiv();
+  if(fbReady){
+    fbRead(`teachers/${teacher.id}`).then(fresh=>{
+      if(fresh){Object.assign(teacher,{classRequests:fresh.classRequests||[],studioLogs:fresh.studioLogs||[],studios:fresh.studios||[]});renderMotiv();}
+    }).catch(()=>{});
+  }
 
   // Easter egg: hold the ring for 2s → singing bowl 🎵
   setTimeout(()=>{
