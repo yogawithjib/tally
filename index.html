@@ -3788,8 +3788,19 @@ async function screenSuperAdmin(s){
       if(studentsNoPin)alerts.push({type:'warn',msg:'🔓 '+studentsNoPin+' '+(lang==='th'?'นักเรียนยังไม่มี PIN':'student'+(studentsNoPin>1?'s':'')+' without PIN')});
       if(alerts.length){
         const nb=el('div');nb.style.cssText='padding:0 16px 10px';
-        nb.innerHTML='<div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:var(--r-xs);padding:10px 14px"><div style="font-size:11px;font-weight:600;color:#854d0e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">⚡ '+(lang==='th'?'ต้องดูแล':'Needs attention')+'</div>'+alerts.map(a=>'<div style="font-size:12px;color:'+(a.type==='err'?'#b91c1c':'#854d0e')+';padding:2px 0">'+a.msg+'</div>').join('')+'</div>';
+        const alertsHTML=alerts.map(a=>'<div style="font-size:12px;color:'+(a.type==='err'?'#b91c1c':'#854d0e')+';padding:2px 0">'+a.msg+'</div>').join('');
+        nb.innerHTML='<button id="notif-toggle" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fef9c3;border:1px solid #f59e0b;border-radius:var(--r-xs);padding:8px 14px;font-family:inherit;cursor:pointer;text-align:left">'+
+          '<span style="font-size:11px;font-weight:600;color:#854d0e">⚡ '+(lang==='th'?'ต้องดูแล':'Needs attention')+' ('+alerts.length+')</span>'+
+          '<span id="notif-arr" style="font-size:11px;color:#854d0e">▼</span></button>'+
+          '<div id="notif-body" style="display:none;background:#fef9c3;border:1px solid #f59e0b;border-top:none;border-radius:0 0 var(--r-xs) var(--r-xs);padding:8px 14px">'+alertsHTML+'</div>';
         statsDiv.appendChild(nb);
+        nb.querySelector('#notif-toggle').onclick=()=>{
+          const body=nb.querySelector('#notif-body');
+          const arr=nb.querySelector('#notif-arr');
+          const open=body.style.display!=='none';
+          body.style.display=open?'none':'block';
+          arr.textContent=open?'▼':'▲';
+        };
       }
 
       function makeCollapsible(titleHTML,contentEl,defaultOpen){
@@ -3851,13 +3862,18 @@ async function screenSuperAdmin(s){
       // Monthly income section
       const allStudentsFlat=teacherBreakdown.flatMap(b=>(C.get('students_'+b.teacher.id)||[]).map(st=>({...st,_teacher:b.teacher})));
       const superMonths=buildMonthlyIncome(allStudentsFlat);
-      const superTotal=allStudentsFlat.flatMap(st=>st.payments||[]).reduce((a,p)=>a+(p.amount||0),0);
+      // Use same calc as totalRevenue (topups if available, else legacy payments)
+      const superTotal=allStudentsFlat.reduce((a,st)=>{
+        const hasTopups=(st.topups||[]).length>0;
+        return a+(hasTopups
+          ?(st.topups||[]).filter(tp=>tp.paid!==false).reduce((s,tp)=>s+(tp.price||0),0)
+          :(st.payments||[]).reduce((s,p)=>s+(p.amount||0),0));
+      },0);
 
       if(superMonths.length){
         const superYears=buildYearlyIncome(allStudentsFlat);
-        const incomeDiv=el('div');
-        incomeDiv.style.cssText='padding:0 16px';
-        incomeDiv.innerHTML=`<div class="section-title" style="padding:10px 0 6px;font-size:11px">💰 ${lang==='th'?'รายได้รวม':'Income'}</div>
+        const incomeInner=el('div');
+        incomeInner.innerHTML=`
 <div style="background:var(--pink-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
   <span style="font-size:12px;color:var(--grey)">${lang==='th'?'รายได้รวมทั้งหมด':'Grand total'}</span>
   <span style="font-weight:600;font-size:16px;color:var(--pink)">฿${superTotal.toLocaleString()}</span>
@@ -3868,10 +3884,14 @@ async function screenSuperAdmin(s){
 </div>
 <div id="sadm-inc-list"></div>`;
 
+        const incomeDiv=el('div');
+        incomeDiv.style.cssText='padding:0 16px';
+        incomeDiv.appendChild(makeCollapsible('💰 '+(lang==='th'?'รายได้รวม':'Income'),incomeInner,false));
+
         function renderSuperIncomeList(v){
-          const list=incomeDiv.querySelector('#sadm-inc-list');
-          const mBtn=incomeDiv.querySelector('#sadm-inc-month');
-          const yBtn=incomeDiv.querySelector('#sadm-inc-year');
+          const list=incomeInner.querySelector('#sadm-inc-list');
+          const mBtn=incomeInner.querySelector('#sadm-inc-month');
+          const yBtn=incomeInner.querySelector('#sadm-inc-year');
           mBtn.style.background=v==='month'?'var(--pink)':'#fff';mBtn.style.color=v==='month'?'#fff':'var(--grey)';mBtn.style.borderColor=v==='month'?'var(--pink)':'var(--grey-m)';
           yBtn.style.background=v==='year'?'var(--pink)':'#fff';yBtn.style.color=v==='year'?'#fff':'var(--grey)';yBtn.style.borderColor=v==='year'?'var(--pink)':'var(--grey-m)';
           if(v==='month'){
@@ -3901,8 +3921,8 @@ async function screenSuperAdmin(s){
           }
         }
 
-        incomeDiv.querySelector('#sadm-inc-month').onclick=()=>renderSuperIncomeList('month');
-        incomeDiv.querySelector('#sadm-inc-year').onclick=()=>renderSuperIncomeList('year');
+        incomeInner.querySelector('#sadm-inc-month').onclick=()=>renderSuperIncomeList('month');
+        incomeInner.querySelector('#sadm-inc-year').onclick=()=>renderSuperIncomeList('year');
         renderSuperIncomeList('month');
 
         // Per-teacher income breakdown (sortable)
