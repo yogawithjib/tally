@@ -4485,10 +4485,17 @@ function calcStreak(hist){
 async function screenLeaderboard(s){
   state._curFn=screenLeaderboard;
   const{student,teacher}=state.user;
-  s.appendChild(makeHeader({back:true,onBack:()=>render(screenStudentCard)}));
+  s.appendChild(makeHeader({back:true,onBack:()=>render(screenStudentCard),title:''}));
+  // Home shortcut for students
+  if(!state.user?._peeking){
+    const homeBtn=el('div');
+    homeBtn.style.cssText='text-align:center;padding:4px 0 0';
+    homeBtn.innerHTML=`<button style="background:none;border:none;color:var(--pink);font-size:12px;cursor:pointer;font-family:inherit;padding:4px 12px" onclick="render(screenStudentCard)">← ${lang==='th'?'กลับหน้าหลัก':'Back to my card'}</button>`;
+    s.appendChild(homeBtn);
+  }
 
   const title=el('div');
-  title.style.cssText='text-align:center;padding:12px 20px 4px';
+  title.style.cssText='text-align:center;padding:4px 20px 4px';
   title.innerHTML=`<div style="font-size:20px;font-weight:600">🏆 ${lang==='th'?'ลีดเดอร์บอร์ด':'Leaderboard'}</div>
 <div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?'สัปดาห์ที่ติดต่อกัน':'Consecutive week streak'}</div>`;
   s.appendChild(title);
@@ -4526,9 +4533,16 @@ async function screenFeed(s){
   state._curFn=screenFeed;
   const{student,teacher}=state.user;
   s.appendChild(makeHeader({back:true,onBack:()=>render(screenStudentCard)}));
+  // Home shortcut for students
+  if(!state.user?._peeking){
+    const homeBtn=el('div');
+    homeBtn.style.cssText='text-align:center;padding:4px 0 0';
+    homeBtn.innerHTML=`<button style="background:none;border:none;color:var(--pink);font-size:12px;cursor:pointer;font-family:inherit;padding:4px 12px" onclick="render(screenStudentCard)">← ${lang==='th'?'กลับหน้าหลัก':'Back to my card'}</button>`;
+    s.appendChild(homeBtn);
+  }
 
   const title=el('div');
-  title.style.cssText='text-align:center;padding:12px 20px 4px';
+  title.style.cssText='text-align:center;padding:4px 20px 4px';
   title.innerHTML=`<div style="font-size:20px;font-weight:600">📣 ${lang==='th'?'กิจกรรม':'Activity'}</div>
 <div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?`กลุ่มของ ${teacher.name||teacher.username}`:`${teacher.name||teacher.username}'s group`}</div>`;
   s.appendChild(title);
