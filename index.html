@@ -4073,7 +4073,6 @@ async function screenSuperAdmin(s){
         {icon:'📅',label:lang==='th'?'วันยอดนิยม':'Most popular day',val:`${topDay} (${topDayCount} ${lang==='th'?'ครั้ง':'times'})`},
         {icon:'🏆',label:lang==='th'?'สตรีคยาวสุดตอนนี้':'Longest active streak',val:`${longestStreak} ${lang==='th'?'สัปดาห์':'wks'} · ${longestStreakStudent}`},
         {icon:'📈',label:lang==='th'?'สถิติสูงสุดต่อเดือน':'Record month',val:`${recordMonthLabel} · ${recordMonth} ${lang==='th'?'คลาส':'classes'}`},
-        {icon:'📆',label:lang==='th'?'เดือนที่คึกคักที่สุด':'Busiest month',val:busiest?`${fmtMonth(busiest[0])} · ${busiest[1]} ${lang==='th'?'คลาส':'classes'}`:'—'},
         {icon:'📉',label:lang==='th'?'เดือนที่เงียบที่สุด':'Quietest month',val:quietest&&quietest[0]!==busiest?.[0]?`${fmtMonth(quietest[0])} · ${quietest[1]} ${lang==='th'?'คลาส':'classes'}`:'—'},
       ].forEach(({icon,label,val})=>{
         const row=el('div');
