@@ -4458,7 +4458,7 @@ async function screenFeed(s){
   const title=el('div');
   title.style.cssText='text-align:center;padding:12px 20px 4px';
   title.innerHTML=`<div style="font-size:20px;font-weight:600">📣 ${lang==='th'?'กิจกรรม':'Activity'}</div>
-<div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?'กลุ่มของคุณ':'Your group'}</div>`;
+<div style="font-size:12px;color:var(--grey);margin-top:4px">${lang==='th'?`กลุ่มของ ${teacher.name||teacher.username}`:`${teacher.name||teacher.username}'s group`}</div>`;
   s.appendChild(title);
 
   const body=el('div');body.innerHTML=`<div class="empty-state"><div class="loading-spin"></div></div>`;
@@ -4491,7 +4491,9 @@ async function screenFeed(s){
       }
       const row=el('div');
       row.style.cssText=`display:flex;align-items:center;gap:10px;padding:10px 20px;${ev.isMe?'background:var(--pink-l);':''}`;
-      const msg=lang==='th'?'เข้าเรียนแล้ว 🧘':'practiced 🧘';
+      const msg=lang==='th'
+        ?`เรียนโยคะกับ ${teacher.name||teacher.username} ♡`
+        :`practiced yoga with ${teacher.name||teacher.username} ♡`;
       row.innerHTML=`<span style="font-size:28px">${ev.emoji}</span>
 <span style="font-size:13px;color:var(--text-s)">${ev.isMe?`<strong>${lang==='th'?'คุณ':'You'}</strong>`:ev.emoji} ${msg}</span>`;
       body.appendChild(row);
