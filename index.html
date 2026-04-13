@@ -3189,7 +3189,7 @@ ${pinPadHTML('savebank')}
   // Copy all button
   const copyAllWrap=el('div');
   copyAllWrap.style.cssText='padding:0 16px 12px';
-  copyAllWrap.innerHTML=`<button id="copy-all-btn" class="btn btn-primary btn-full">📋 ${lang==='th'?'คัดลอกทั้งหมด (ธนาคาร + ติดต่อ)':'Copy all (bank + contact)'}</button>`;
+  copyAllWrap.innerHTML=`<button id="copy-all-btn" class="btn btn-ghost btn-sm">📋 ${lang==='th'?'คัดลอกทั้งหมด (ธนาคาร + ติดต่อ)':'Copy all (bank + contact)'}</button>`;
   container.appendChild(copyAllWrap);
   document.querySelector('#copy-all-btn').onclick=()=>{
     const txt=[getBankText(),getContactText()].filter(Boolean).join('\n\n');
@@ -3779,43 +3779,74 @@ async function screenSuperAdmin(s){
 </div>`;
       }).join('');
 
-      statsDiv.innerHTML=`
-<div class="section-title" style="padding-top:4px">📊 ${lang==='th'?'สถิติรวม':'Global Stats'}</div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
-  <div class="stat-chip"><div class="stat-num">${teachers.length}</div><div class="stat-lbl">${t('teachers')}</div></div>
-  <div class="stat-chip"><div class="stat-num">${totalStudents}</div><div class="stat-lbl">${t('statsStudents')}</div></div>
-  <div class="stat-chip"><div class="stat-num" style="${pending?'color:var(--pink)':''}">${pending}</div><div class="stat-lbl">${lang==='th'?'ใบสมัครรอ':'Pending'}</div></div>
-  <div class="stat-chip"><div class="stat-num">${totalSold}</div><div class="stat-lbl">${lang==='th'?'คลาสขาย':'Sold'}</div></div>
-  <div class="stat-chip"><div class="stat-num">${totalUsed}</div><div class="stat-lbl">${lang==='th'?'คลาสใช้':'Used'}</div></div>
-  <div class="stat-chip"><div class="stat-num" style="${totalRem<0?'color:#b91c1c':''}">${totalRem}</div><div class="stat-lbl">${totalRem<0?(lang==='th'?'ติดหนี้':'Debt'):(lang==='th'?'คงเหลือ':'Left')}</div></div>
-  <div class="stat-chip"><div class="stat-num" style="${studentsInDebt?'color:#b91c1c':''}">${studentsInDebt}</div><div class="stat-lbl">${lang==='th'?'นักเรียนติดหนี้':'In debt'}</div></div>
-  <div class="stat-chip"><div class="stat-num" style="${studentsNoPin?'color:#f59e0b':''}">${studentsNoPin}</div><div class="stat-lbl">${lang==='th'?'ยังไม่มี PIN':'No PIN'}</div></div>
-  <div class="stat-chip"><div class="stat-num">${visitCount.toLocaleString()}</div><div class="stat-lbl">👀 ${lang==='th'?'ผู้เยี่ยมชม':'Visits'}</div></div>
-</div>
-${totalRevenue>0?`<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;font-size:13px">
-  <span style="color:var(--grey)">${lang==='th'?'รายได้รวมทั้งหมด':'Total income recorded'}</span>
-  <span style="font-weight:600;float:right">฿${totalRevenue.toLocaleString()}</span>
-</div>`:''}
-${locationHTML?`<div style="background:#fff;border-radius:var(--r-xs);padding:10px 14px;margin-bottom:10px;box-shadow:var(--sh-s)">
-<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">📍 ${lang==='th'?'ที่ตั้งครู':'Teacher locations'}</div>
-${locationHTML}
-</div>`:''}
-${teacherBreakdown.length>1?`<div class="section-title" style="padding:10px 4px 6px;font-size:11px">${lang==='th'?'แยกตามครู':'Per teacher'}</div>
-<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px">
-${teacherBreakdown.map(b=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:#fff;border-radius:var(--r-xs);padding:7px 10px;box-shadow:var(--sh-s)">
-  <span style="font-size:16px">${b.teacher.emoji||'🧘'}</span>
-  <span style="flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.teacher.name||b.teacher.username}</span>
-  <span style="color:var(--grey);font-size:11px">${b.teacher.location||''}</span>
-  <span style="color:var(--grey)">${b.students} ${lang==='th'?'คน':'stu'}</span>
-  <span class="pill ${b.rem<0?'pill-red':b.rem===0?'pill-amber':'pill-pink'}">${b.rem<0?'−':''}${Math.abs(b.rem)}</span>
-</div>`).join('')}
-</div>`:''}
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-  <button class="btn btn-ghost btn-sm" id="dl-students">⬇ ${lang==='th'?'นักเรียนทั้งหมด':'All students'} .csv</button>
-  <button class="btn btn-ghost btn-sm" id="dl-signups">⬇ ${lang==='th'?'ใบสมัคร':'Signups'} .csv</button>
-  <button class="btn btn-ghost btn-sm" id="dl-summary">⬇ ${lang==='th'?'สรุปครู':'Teacher summary'} .csv</button>
-  <button class="btn btn-ghost btn-sm" id="dl-income">⬇ ${lang==='th'?'รายได้':'Income'} .csv</button>
-</div>`;
+      statsDiv.innerHTML='';
+
+      // Notification bar
+      const alerts=[];
+      if(pending)alerts.push({type:'warn',msg:'📬 '+pending+' '+(lang==='th'?'ใบสมัครรอการอนุมัติ':'pending application'+(pending>1?'s':''))});
+      if(studentsInDebt)alerts.push({type:'err',msg:'⚠️ '+studentsInDebt+' '+(lang==='th'?'นักเรียนมียอดค้างชำระ':'student'+(studentsInDebt>1?'s':'')+' in debt')});
+      if(studentsNoPin)alerts.push({type:'warn',msg:'🔓 '+studentsNoPin+' '+(lang==='th'?'นักเรียนยังไม่มี PIN':'student'+(studentsNoPin>1?'s':'')+' without PIN')});
+      if(alerts.length){
+        const nb=el('div');nb.style.cssText='padding:0 16px 10px';
+        nb.innerHTML='<div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:var(--r-xs);padding:10px 14px"><div style="font-size:11px;font-weight:600;color:#854d0e;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">⚡ '+(lang==='th'?'ต้องดูแล':'Needs attention')+'</div>'+alerts.map(a=>'<div style="font-size:12px;color:'+(a.type==='err'?'#b91c1c':'#854d0e')+';padding:2px 0">'+a.msg+'</div>').join('')+'</div>';
+        statsDiv.appendChild(nb);
+      }
+
+      function makeCollapsible(titleHTML,contentEl,defaultOpen){
+        const wrap=el('div');wrap.style.cssText='padding:0 16px;margin-bottom:4px';
+        const hdr=el('div');hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 0;border-bottom:0.5px solid var(--grey-l)';
+        hdr.innerHTML='<span style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em">'+titleHTML+'</span><span style="font-size:11px;color:var(--grey)">'+(defaultOpen?'▲':'▼')+'</span>';
+        const body=el('div');body.style.display=defaultOpen?'block':'none';body.style.paddingTop='8px';
+        body.appendChild(contentEl);
+        hdr.onclick=()=>{const open=body.style.display!=='none';body.style.display=open?'none':'block';hdr.querySelector('span:last-child').textContent=open?'▼':'▲';};
+        wrap.appendChild(hdr);wrap.appendChild(body);return wrap;
+      }
+
+      // Stats grid
+      const statsGrid=el('div');
+      statsGrid.innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">'+
+        '<div class="stat-chip"><div class="stat-num">'+teachers.length+'</div><div class="stat-lbl">'+t('teachers')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num">'+totalStudents+'</div><div class="stat-lbl">'+t('statsStudents')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num" style="'+(pending?'color:var(--pink)':'')+'">'+pending+'</div><div class="stat-lbl">'+(lang==='th'?'ใบสมัครรอ':'Pending')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num">'+totalSold+'</div><div class="stat-lbl">'+(lang==='th'?'คลาสขาย':'Sold')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num">'+totalUsed+'</div><div class="stat-lbl">'+(lang==='th'?'คลาสใช้':'Used')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num" style="'+(totalRem<0?'color:#b91c1c':'')+'">'+totalRem+'</div><div class="stat-lbl">'+(totalRem<0?(lang==='th'?'ติดหนี้':'Debt'):(lang==='th'?'คงเหลือ':'Left'))+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num" style="'+(studentsInDebt?'color:#b91c1c':'')+'">'+studentsInDebt+'</div><div class="stat-lbl">'+(lang==='th'?'นักเรียนติดหนี้':'In debt')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num" style="'+(studentsNoPin?'color:#f59e0b':'')+'">'+studentsNoPin+'</div><div class="stat-lbl">'+(lang==='th'?'ยังไม่มี PIN':'No PIN')+'</div></div>'+
+        '<div class="stat-chip"><div class="stat-num">'+visitCount.toLocaleString()+'</div><div class="stat-lbl">👀 '+(lang==='th'?'ผู้เยี่ยมชม':'Visits')+'</div></div>'+
+        '</div>'+
+        (totalRevenue>0?'<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 14px;margin-bottom:8px;font-size:13px"><span style="color:var(--grey)">'+(lang==='th'?'รายได้รวมทั้งหมด':'Total income recorded')+'</span><span style="font-weight:600;float:right">฿'+totalRevenue.toLocaleString()+'</span></div>':'');
+      statsDiv.appendChild(makeCollapsible('📊 '+(lang==='th'?'สถิติรวม':'Global stats'),statsGrid,true));
+
+      // Locations
+      if(locationHTML){
+        const locEl=el('div');locEl.innerHTML='<div style="padding:4px 0">'+locationHTML+'</div>';
+        statsDiv.appendChild(makeCollapsible('📍 '+(lang==='th'?'ที่ตั้งครู':'Teacher locations'),locEl,false));
+      }
+
+      // Per teacher
+      if(teacherBreakdown.length>1){
+        const breakEl=el('div');
+        breakEl.innerHTML='<div style="display:flex;flex-direction:column;gap:4px;padding:4px 0">'+
+          teacherBreakdown.map(b=>'<div style="display:flex;align-items:center;gap:8px;font-size:12px;background:#fff;border-radius:var(--r-xs);padding:7px 10px;box-shadow:var(--sh-s)">'+
+            '<span style="font-size:16px">'+(b.teacher.emoji||'🧘')+'</span>'+
+            '<span style="flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(b.teacher.name||b.teacher.username)+'</span>'+
+            '<span style="color:var(--grey);font-size:11px">'+(b.teacher.location||'')+'</span>'+
+            '<span style="color:var(--grey)">'+b.students+' '+(lang==='th'?'คน':'stu')+'</span>'+
+            '<span class="pill '+(b.rem<0?'pill-red':b.rem===0?'pill-amber':'pill-pink')+'">'+(b.rem<0?'−':'')+Math.abs(b.rem)+'</span>'+
+          '</div>').join('')+'</div>';
+        statsDiv.appendChild(makeCollapsible('👩‍🏫 '+(lang==='th'?'แยกตามครู':'Per teacher'),breakEl,false));
+      }
+
+      // Downloads
+      const dlEl=el('div');
+      dlEl.innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 0">'+
+        '<button class="btn btn-ghost btn-sm" id="dl-students">⬇ '+(lang==='th'?'นักเรียนทั้งหมด':'All students')+' .csv</button>'+
+        '<button class="btn btn-ghost btn-sm" id="dl-signups">⬇ '+(lang==='th'?'ใบสมัคร':'Signups')+' .csv</button>'+
+        '<button class="btn btn-ghost btn-sm" id="dl-summary">⬇ '+(lang==='th'?'สรุปครู':'Teacher summary')+' .csv</button>'+
+        '<button class="btn btn-ghost btn-sm" id="dl-income">⬇ '+(lang==='th'?'รายได้':'Income')+' .csv</button>'+
+        '</div>';
+      statsDiv.appendChild(makeCollapsible('⬇ '+(lang==='th'?'ดาวน์โหลด':'Downloads'),dlEl,false));
 
       // Monthly income section
       const allStudentsFlat=teacherBreakdown.flatMap(b=>(C.get('students_'+b.teacher.id)||[]).map(st=>({...st,_teacher:b.teacher})));
