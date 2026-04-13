@@ -1219,6 +1219,59 @@ function resetDots(id){
 // SCREEN: STUDENT CARD
 // ═══════════════════════════════════════════════════════════
 // ─── Motivational card ─────────────────────────────────────
+async function buildVideoRecommendations(student){
+  if(!student?.keywords)return null;
+  const videos=await fetchVideos();
+  if(!videos?.length)return null;
+
+  const kws=student.keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean);
+  if(!kws.length)return null;
+
+  const tierKey=v=>v['ใครดูได้บ้าง (สมาชิกระดับไหน / ฟรี)']||v['tier']||'';
+  const tiers=['ฟรี','ผีเสื้อ','แมลงปอ'];
+  const tierClass={'ฟรี':'tier-free','ผีเสื้อ':'tier-1','แมลงปอ':'tier-2'};
+
+  // Score each video by keyword matches
+  function score(v){
+    const title=(v['Full title']||v['title']||v['Title']||'').toLowerCase();
+    return kws.reduce((a,k)=>a+(title.includes(k)?1:0),0);
+  }
+
+  // Pick best match per tier, fallback to random
+  const picks=tiers.map(tier=>{
+    const pool=videos.filter(v=>tierKey(v)===tier);
+    if(!pool.length)return null;
+    const scored=pool.map(v=>({v,s:score(v)})).sort((a,b)=>b.s-a.s);
+    return scored[0].s>0?scored[0].v:getRandItem(pool);
+  }).filter(Boolean);
+
+  if(!picks.length)return null;
+
+  const wrap=el('div');
+  wrap.style.cssText='padding:0 16px 16px';
+  wrap.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">✨ ${lang==='th'?'วิดีโอสำหรับคุณ':'Recommended for you'}</div>`;
+
+  const row=el('div');
+  row.style.cssText='display:flex;gap:10px;overflow-x:auto;padding-bottom:4px';
+
+  picks.forEach(v=>{
+    const tier=tierKey(v);
+    const card=el('div','video-card');
+    const url=v['url']||v['URL']||'';
+    const title=v['Full title']||v['title']||v['Title']||'';
+    const dur=v['duration (mins)']||v['duration']||'';
+    const thumb=thumbUrl(v['Thumbnail']||v['thumbnail']||'')||ytThumb(url);
+    card.innerHTML=(thumb?`<img class="video-thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="video-thumb-ph" style="display:none">🧘</div>`:`<div class="video-thumb-ph">🧘</div>`)+
+      `<div class="video-info"><div class="video-title">${title}</div>
+<div class="video-meta"><span class="video-tier ${tierClass[tier]||'tier-free'}">${tier}</span>${dur?`<span class="video-dur">⏱ ${dur}m</span>`:''}</div></div>`;
+    if(url)card.onclick=()=>window.open(url,'_blank');
+    row.appendChild(card);
+  });
+
+  wrap.appendChild(row);
+  return wrap;
+}
+
 function buildMotivationalCard(hist,student,teacher){
   if(!hist||!hist.length)return null;
 
@@ -1503,6 +1556,13 @@ ${(()=>{
     fbRead(`teachers/${teacher.id}`).then(fresh=>{
       if(fresh){Object.assign(teacher,{classRequests:fresh.classRequests||[],studioLogs:fresh.studioLogs||[],studios:fresh.studios||[]});renderMotiv();}
     }).catch(()=>{});
+  }
+
+  // Video recommendations
+  if(student.keywords&&!state.user?._peeking){
+    buildVideoRecommendations(student).then(rec=>{
+      if(rec)s.appendChild(rec);
+    });
   }
 
   // Easter egg: hold the ring for 2s → singing bowl 🎵
@@ -3253,6 +3313,8 @@ function showEditStudentModal(student,teacher){
 <input class="input" id="e-sym" value="${student.sym||''}" placeholder="username" autocapitalize="none"></div>
 <div class="input-group"><label class="input-label">${t('price')} (฿)</label>
 <input class="input" id="e-price" type="number" value="${student.price||''}" placeholder="0"></div>
+<div class="input-group"><label class="input-label">${lang==='th'?'คีย์เวิร์ดวิดีโอ':'Video keywords'}</label>
+<input class="input" id="e-keywords" value="${student.keywords||''}" placeholder="${lang==='th'?'เช่น beginner, hip opener, yin':'e.g. beginner, hip opener, yin'}"></div>
 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey-l);border-radius:var(--r-xs);padding:12px 14px;margin-bottom:14px">
   <div>
     <div style="font-size:13px;font-weight:600">${lang==='th'?'โหมดรายครั้ง':'Per class mode'}</div>
@@ -3292,9 +3354,10 @@ function showEditStudentModal(student,teacher){
     const perClass=cb.checked;
     const rate1=parseFloat($('e-rate1')?.value)||0;
     const rate15=parseFloat($('e-rate15')?.value)||0;
+    const keywords=$('e-keywords').value.trim();
     if(!sym){$('e-err').style.display='';$('e-err').textContent='Username required';return;}
     $('e-ok').disabled=true;
-    const upd={n:name,sym,price,perClass,rate1,rate15};
+    const upd={n:name,sym,price,perClass,rate1,rate15,keywords};
     if(pinRaw.length===4){upd.pin=await hashPin(pinRaw);}
     else if(pinRaw.length>0&&pinRaw.length<4){$('e-err').style.display='';$('e-err').textContent='PIN must be 4 digits';$('e-ok').disabled=false;return;}
     try{
