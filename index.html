@@ -1417,6 +1417,26 @@ ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}
 <button id="sc-feed" class="btn btn-ghost btn-sm">📣 ${lang==='th'?'กิจกรรม':'Activity'}</button>
 <button id="sc-emoji" class="btn btn-ghost btn-sm">${student.studentEmoji||'😊'} ${lang==='th'?'เปลี่ยน':'Change'}</button>
 <button id="sc-pin" class="btn btn-ghost btn-sm">🔑 ${lang==='th'?'เปลี่ยน PIN':'Change PIN'}</button>
+</div>
+<div style="margin-top:10px;text-align:center">
+<button id="sc-request" class="btn btn-primary btn-sm">📝 ${lang==='th'?'ขอบันทึกคลาส':'Request class log'}</button>
+</div>
+${(()=>{
+  const myRequests=(teacher.classRequests||[]).filter(r=>r.studentId===student.id);
+  if(!myRequests.length)return'';
+  return'<div style="margin-top:10px;border-top:1px solid var(--grey-l);padding-top:10px">'+
+    '<div style="font-size:11px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">'+(lang==='th'?'คำขอของฉัน':'My requests')+'</div>'+
+    [...myRequests].reverse().slice(0,5).map(r=>{
+      const statusIcon=r.status==='approved'?'✅':r.status==='rejected'?'📋':'⏳';
+      const statusText=r.status==='approved'?(lang==='th'?'อนุมัติแล้ว':'Approved'):r.status==='rejected'?(lang==='th'?'ครูตรวจสอบและปรับข้อมูลให้เรียบร้อย':'Your teacher has reviewed and updated your record'):(lang==='th'?'รอการอนุมัติ':'Pending');
+      return'<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--grey-l)">'+
+        '<span style="flex-shrink:0">'+statusIcon+'</span>'+
+        '<span style="color:var(--grey);flex-shrink:0">'+fmtDate(r.date)+'</span>'+
+        '<span style="flex:1;font-size:11px;color:'+(r.status==='rejected'?'#888':r.status==='approved'?'#166534':'#854d0e')+'">'+statusText+'</span>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+})()}
 </div>`;
 
   // End of card HTML done
@@ -1425,6 +1445,7 @@ ${student.price?`<div class="text-center text-xs text-grey mt-4">${t('package')}
   $('sc-feed').onclick=()=>render(screenFeed);
   $('sc-emoji').onclick=()=>render(screenEmojiPicker);
   $('sc-pin').onclick=()=>showStudentChangePinModal(student,teacher);
+  $('sc-request').onclick=()=>showStudentClassRequestModal(student,teacher);
 
   // Motivational section
   const motiv=buildMotivationalCard(hist);
@@ -1829,7 +1850,8 @@ async function screenTeacherDash(s){
   
   // Tabs
   const tabs=el('div','tab-row');
-  tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">📋 ${lang==='th'?'ชื่อ':'Names'}</div>
+  const pendingRequests=(teacher.classRequests||[]).filter(r=>r.status==='pending').length;
+  tabs.innerHTML=`<div class="tab ${activeTab==='students'?'active':''}" data-tab="students">📋 ${lang==='th'?'ชื่อ':'Names'}${pendingRequests?` <span style="background:#fb2a7b;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:2px">${pendingRequests}</span>`:''}</div>
 <div class="tab ${activeTab==='income'?'active':''}" data-tab="income">💰 ${lang==='th'?'รายได้':'Income'}</div>
 <div class="tab ${activeTab==='settings'?'active':''}" data-tab="settings">⚙️ ${lang==='th'?'ตั้งค่า':'Settings'}</div>`;
   s.appendChild(tabs);
@@ -2154,6 +2176,66 @@ function renderIncomeList(container,view,months,years,students,teacher){
 async function renderTabBody(container,teacher,tab,students){
   container.innerHTML='';
   if(tab==='students'){
+    // Pending class requests — hidden unless there are some
+    const pending=(teacher.classRequests||[]).filter(r=>r.status==='pending');
+    if(pending.length){
+      const reqBar=el('div');
+      reqBar.style.cssText='padding:0 16px 10px';
+      reqBar.innerHTML=`<button id="req-toggle" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fff0f6;border:1px solid #f4c0d1;border-radius:var(--r-xs);padding:10px 14px;font-family:inherit;cursor:pointer;text-align:left">
+<span style="font-size:12px;font-weight:600;color:var(--pink)">📝 ${lang==='th'?'คำขอบันทึกคลาส':'Class requests'} (${pending.length})</span>
+<span style="font-size:11px;color:var(--pink)">▼</span>
+</button>
+<div id="req-body" style="display:none"></div>`;
+      container.appendChild(reqBar);
+      reqBar.querySelector('#req-toggle').onclick=()=>{
+        const body=reqBar.querySelector('#req-body');
+        const arr=reqBar.querySelector('#req-toggle span:last-child');
+        const open=body.style.display!=='none';
+        body.style.display=open?'none':'block';
+        arr.textContent=open?'▼':'▲';
+        if(!open&&!body.dataset.built){
+          body.dataset.built='1';
+          pending.forEach(r=>{
+            const row=el('div');
+            row.style.cssText='background:#fff;border:0.5px solid #f4c0d1;border-radius:var(--r-xs);padding:10px 12px;margin-top:6px';
+            row.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+<span style="font-size:18px">${r.studentEmoji||'🧘'}</span>
+<div><div style="font-weight:600;font-size:13px">${r.studentName}</div>
+<div style="font-size:12px;color:var(--grey)">${fmtDate(r.date)}</div></div>
+</div>
+<div style="display:flex;gap:8px">
+<button data-approve="${r.id}" class="btn btn-primary flex-1">✅ ${lang==='th'?'อนุมัติ':'Approve'}</button>
+<button data-reject="${r.id}" class="btn btn-ghost flex-1">✕ ${lang==='th'?'ปฏิเสธ':'Reject'}</button>
+</div>`;
+            row.querySelector(`[data-approve]`).onclick=async()=>{
+              const sts=await getStudents(teacher.id);
+              const st=sts.find(s=>s.id===r.studentId);
+              if(st){
+                const newH=[...(st.h||[]),r.date].sort();
+                const newC=Math.max(0,(st.c||0)-1);
+                const newU=(st.u||0)+1;
+                await writeStudent(teacher.id,st.id,{h:newH,c:newC,u:newU});
+                syncStudentCache({...st,h:newH,c:newC,u:newU},teacher);
+              }
+              const newReqs=(teacher.classRequests||[]).map(q=>q.id===r.id?{...q,status:'approved'}:q);
+              await fbWrite(`teachers/${teacher.id}`,{classRequests:newReqs},true);
+              teacher.classRequests=newReqs;
+              toast('✅ '+(lang==='th'?'อนุมัติแล้ว':'Approved'));
+              render(s2=>screenTeacherDash(s2));
+            };
+            row.querySelector(`[data-reject]`).onclick=async()=>{
+              const newReqs=(teacher.classRequests||[]).map(q=>q.id===r.id?{...q,status:'rejected'}:q);
+              await fbWrite(`teachers/${teacher.id}`,{classRequests:newReqs},true);
+              teacher.classRequests=newReqs;
+              toast(lang==='th'?'ปฏิเสธแล้ว':'Rejected');
+              render(s2=>screenTeacherDash(s2));
+            };
+            body.appendChild(row);
+          });
+        }
+      };
+    }
+
     const addRow=el('div');
     addRow.innerHTML=`<div style="padding:0 16px 10px"><button class="btn btn-primary btn-full" id="add-student-btn">${t('addStudent')}</button></div>`;
     container.appendChild(addRow);
@@ -2275,6 +2357,75 @@ function peekAsStudent(student,teacher){
     render(s2=>screenTeacherDash(s2));
   }};
   render(s2=>screenStudentCard(s2));
+}
+
+function showStudentClassRequestModal(student,teacher){
+  const{close}=showModal(`<div class="modal-title">📝 ${lang==='th'?'ขอบันทึกคลาส':'Request class log'}</div>
+<div style="font-size:13px;color:var(--grey);margin-bottom:12px">${lang==='th'?'ส่งคำขอให้ครูอนุมัติ ก่อนหักจากแพ็กเกจนะคะ':'Send a request for your teacher to approve before deducting from your package'}</div>
+<div class="input-group"><label class="input-label">${lang==='th'?'วันที่เรียน':'Class date'}</label>
+<input class="input" id="cr-date" type="date" value="${todayISO()}"></div>
+<button class="btn btn-primary btn-full mt-8" id="cr-send">📝 ${lang==='th'?'ส่งคำขอ':'Send request'}</button>
+<div id="cr-err" class="alert alert-err mt-8" style="display:none"></div>`);
+
+  $('cr-send').onclick=async()=>{
+    const date=$('cr-date').value||todayISO();
+    $('cr-send').disabled=true;
+    const req={id:'req_'+Date.now(),studentId:student.id,studentName:student.n||student.sym,studentEmoji:student.studentEmoji||'',date,status:'pending',ts:new Date().toISOString()};
+    const requests=[...(teacher.classRequests||[]),req];
+    try{
+      await fbWrite(`teachers/${teacher.id}`,{classRequests:requests},true);
+      teacher.classRequests=requests;
+      close();toast(`✅ ${lang==='th'?'ส่งคำขอแล้ว รอครูอนุมัตินะคะ':'Request sent! Waiting for teacher approval'}`);
+      render(s2=>screenStudentCard(s2));
+    }catch(e){$('cr-err').style.display='';$('cr-err').textContent='Error: '+e.message;$('cr-send').disabled=false;}
+  };
+}
+
+async function showClassRequestsModal(teacher){
+  const pending=(teacher.classRequests||[]).filter(r=>r.status==='pending');
+  if(!pending.length){toast(lang==='th'?'ไม่มีคำขอที่รอ':'No pending requests');return;}
+
+  const{modal,close}=showModal(`<div class="modal-title">📝 ${lang==='th'?'คำขอบันทึกคลาส':'Class requests'} (${pending.length})</div>
+<div id="cr-list" style="max-height:60vh;overflow-y:auto">${pending.map(r=>`
+<div style="background:var(--grey-l);border-radius:var(--r-xs);padding:10px 12px;margin-bottom:8px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <span style="font-size:20px">${r.studentEmoji||'🧘'}</span>
+    <div><div style="font-weight:600;font-size:13px">${r.studentName}</div>
+    <div style="font-size:12px;color:var(--grey)">${fmtDate(r.date)}</div></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button data-approve="${r.id}" class="btn btn-primary flex-1">✅ ${lang==='th'?'อนุมัติ':'Approve'}</button>
+    <button data-reject="${r.id}" class="btn btn-ghost flex-1">✕ ${lang==='th'?'ปฏิเสธ':'Reject'}</button>
+  </div>
+</div>`).join('')}</div>`);
+
+  async function handleAction(reqId,approve){
+    const students=await getStudents(teacher.id);
+    const req=(teacher.classRequests||[]).find(r=>r.id===reqId);
+    if(!req)return;
+    const newRequests=(teacher.classRequests||[]).map(r=>r.id===reqId?{...r,status:approve?'approved':'rejected'}:r);
+
+    if(approve){
+      const student=students.find(s=>s.id===req.studentId);
+      if(student){
+        const newH=[...(student.h||[]),req.date].sort();
+        const newC=Math.max(0,(student.c||0)-1);
+        const newU=(student.u||0)+1;
+        await writeStudent(teacher.id,student.id,{h:newH,c:newC,u:newU});
+        student.h=newH;student.c=newC;student.u=newU;
+        syncStudentCache(student,teacher);
+      }
+    }
+
+    await fbWrite(`teachers/${teacher.id}`,{classRequests:newRequests},true);
+    teacher.classRequests=newRequests;
+    close();
+    toast(approve?(lang==='th'?'✅ อนุมัติแล้ว':'✅ Approved'):(lang==='th'?'ปฏิเสธแล้ว':'Rejected'));
+    render(s2=>screenTeacherDash(s2));
+  }
+
+  modal.querySelectorAll('[data-approve]').forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.approve,true));
+  modal.querySelectorAll('[data-reject]').forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.reject,false));
 }
 
 function showStudentChangePinModal(student,teacher){
