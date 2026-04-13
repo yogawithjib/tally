@@ -3785,8 +3785,8 @@ async function screenSuperAdmin(s){
       const totalRem=totalSold-totalUsed;
 
       // Visitor count from Firestore
-      let visitCount=0;
-      try{const vs=await fbRead('system/stats');visitCount=vs?.visits||0;}catch{}
+      let visitCount=0,uniqueCount=0;
+      try{const vs=await fbRead('system/stats');visitCount=vs?.visits||0;uniqueCount=vs?.unique||0;}catch{}
 
       // Location stats — group by country then province
       const byCountry={};
@@ -3886,6 +3886,74 @@ async function screenSuperAdmin(s){
         '<button class="btn btn-ghost btn-sm" id="dl-income">⬇ '+(lang==='th'?'รายได้':'Income')+' .csv</button>'+
         '</div>';
       statsDiv.appendChild(makeCollapsible('⬇ '+(lang==='th'?'ดาวน์โหลด':'Downloads'),dlEl,false));
+
+      // Community stats
+      const allStudents=teacherBreakdown.flatMap(b=>C.get('students_'+b.teacher.id)||[]);
+      const allDates=allStudents.flatMap(st=>st.h||[]);
+
+      // Total classes practiced
+      const totalPracticed=allDates.length;
+
+      // Most popular day of week
+      const dayCounts=[0,0,0,0,0,0,0];
+      allDates.forEach(d=>{if(d)dayCounts[new Date(d).getDay()]++;});
+      const dayNames=lang==='th'
+        ?['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์']
+        :['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const topDayIdx=dayCounts.indexOf(Math.max(...dayCounts));
+      const topDay=dayNames[topDayIdx];
+      const topDayCount=dayCounts[topDayIdx];
+
+      // Longest active streak (any student right now)
+      function calcStreak(h){
+        const sorted=[...new Set(h)].sort().reverse();
+        if(!sorted.length)return 0;
+        let streak=0,prev=null;
+        for(const d of sorted){
+          const curr=new Date(d);
+          if(!prev){prev=curr;streak=1;continue;}
+          const diff=(prev-curr)/(1000*60*60*24);
+          if(diff<=7){streak++;prev=curr;}else break;
+        }
+        return streak;
+      }
+      let longestStreak=0,longestStreakStudent='';
+      allStudents.forEach(st=>{
+        const s=calcStreak(st.h||[]);
+        if(s>longestStreak){longestStreak=s;longestStreakStudent=st.n||st.sym||'?';}
+      });
+
+      // Monthly class counts
+      const monthMap={};
+      allDates.forEach(d=>{
+        const m=(d||'').slice(0,7);
+        if(m)monthMap[m]=(monthMap[m]||0)+1;
+      });
+      const monthEntries=Object.entries(monthMap).sort((a,b)=>b[1]-a[1]);
+      const busiest=monthEntries[0];
+      const quietest=monthEntries[monthEntries.length-1];
+      const fmtMonth=m=>m?new Date(m+'-01').toLocaleDateString(lang==='th'?'th-TH':'en-GB',{month:'long',year:'numeric'}):'—';
+
+      // Most classes in single month
+      const recordMonth=busiest?busiest[1]:0;
+      const recordMonthLabel=busiest?fmtMonth(busiest[0]):'—';
+
+      const communityEl=el('div');
+      communityEl.style.cssText='display:flex;flex-direction:column;gap:6px;padding:6px 0';
+      [
+        {icon:'🔥',label:lang==='th'?'คลาสรวมทั้งหมด':'Total classes practiced',val:totalPracticed.toLocaleString()},
+        {icon:'📅',label:lang==='th'?'วันยอดนิยม':'Most popular day',val:`${topDay} (${topDayCount} ${lang==='th'?'ครั้ง':'times'})`},
+        {icon:'🏆',label:lang==='th'?'สตรีคยาวสุดตอนนี้':'Longest active streak',val:`${longestStreak} ${lang==='th'?'สัปดาห์':'wks'} · ${longestStreakStudent}`},
+        {icon:'📈',label:lang==='th'?'สถิติสูงสุดต่อเดือน':'Record month',val:`${recordMonthLabel} · ${recordMonth} ${lang==='th'?'คลาส':'classes'}`},
+        {icon:'📆',label:lang==='th'?'เดือนที่คึกคักที่สุด':'Busiest month',val:busiest?`${fmtMonth(busiest[0])} · ${busiest[1]} ${lang==='th'?'คลาส':'classes'}`:'—'},
+        {icon:'📉',label:lang==='th'?'เดือนที่เงียบที่สุด':'Quietest month',val:quietest&&quietest[0]!==busiest?.[0]?`${fmtMonth(quietest[0])} · ${quietest[1]} ${lang==='th'?'คลาส':'classes'}`:'—'},
+      ].forEach(({icon,label,val})=>{
+        const row=el('div');
+        row.style.cssText='display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:var(--r-xs);padding:8px 12px;box-shadow:var(--sh-s);font-size:12px';
+        row.innerHTML=`<span style="color:var(--grey)">${icon} ${label}</span><span style="font-weight:600;color:var(--pink)">${val}</span>`;
+        communityEl.appendChild(row);
+      });
+      statsDiv.appendChild(makeCollapsible('🌍 '+(lang==='th'?'สถิติชุมชน':'Community stats'),communityEl,false));
 
       // Monthly income section
       const allStudentsFlat=teacherBreakdown.flatMap(b=>(C.get('students_'+b.teacher.id)||[]).map(st=>({...st,_teacher:b.teacher})));
@@ -4963,9 +5031,21 @@ async function trackVisit(displayEl){
   if(!fbReady)return;
   try{
     const ref=db.collection('system').doc('stats');
-    await ref.set({visits:firebase.firestore.FieldValue.increment(1)},{merge:true});
+    // Check if this is a unique visitor via localStorage fingerprint
+    let visitorId=localStorage.getItem('tally_visitor_id');
+    let isNew=false;
+    if(!visitorId){
+      visitorId='v_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+      localStorage.setItem('tally_visitor_id',visitorId);
+      isNew=true;
+    }
+    const update={visits:firebase.firestore.FieldValue.increment(1)};
+    if(isNew)update.unique=firebase.firestore.FieldValue.increment(1);
+    await ref.set(update,{merge:true});
     const snap=await ref.get();
-    const count=snap.data()?.visits||0;
+    const data=snap.data()||{};
+    const count=data.visits||0;
+    const unique=data.unique||0;
     if(displayEl)displayEl.textContent=`👀 ${Number(count).toLocaleString()} visits`;
   }catch(e){console.warn('visit counter',e);}
 }
