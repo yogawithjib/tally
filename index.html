@@ -1462,6 +1462,15 @@ async function screenStudentCard(s){
   const isPerClass=!!student.perClass;
   const lastDate=[...hist].sort().slice(-1)[0]||null;
 
+  // Last package only for ring display
+  const sortedTopups=[...(student.topups||[])].sort((a,b)=>a.date>b.date?1:-1);
+  const lastPkg=sortedTopups[sortedTopups.length-1];
+  const ringTot=lastPkg?lastPkg.classes:tot;
+  // Classes used from last package = total hist minus classes from all previous packages
+  const prevPkgsClasses=sortedTopups.slice(0,-1).reduce((a,tp)=>a+tp.classes,0);
+  const ringUsed=Math.max(0,hist.length-prevPkgsClasses);
+  const ringC=Math.max(0,ringTot-ringUsed);
+
   // Per-class student view
   if(isPerClass){
     const totalPaid=payments.reduce((a,p)=>a+(p.amount||0),0);
@@ -1530,7 +1539,7 @@ ${pay&&pay.amount?`<span style="font-weight:600;color:var(--pink);font-size:12px
 <div class="bold" style="font-size:18px;margin:6px 0">${student.n||student.sym}</div>
 <div class="text-grey text-sm">@${student.sym}</div>
 </div>
-${ringHTML(c,tot)}
+${ringHTML(ringC,ringTot)}
 <div style="display:flex;justify-content:center;gap:20px;margin:8px 0">
 <div class="text-center"><div class="stat-num">${tot}</div><div class="text-xs text-grey">${t('total')}</div></div>
 <div class="text-center"><div class="stat-num">${used}</div><div class="text-xs text-grey">${t('used')}</div></div>
