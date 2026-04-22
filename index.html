@@ -898,7 +898,8 @@ function handleLogoTap(){
 // Ring SVG helper
 function ringHTML(c,tot){
   const r=54,circ=2*Math.PI*r;
-  const ratio=tot>0?Math.min(c/tot,1):0;
+  const used=Math.max(0,tot-c);
+  const ratio=tot>0?Math.min(used/tot,1):0;
   const offset=circ*(1-ratio);
   return`<div class="ring-wrap"><div style="position:relative;width:140px;height:140px" id="ring-touch-zone">
 <svg class="ring-svg" viewBox="0 0 120 120"><circle class="ring-track" cx="60" cy="60" r="${r}"/><circle class="ring-fill" cx="60" cy="60" r="${r}" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/></svg>
